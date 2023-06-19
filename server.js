@@ -3,6 +3,7 @@ const app = express();
 
 app.use(express.json());
 
+// 로그인 api
 app.get("/login", (req, res) => {
   const { id, pw } = req.body;
 
@@ -21,6 +22,30 @@ app.get("/login", (req, res) => {
 
   res.send(result);
 });
+
+// 회원가입api
+//(아이디, 비밀번호, 이메일, 전화번호) body로 넘겨줌
+app.post("/signup", (req, res) => {
+  const { id, pw, email, phoneNumber } = req.body;
+
+  const result = {
+    "success": false,
+  }
+
+  // db연결 일단은 배열로 임시 db 만들자
+  let userDB = [];
+  const user = {
+    "id": id,
+    "pw": pw,
+    "email": email,
+    "phoneNumber": phoneNumber
+  };
+
+  userDB.push(user);
+  result.success = true;
+
+  res.send(result);
+})
 
 app.listen(8000, () => {
   console.log("8000포트에서 실행");
