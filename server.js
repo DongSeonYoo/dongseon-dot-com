@@ -9,8 +9,8 @@ app.use(express.json());
 
 // 로그인 api
 // GET
-app.get("/login", (req, res) => {
-  const { id, pw } = req.query;
+app.post("/login", (req, res) => {
+  const { id, pw } = req.body;
 
   const result = {
     "success": false,
@@ -18,18 +18,18 @@ app.get("/login", (req, res) => {
   }
 
   db.query(
-    `SELECT id FROM user_TB WHERE login_id='${id}' AND password='${pw}'`,
-    (error, results, fields) => {
+      `SELECT id FROM user_TB WHERE login_id='${id}' AND password='${pw}'`,
+      (error, results, fields) => {
       if (error) {
         result.message = "데이터베이스 오류.";
         res.send(result);
         return;
       }
 
-      if (results.length === 1) {
+      if (results.length) {
         result.success = true;
         result.message = "로그인 성공";
-        
+
       } else {
         result.message = "아이디 혹은 비밀번호가 올바르지 않습니다.";
       }
