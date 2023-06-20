@@ -78,6 +78,41 @@ app.post("/signup", (req, res) => {
   );
 });
 
+// 아이디 찾기 api
+// name, phoneNumber, email
+// GET
+app.get("/account/id", (req, res) => {
+  const { name, phoneNumber, email } = req.query;
+
+  const result = {
+    success: false,
+    message: {},
+  }
+
+  const query = "SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?";
+  const params = [name, phoneNumber, email];
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+
+    } else {
+
+      if (results.length > 0) {
+        result.success = true;
+        result.message = results[0].login_id;
+
+      } else {
+        result.success = false;
+        result.message = "아이디를 찾지 못했습니다";
+      }
+    }
+
+    res.send(result);
+  })
+})
+
+
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 })
