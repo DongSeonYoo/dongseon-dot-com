@@ -17,11 +17,12 @@ app.post("/account/login", (req, res) => {
     "message": ""
   }
 
-  db.query(
-      `SELECT id FROM user_TB WHERE login_id='${id}' AND password='${pw}'`,
-      (error, results, fields) => {
+  const query = "SELECT id FROM user_TB WHERE login_id=? AND password=?";
+  const params = [id, pw];
+
+  db.query(query, params, (error, results, fields) => {
       if (error) {
-        result.message = "데이터베이스 오류.";
+        result.message = "데이터베이스 오류";
         res.send(result);
         return;
       }
@@ -50,9 +51,10 @@ app.post("/account/signup", (req, res) => {
     message: "",
   };
 
-  db.query(
-    `INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES ('${id}', '${pw}', '${name}', '${phoneNumber}', '${email}', now(), now())`,
-    (error, results, fields) => {
+  const query = "INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())";
+  const params = [id, pw, name, phoneNumber, email];
+
+  db.query(query, params, (error, results, fields) => {
       if (error) {
         const isDuplicateId = String(error).includes("login_id");
         const isDuplicatePhoneNumber = String(error).includes("phone_number");
