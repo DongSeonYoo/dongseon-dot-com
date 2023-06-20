@@ -21,22 +21,22 @@ app.post("/account/login", (req, res) => {
   const params = [id, pw];
 
   db.query(query, params, (error, results, fields) => {
-      if (error) {
-        result.message = "데이터베이스 오류";
-        res.send(result);
-        return;
-      }
-
-      if (results.length) {
-        result.success = true;
-        result.message = "로그인 성공";
-
-      } else {
-        result.message = "아이디 혹은 비밀번호가 올바르지 않습니다.";
-      }
-
+    if (error) {
+      result.message = "데이터베이스 오류";
       res.send(result);
+      return;
     }
+
+    if (results.length) {
+      result.success = true;
+      result.message = "로그인 성공";
+
+    } else {
+      result.message = "아이디 혹은 비밀번호가 올바르지 않습니다.";
+    }
+
+    res.send(result);
+  }
   );
 });
 
@@ -55,28 +55,28 @@ app.post("/account/signup", (req, res) => {
   const params = [id, pw, name, phoneNumber, email];
 
   db.query(query, params, (error, results, fields) => {
-      if (error) {
-        const isDuplicateId = String(error).includes("login_id");
-        const isDuplicatePhoneNumber = String(error).includes("phone_number");
-        const isDuplicatedEmail = String(error).includes("email");
+    if (error) {
+      const isDuplicateId = String(error).includes("login_id");
+      const isDuplicatePhoneNumber = String(error).includes("phone_number");
+      const isDuplicatedEmail = String(error).includes("email");
 
-        if (isDuplicateId) {
-          result.message = "중복된 아이디가 존재합니다";
-          
-        } else if (isDuplicatePhoneNumber) {
-          result.message = "중복된 전화번호가 존재합니다";
-          
-        } else if (isDuplicatedEmail) {
-          result.message = "중복된 이메일이 존재합니다";
-        }
-        
-      } else {
-        result.success = true;
-        result.message = "회원가입 성공";
+      if (isDuplicateId) {
+        result.message = "중복된 아이디가 존재합니다";
+
+      } else if (isDuplicatePhoneNumber) {
+        result.message = "중복된 전화번호가 존재합니다";
+
+      } else if (isDuplicatedEmail) {
+        result.message = "중복된 이메일이 존재합니다";
       }
 
-      res.send(result);
+    } else {
+      result.success = true;
+      result.message = "회원가입 성공";
     }
+
+    res.send(result);
+  }
   );
 });
 
