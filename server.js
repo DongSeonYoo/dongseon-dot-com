@@ -8,8 +8,8 @@ db.connect();
 app.use(express.json());
 
 // 로그인 api
-// GET
-app.post("/login", (req, res) => {
+// POST
+app.post("/account/login", (req, res) => {
   const { id, pw } = req.body;
 
   const result = {
@@ -42,7 +42,7 @@ app.post("/login", (req, res) => {
 // 회원가입 api
 // id, pw, name, phone_number, email
 // POST
-app.post("/signup", (req, res) => {
+app.post("/account/signup", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
 
   const result = {
