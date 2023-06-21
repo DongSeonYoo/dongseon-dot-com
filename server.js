@@ -15,7 +15,7 @@ app.post("/account/login", (req, res) => {
   const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND password=?", [id, pw]);
 
   const result = makeResult();
-  
+
   db.query(query, params, (error, results, fields) => {
     if (error) {
       result.message = error;
@@ -39,7 +39,7 @@ app.post("/account/login", (req, res) => {
 // 회원가입 api
 // id, pw, name, phoneNumber, email
 // POST
-app.post("/account/signup", (req, res) => {
+app.post("/account", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
   const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())", [id, pw, name, phoneNumber, email]);
 
@@ -65,7 +65,7 @@ app.post("/account/signup", (req, res) => {
 // 아이디 찾기 api
 // name, phoneNumber, email
 // GET
-app.get("/account/find-id", (req, res) => {
+app.get("/account/id", (req, res) => {
   const { name, phoneNumber, email } = req.body;
   const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email])
 
@@ -94,7 +94,7 @@ app.get("/account/find-id", (req, res) => {
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
 // id, name, phoneNumber, email
-app.post("/accout/find-pw/validate", (req, res) => {
+app.post("/account/pw/validate", (req, res) => {
   const { id, name, phoneNumber, email } = req.body;
   const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?", [id, name, phoneNumber, email]);
 
@@ -124,7 +124,7 @@ app.post("/accout/find-pw/validate", (req, res) => {
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
 // userPk, newPassword
-app.post("/accout/find-pw/reset-pw", (req, res) => {
+app.post("/account/pw/reset-pw", (req, res) => {
   const { userPk, newPassword } = req.body;
   const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPassword, userPk]);
 
@@ -153,7 +153,7 @@ app.post("/accout/find-pw/reset-pw", (req, res) => {
 // 내 프로필 보기 api
 // userPk
 // GET
-app.get("/settings/profile", (req, res) => {
+app.get("/account", (req, res) => {
   const { userPk } = req.body;
   const { query, params } = makeQuery("SELECT * from user_TB WHERE id = ?", userPk);
 
