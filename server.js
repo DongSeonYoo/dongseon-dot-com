@@ -176,7 +176,36 @@ app.get("/account", (req, res) => {
     }
 
     res.send(result);
-  })
+  });
+});
+
+// 회원 정보 수정 api
+// userPk, name, phoneNumber, email
+// PUT
+app.put("/account/setting", (req, res) => {
+  const { userPk, name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?", [name, phoneNumber, email, userPk]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 1;
+    if (data) {
+      result.success = true;
+      result.message = "수정에 성공하였습니다";
+
+    } else {
+      result.message = "수정에 실패하였습니다";
+    }
+
+    res.send(result);
+  });
 });
 
 // 회원 탈퇴 api
