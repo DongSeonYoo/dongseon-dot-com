@@ -3,6 +3,7 @@ const app = express();
 
 // db connect
 const db = require("./database/connect/mariadb");
+const { error } = require('console');
 db.connect();
 
 app.use(express.json());
@@ -152,8 +153,30 @@ app.post("/accout/find-pw/validate", (req, res) => {
 // 2.(비밀번호 재설정 단계)
 // userPk, newPassword
 app.post("/accout/find-pw/reset-pw", (req, res) => {
+  const { userPk, newPassword } = req.body;
 
-  res.send();
+  const result = {
+    success: false,
+    message: "",
+  };
+
+  const query = "UPDATE user_TB SET password=? WHERE id=?";
+  const params = [newPassword, userPk];
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    const isModified = results.affectedRows === 1;
+    if (isModified) {
+      result.success = true;
+      result.message = "재설정 성공";
+    }
+
+    res.send(result);
+  })
 })
 
 
