@@ -114,6 +114,23 @@ app.get("/account/id", (req, res) => {
   })
 })
 
+// 비밀번호 찾기 api
+// 1.(사용자 인증 단계)
+// id, name, phoneNumber, email
+app.post("/accout/find-pw/validate", (req, res) => {
+
+  res.send();
+})
+
+// 비밀번호 찾기 api
+// 2.(비밀번호 재설정 단계)
+// newPassword
+app.post("/accout/find-pw/reset-pw", (req, res) => {
+
+  res.send();
+})
+
+
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
