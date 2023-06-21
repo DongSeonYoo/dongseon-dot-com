@@ -41,7 +41,7 @@ app.post("/account/login", (req, res) => {
 });
 
 // 회원가입 api
-// id, pw, name, phone_number, email
+// id, pw, name, phoneNumber, email
 // POST
 app.post("/account/signup", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
@@ -56,21 +56,13 @@ app.post("/account/signup", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      const isDuplicateId = String(error).includes("login_id");
-      const isDuplicatePhoneNumber = String(error).includes("phone_number");
-      const isDuplicatedEmail = String(error).includes("email");
+      result.message = `회원가입 실패: ${error}`;
+      res.send(result);
+      return;
+    }
 
-      if (isDuplicateId) {
-        result.message = "중복된 아이디가 존재합니다";
-
-      } else if (isDuplicatePhoneNumber) {
-        result.message = "중복된 전화번호가 존재합니다";
-
-      } else if (isDuplicatedEmail) {
-        result.message = "중복된 이메일이 존재합니다";
-      }
-
-    } else {
+    const isRegistered = results.affectedRows === 1;
+    if (isRegistered) {
       result.success = true;
       result.message = "회원가입 성공";
     }
@@ -92,21 +84,19 @@ app.get("/account/id", (req, res) => {
 
   const query = "SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?";
   const params = [name, phoneNumber, email];
-
   db.query(query, params, (error, results, fields) => {
     if (error) {
       console.log(error);
+      return;
+    }
+
+    const data = results[0];
+    if (data) {
+      result.success = true;
+      result.message = data.login_id;
 
     } else {
-
-      if (results.length > 0) {
-        result.success = true;
-        result.message = results[0].login_id;
-
-      } else {
-        result.success = false;
-        result.message = "아이디를 찾지 못했습니다";
-      }
+      result.message = "해당하는 아이디가 없습니다";
     }
 
     res.send(result);
