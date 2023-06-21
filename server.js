@@ -20,12 +20,13 @@ app.post("/account/login", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = "데이터베이스 오류";
+      result.message = error;
       res.send(result);
       return;
     }
 
-    if (results.length) {
+    const data = results[0];
+    if (data) {
       result.success = true;
       result.message = "로그인 성공";
 
@@ -77,7 +78,8 @@ app.get("/account/id", (req, res) => {
   const params = [name, phoneNumber, email];
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.log(error);
+      result.message = error;
+      res.send(result);
       return;
     }
 
@@ -91,8 +93,8 @@ app.get("/account/id", (req, res) => {
     }
 
     res.send(result);
-  })
-})
+  });
+});
 
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
@@ -107,7 +109,8 @@ app.post("/accout/find-pw/validate", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.log(error);
+      result.message = error;
+      res.send(result);
       return;
     }
 
@@ -122,8 +125,8 @@ app.post("/accout/find-pw/validate", (req, res) => {
     }
 
     res.send(result);
-  })
-})
+  });
+});
 
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
@@ -138,7 +141,8 @@ app.post("/accout/find-pw/reset-pw", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.log(error);
+      result.message = error;
+      res.send(result);
       return;
     }
 
