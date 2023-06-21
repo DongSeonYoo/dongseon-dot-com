@@ -15,8 +15,8 @@ app.post("/account/login", (req, res) => {
 
   const result = {
     "success": false,
-    "message": ""
-  }
+    "message": "",
+  };
 
   const query = "SELECT id FROM user_TB WHERE login_id=? AND password=?";
   const params = [id, pw];
@@ -37,8 +37,7 @@ app.post("/account/login", (req, res) => {
     }
 
     res.send(result);
-  }
-  );
+  });
 });
 
 // 회원가입 api
@@ -77,8 +76,7 @@ app.post("/account/signup", (req, res) => {
     }
 
     res.send(result);
-  }
-  );
+  })
 });
 
 // 아이디 찾기 api
@@ -89,8 +87,8 @@ app.get("/account/id", (req, res) => {
 
   const result = {
     success: false,
-    message: {},
-  }
+    message: "",
+  };
 
   const query = "SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?";
   const params = [name, phoneNumber, email];
