@@ -150,7 +150,7 @@ app.post("/accout/find-pw/validate", (req, res) => {
 
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
-// newPassword
+// userPk, newPassword
 app.post("/accout/find-pw/reset-pw", (req, res) => {
 
   res.send();
