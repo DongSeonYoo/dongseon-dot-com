@@ -150,12 +150,44 @@ app.post("/accout/find-pw/reset-pw", (req, res) => {
     if (isModified) {
       result.success = true;
       result.message = "재설정 성공";
+
     } else {
       result.message = "재설정 실패, 해당하는 사용자를 찾지 못했습니다";
     }
 
     res.send(result);
   });
+});
+
+// 내 프로필 보기 api
+// userPk
+// GET
+app.get("/settings/profile", (req, res) => {
+  const { userPk } = req.body;
+
+  const result = makeResult();
+
+  const query = "SELECT * FROM user_TB WHERE id = ?";
+  const params = [userPk];
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    const data = results[0];
+    if (data) {
+      result.success = true;
+      result.message = data;
+
+    } else {
+      result.message = "조회에 실패하였습니다";
+    }
+
+    res.send(result);
+  })
 });
 
 app.listen(8000, () => {
