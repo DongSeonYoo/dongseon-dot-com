@@ -118,8 +118,34 @@ app.get("/account/id", (req, res) => {
 // 1.(사용자 인증 단계)
 // id, name, phoneNumber, email
 app.post("/accout/find-pw/validate", (req, res) => {
+  const { id, name, phoneNumber, email } = req.body;
 
-  res.send();
+  const result = {
+    success: false,
+    message: "",
+  };
+
+  const query = "SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?";
+  const params = [id, name, phoneNumber, email];
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    const data = results[0];
+
+    if (data) {
+      result.success = true;
+      result.message = data.id;
+
+    } else {
+      result.message = "해당하는 사용자를 찾지 못했습니다";
+    }
+
+    res.send(result);
+  })
 })
 
 // 비밀번호 찾기 api
