@@ -179,6 +179,35 @@ app.get("/account", (req, res) => {
   })
 });
 
+// 회원 탈퇴 api
+// userPk
+// DELETE
+app.delete("/account", (req, res) => {
+  const { userPk } = req.body;
+  const { query, params } = makeQuery("DELETE FROM user_TB WHERE id = ?", [userPk]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 1;
+    if (data) {
+      result.success = true;
+      result.message = "탈퇴되었습니다";
+
+    } else {
+      result.message = "탈퇴에 실패하였습니다";
+    }
+
+    res.send(result);
+  })
+});
+
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 });
