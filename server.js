@@ -75,7 +75,7 @@ app.post("/account/signup", (req, res) => {
 // name, phoneNumber, email
 // GET
 app.get("/account/id", (req, res) => {
-  const { name, phoneNumber, email } = req.query;
+  const { name, phoneNumber, email } = req.body;
 
   const result = {
     success: false,
