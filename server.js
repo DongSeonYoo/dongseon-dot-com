@@ -12,12 +12,10 @@ app.use(express.json());
 // POST
 app.post("/account/login", (req, res) => {
   const { id, pw } = req.body;
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND password=?", [id, pw]);
 
   const result = makeResult();
-
-  const query = "SELECT id FROM user_TB WHERE login_id=? AND password=?";
-  const params = [id, pw];
-
+  
   db.query(query, params, (error, results, fields) => {
     if (error) {
       result.message = error;
@@ -43,11 +41,9 @@ app.post("/account/login", (req, res) => {
 // POST
 app.post("/account/signup", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())", [id, pw, name, phoneNumber, email]);
 
   const result = makeResult();
-
-  const query = "INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())";
-  const params = [id, pw, name, phoneNumber, email];
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -69,13 +65,12 @@ app.post("/account/signup", (req, res) => {
 // 아이디 찾기 api
 // name, phoneNumber, email
 // GET
-app.get("/account/id", (req, res) => {
+app.get("/account/find-id", (req, res) => {
   const { name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email])
 
   const result = makeResult();
 
-  const query = "SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?";
-  const params = [name, phoneNumber, email];
   db.query(query, params, (error, results, fields) => {
     if (error) {
       result.message = error;
@@ -101,11 +96,9 @@ app.get("/account/id", (req, res) => {
 // id, name, phoneNumber, email
 app.post("/accout/find-pw/validate", (req, res) => {
   const { id, name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?", [id, name, phoneNumber, email]);
 
   const result = makeResult();
-
-  const query = "SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?";
-  const params = [id, name, phoneNumber, email];
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -133,11 +126,9 @@ app.post("/accout/find-pw/validate", (req, res) => {
 // userPk, newPassword
 app.post("/accout/find-pw/reset-pw", (req, res) => {
   const { userPk, newPassword } = req.body;
+  const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPassword, userPk]);
 
   const result = makeResult();
-
-  const query = "UPDATE user_TB SET password=? WHERE id=?";
-  const params = [newPassword, userPk];
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -164,11 +155,9 @@ app.post("/accout/find-pw/reset-pw", (req, res) => {
 // GET
 app.get("/settings/profile", (req, res) => {
   const { userPk } = req.body;
+  const { query, params } = makeQuery("SELECT * from user_TB WHERE id = ?", userPk);
 
   const result = makeResult();
-
-  const query = "SELECT * FROM user_TB WHERE id = ?";
-  const params = [userPk];
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -199,4 +188,11 @@ function makeResult() {
     success: false,
     message: "",
   };
-};
+}
+
+function makeQuery(sql, params) {
+  return {
+    query: sql,
+    params: params,
+  };
+}
