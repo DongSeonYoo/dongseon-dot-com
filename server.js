@@ -13,10 +13,7 @@ app.use(express.json());
 app.post("/account/login", (req, res) => {
   const { id, pw } = req.body;
 
-  const result = {
-    "success": false,
-    "message": "",
-  };
+  const result = makeResult();
 
   const query = "SELECT id FROM user_TB WHERE login_id=? AND password=?";
   const params = [id, pw];
@@ -46,10 +43,7 @@ app.post("/account/login", (req, res) => {
 app.post("/account/signup", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
 
-  const result = {
-    success: false,
-    message: "",
-  };
+  const result = makeResult();
 
   const query = "INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())";
   const params = [id, pw, name, phoneNumber, email];
@@ -77,10 +71,7 @@ app.post("/account/signup", (req, res) => {
 app.get("/account/id", (req, res) => {
   const { name, phoneNumber, email } = req.body;
 
-  const result = {
-    success: false,
-    message: "",
-  };
+  const result = makeResult();
 
   const query = "SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?";
   const params = [name, phoneNumber, email];
@@ -109,10 +100,7 @@ app.get("/account/id", (req, res) => {
 app.post("/accout/find-pw/validate", (req, res) => {
   const { id, name, phoneNumber, email } = req.body;
 
-  const result = {
-    success: false,
-    message: "",
-  };
+  const result = makeResult();
 
   const query = "SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?";
   const params = [id, name, phoneNumber, email];
@@ -143,10 +131,7 @@ app.post("/accout/find-pw/validate", (req, res) => {
 app.post("/accout/find-pw/reset-pw", (req, res) => {
   const { userPk, newPassword } = req.body;
 
-  const result = {
-    success: false,
-    message: "",
-  };
+  const result = makeResult();
 
   const query = "UPDATE user_TB SET password=? WHERE id=?";
   const params = [newPassword, userPk];
@@ -161,14 +146,21 @@ app.post("/accout/find-pw/reset-pw", (req, res) => {
     if (isModified) {
       result.success = true;
       result.message = "재설정 성공";
+    } else {
+      result.message = "재설정 실패, 해당하는 사용자를 찾지 못했습니다";
     }
 
     res.send(result);
-  })
-})
-
-
+  });
+});
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
-})
+});
+
+function makeResult() {
+  return {
+    success: false,
+    message: "",
+  };
+};
