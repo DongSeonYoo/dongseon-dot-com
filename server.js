@@ -285,6 +285,35 @@ app.get("/posts", (req, res) => {
   });
 });
 
+// 특정 게시글 조회 api
+// postId
+// GET
+app.get("/posts/:postId", (req, res) => {
+  const { postId } = req.params;
+  const { query, params } = makeQuery("SELECT * FROM post_TB WHERE id = ?", [postId]);
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    // 게시글을 찾으면 true, 찾지 못하면 false
+    const isFindPost = results.length !== 0;
+    if (isFindPost) {
+      result.success = true;
+      result.message = results;
+
+    } else {
+      result.message = "게시글을 찾지 못했습니다";
+    }
+    
+    res.send(result);
+  });
+});
+
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 });
