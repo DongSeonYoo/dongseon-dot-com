@@ -307,7 +307,37 @@ app.get("/posts/:postId", (req, res) => {
       result.message = results;
 
     } else {
-      result.message = "게시글을 찾지 못했습니다";
+      result.message = "해당하는 게시글이 존재하지 않습니다";
+    }
+    
+    res.send(result);
+  });
+});
+
+// 특정 사용자의 게시글을 조회
+// userId
+// GET
+app.get("/posts/user/:userId", (req, res) => {
+  const { userId } = req.params;
+  const { query, params } = makeQuery("SELECT * FROM post_TB WHERE user_id = ?", [userId]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    // 게시글을 찾으면 true, 찾지 못하면 false
+    const isFindPost = results.length !== 0;
+    if (isFindPost) {
+      result.success = true;
+      result.message = results;
+
+    } else {
+      result.message = "해당하는 사용자의 게시글이 존재하지 않습니다";
     }
     
     res.send(result);
