@@ -262,8 +262,28 @@ app.post("/post", (req, res) => {
     }
 
     res.send(result);
-  })
-})
+  });
+});
+
+// 모든 게시글 조회 api
+// GET
+app.get("/posts", (req, res) => {
+  // const { query, params } = makeQuery("SELECT * FROM post_TB LIMIT ?, ?", [1, 10]);
+  const { query } = makeQuery("SELECT * FROM post_TB");
+  const result = makeResult();
+
+  db.query(query, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    result.success = true;
+    result.message = results;
+    res.send(result);
+  });
+});
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
