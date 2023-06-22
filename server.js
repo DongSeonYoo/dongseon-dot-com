@@ -66,7 +66,7 @@ app.post("/account", (req, res) => {
 // name, phoneNumber, email
 // GET
 app.get("/account/id", (req, res) => {
-  const { name, phoneNumber, email } = req.body;
+  const { name, phoneNumber, email } = req.query;
   const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email])
 
   const result = makeResult();
@@ -154,7 +154,7 @@ app.post("/account/pw/reset-pw", (req, res) => {
 // userPk
 // GET
 app.get("/account", (req, res) => {
-  const { userPk } = req.body;
+  const { userPk } = req.query;
   const { query, params } = makeQuery("SELECT * from user_TB WHERE id = ?", userPk);
 
   const result = makeResult();
@@ -236,6 +236,34 @@ app.delete("/account", (req, res) => {
     res.send(result);
   })
 });
+
+// 게시글 작성 api
+// userPk, title, content
+app.post("/post", (req, res) => {
+  const { userPk, title, content } = req.body; 
+  const { query, params } = makeQuery("INSERT INTO post_TB (user_id, title, content) VALUES (?, ?, ?)", [userPk, title, content]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 1;
+    if (data) {
+      result.success = true;
+      result.message = "작성에 성공하였습니다";
+
+    } else {
+      result.message = "게시글 작성에 실패하였습니다";
+    }
+
+    res.send(result);
+  })
+})
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
