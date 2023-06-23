@@ -437,8 +437,30 @@ app.put("/post/:postId", (req, res) => {
 // 게시글 삭제
 // userId, postId
 // DELETE
-app.delete("post/:postId", (req, res) => {
+app.delete("/post/:postId", (req, res) => {
+  const { postId } = req.params;
+  const { userId } = req.body;
+  const { query, params } = makeQuery("DELETE FROM post_TB WHERE id = ? AND user_id = ?", [postId, userId]);
 
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const isDeleted = results.affectedRows === 1;
+    if (isDeleted) {
+      result.success = true;
+      result.message = "삭제 성공";
+    } else {
+      result.message = "삭제 실패, 본인만 삭제 가능";
+    }
+
+    res.send(result);
+  });
 });
 
 app.listen(8000, () => {
