@@ -18,7 +18,7 @@ app.post("/login", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -47,7 +47,7 @@ app.post("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = `회원가입 실패: ${error}`;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -73,7 +73,7 @@ app.get("/account/id", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -325,7 +325,7 @@ app.get("/posts/user/:userId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
