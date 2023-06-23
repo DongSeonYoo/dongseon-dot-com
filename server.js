@@ -344,6 +344,34 @@ app.get("/:userId/posts", (req, res) => {
   });
 });
 
+// 게시글 제목 수정
+// userId, postId, title
+// PATCH
+app.path("/post/:postId/title", (req, res) => {
+
+});
+
+// 게시글 본문 수정
+// userId, postId, content
+// PATCH
+app.patch("/post/:postId/content", (req, res) => {
+
+});
+
+// 게시글 수정
+// userId, postId, title, content
+// PUT
+app.put("/post/:postId", (req, res) => {
+
+});
+
+// 게시글 삭제
+// userId, postId
+// DELETE
+app.delete("post/:postId", (req, res) => {
+
+});
+
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 });
