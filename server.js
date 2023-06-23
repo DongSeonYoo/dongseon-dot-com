@@ -67,7 +67,7 @@ app.post("/account", (req, res) => {
 // GET
 app.get("/account/id", (req, res) => {
   const { name, phoneNumber, email } = req.query;
-  const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email])
+  const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email]);
 
   const result = makeResult();
 
@@ -94,9 +94,9 @@ app.get("/account/id", (req, res) => {
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
 // id, name, phoneNumber, email
-app.post("/account/pw/validate", (req, res) => {
-  const { id, name, phoneNumber, email } = req.body;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND name=? AND phone_number=? AND email=?", [id, name, phoneNumber, email]);
+app.get("/account/pw", (req, res) => {
+  const { id, name, phoneNumber, email } = req.query;
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?", [id, name, phoneNumber, email]);
 
   const result = makeResult();
 
@@ -124,9 +124,9 @@ app.post("/account/pw/validate", (req, res) => {
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
 // userPk, newPassword
-app.post("/account/pw/reset-pw", (req, res) => {
-  const { userPk, newPassword } = req.body;
-  const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPassword, userPk]);
+app.post("/account/pw", (req, res) => {
+  const { userPk, newPw } = req.body;
+  const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPw, userPk]);
 
   const result = makeResult();
 
@@ -182,7 +182,7 @@ app.get("/account", (req, res) => {
 // 회원 정보 수정 api
 // userPk, name, phoneNumber, email
 // PUT
-app.put("/account/setting", (req, res) => {
+app.put("/account", (req, res) => {
   const { userPk, name, phoneNumber, email } = req.body;
   const { query, params } = makeQuery("UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?", [name, phoneNumber, email, userPk]);
 
