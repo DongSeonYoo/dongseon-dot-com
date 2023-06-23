@@ -106,15 +106,14 @@ app.get("/account/pw", (req, res) => {
       res.send(result);
       return;
     }
-
+    
     const data = results[0];
-
     if (data) {
       result.success = true;
-      result.message = data.id;
+      result.message = data;
 
     } else {
-      result.message = "해당하는 사용자를 찾지 못했습니다";
+      result.message = "해당하는 유저가 없습니다";
     }
 
     res.send(result);
