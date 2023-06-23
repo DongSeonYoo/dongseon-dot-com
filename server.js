@@ -10,9 +10,9 @@ app.use(express.json());
 
 // 로그인 api
 // POST
-app.post("/account/login", (req, res) => {
+app.post("/login", (req, res) => {
   const { id, pw } = req.body;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id=? AND password=?", [id, pw]);
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND password = ?", [id, pw]);
 
   const result = makeResult();
 
