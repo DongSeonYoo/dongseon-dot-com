@@ -246,7 +246,7 @@ app.post("/post", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -255,9 +255,6 @@ app.post("/post", (req, res) => {
     if (data) {
       result.success = true;
       result.message = "작성에 성공하였습니다";
-
-    } else {
-      result.message = "게시글 작성에 실패하였습니다";
     }
 
     res.send(result);
@@ -315,11 +312,11 @@ app.get("/post/:postId", (req, res) => {
 });
 
 // 특정 사용자의 게시글을 조회 api
-// userId
+// userLoginId
 // GET
-app.get("/:userId/posts", (req, res) => {
-  const { userId } = req.params;
-  const { query, params } = makeQuery("SELECT * FROM post_TB JOIN user_TB ON post_TB.user_id = user_TB.id WHERE user_TB.login_id = ?", [userId]);
+app.get("/:userLoginId/posts", (req, res) => {
+  const { userLoginId } = req.params;
+  const { query, params } = makeQuery("SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)", [userLoginId]);
 
   const result = makeResult();
 
@@ -462,6 +459,8 @@ app.delete("/post/:postId", (req, res) => {
     res.send(result);
   });
 });
+
+
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
