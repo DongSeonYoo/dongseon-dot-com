@@ -314,7 +314,7 @@ app.get("/post/:postId", (req, res) => {
   });
 });
 
-// 특정 사용자의 게시글을 조회
+// 특정 사용자의 게시글을 조회 api
 // userId
 // GET
 app.get("/:userId/posts", (req, res) => {
@@ -344,7 +344,7 @@ app.get("/:userId/posts", (req, res) => {
   });
 });
 
-// 게시글 제목 수정
+// 게시글 제목 수정 api
 // userId, postId, title
 // PATCH
 app.patch("/post/:postId/title", (req, res) => {
@@ -374,7 +374,7 @@ app.patch("/post/:postId/title", (req, res) => {
   });
 });
 
-// 게시글 본문 수정
+// 게시글 본문 수정 api
 // userId, postId, content
 // PATCH
 app.patch("/post/:postId/content", (req, res) => {
@@ -404,7 +404,7 @@ app.patch("/post/:postId/content", (req, res) => {
   });
 });
 
-// 게시글 수정
+// 게시글 수정 api
 // userId, postId, title, content
 // PUT
 app.put("/post/:postId", (req, res) => {
@@ -434,7 +434,7 @@ app.put("/post/:postId", (req, res) => {
   });
 });
 
-// 게시글 삭제
+// 게시글 삭제 api
 // userId, postId
 // DELETE
 app.delete("/post/:postId", (req, res) => {
