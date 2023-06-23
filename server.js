@@ -102,7 +102,7 @@ app.post("/account/pw/validate", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -132,7 +132,7 @@ app.post("/account/pw/reset-pw", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -161,7 +161,7 @@ app.get("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -190,7 +190,7 @@ app.put("/account/setting", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -219,7 +219,7 @@ app.delete("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -274,7 +274,7 @@ app.get("/posts", (req, res) => {
 
   db.query(query, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
@@ -288,14 +288,15 @@ app.get("/posts", (req, res) => {
 // 특정 게시글 조회 api
 // postId
 // GET
-app.get("/posts/:postId", (req, res) => {
+app.get("/post/:postId", (req, res) => {
   const { postId } = req.params;
   const { query, params } = makeQuery("SELECT * FROM post_TB WHERE id = ?", [postId]);
+  
   const result = makeResult();
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      result.message = error;
+      result.message = error.sqlMessage;
       res.send(result);
       return;
     }
