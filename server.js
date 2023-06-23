@@ -378,7 +378,30 @@ app.patch("/post/:postId/title", (req, res) => {
 // userId, postId, content
 // PATCH
 app.patch("/post/:postId/content", (req, res) => {
+  const { postId } = req.params;
+  const { userId, content } = req.body;
+  const { query, params } = makeQuery("UPDATE post_TB SET title = ? WHERE user_id = ? AND id = ?", [content, userId, postId]);
 
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 1;
+    if (data) {
+      result.success = true;
+      result.message = "수정 성공";
+
+    } else {
+      result.message = "수정 실패, 본인만 수정 가능";
+    }
+
+    res.send(result);
+  });
 });
 
 // 게시글 수정
