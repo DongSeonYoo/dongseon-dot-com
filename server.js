@@ -53,8 +53,8 @@ app.post("/account", (req, res) => {
       return;
     }
 
-    const isRegistered = results.affectedRows === 1;
-    if (isRegistered) {
+    const isRegistered = results.affectedRows === 0;
+    if (!isRegistered) {
       result.success = true;
       result.message = "회원가입 성공";
     }
@@ -137,8 +137,8 @@ app.post("/account/pw", (req, res) => {
       return;
     }
 
-    const isModified = results.affectedRows === 1;
-    if (isModified) {
+    const isModified = results.affectedRows === 0;
+    if (!isModified) {
       result.success = true;
       result.message = "재설정 성공";
 
@@ -195,8 +195,8 @@ app.put("/account", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "수정에 성공하였습니다";
 
@@ -224,8 +224,8 @@ app.delete("/account", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "탈퇴되었습니다";
 
@@ -252,8 +252,8 @@ app.post("/post", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "작성에 성공하였습니다";
     }
@@ -299,8 +299,8 @@ app.get("/post/:postId", (req, res) => {
     }
 
     // 게시글을 찾으면 true, 찾지 못하면 false
-    const isFindPost = results.length !== 0;
-    if (isFindPost) {
+    const isFindPost = results.length === 0;
+    if (!isFindPost) {
       result.success = true;
       result.message = results;
 
@@ -329,8 +329,8 @@ app.get("/account/:userLoginId/posts", (req, res) => {
     }
 
     // 게시글을 찾으면 true, 찾지 못하면 false
-    const isFindPost = results.length !== 0;
-    if (isFindPost) {
+    const isFindPost = results.length === 0;
+    if (!isFindPost) {
       result.success = true;
       result.message = results;
 
@@ -359,8 +359,8 @@ app.patch("/post/:postId/title", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "수정 성공";
 
@@ -389,8 +389,8 @@ app.patch("/post/:postId/content", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "수정 성공";
 
@@ -419,8 +419,8 @@ app.put("/post/:postId", (req, res) => {
       return;
     }
 
-    const data = results.affectedRows === 1;
-    if (data) {
+    const data = results.affectedRows === 0;
+    if (!data) {
       result.success = true;
       result.message = "수정 성공";
 
@@ -449,8 +449,8 @@ app.delete("/post/:postId", (req, res) => {
       return;
     }
 
-    const isDeleted = results.affectedRows === 1;
-    if (isDeleted) {
+    const isDeleted = results.affectedRows === 0;
+    if (!isDeleted) {
       result.success = true;
       result.message = "삭제 성공";
     } else {
