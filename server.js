@@ -9,10 +9,11 @@ db.connect();
 app.use(express.json());
 
 // 로그인 api
+// login_id, pw
 // POST
 app.post("/login", (req, res) => {
-  const { id, pw } = req.body;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND password = ?", [id, pw]);
+  const { login_id, pw } = req.body;
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND password = ?", [login_id, pw]);
 
   const result = makeResult();
 
@@ -26,7 +27,7 @@ app.post("/login", (req, res) => {
     const data = results[0];
     if (data) {
       result.success = true;
-      result.message = "로그인 성공";
+      result.message = `로그인 성공, user: ${data.id}`;
 
     } else {
       result.message = "아이디 혹은 비밀번호가 올바르지 않습니다.";
@@ -37,11 +38,11 @@ app.post("/login", (req, res) => {
 });
 
 // 회원가입 api
-// id, pw, name, phoneNumber, email
+// login_id, pw, name, phoneNumber, email
 // POST
 app.post("/account", (req, res) => {
-  const { id, pw, name, phoneNumber, email } = req.body;
-  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)", [id, pw, name, phoneNumber, email]);
+  const { login_id, pw, name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)", [login_id, pw, name, phoneNumber, email]);
 
   const result = makeResult();
 
@@ -93,10 +94,10 @@ app.get("/account/id", (req, res) => {
 
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
-// id, name, phoneNumber, email
+// login_id, name, phoneNumber, email
 app.get("/account/pw", (req, res) => {
-  const { id, name, phoneNumber, email } = req.query;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?", [id, name, phoneNumber, email]);
+  const { login_id, name, phoneNumber, email } = req.query;
+  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?", [login_id, name, phoneNumber, email]);
 
   const result = makeResult();
 
@@ -154,7 +155,7 @@ app.post("/account/pw", (req, res) => {
 // GET
 app.get("/account", (req, res) => {
   const { userPk } = req.query;
-  const { query, params } = makeQuery("SELECT * from user_TB WHERE id = ?", userPk);
+  const { query, params } = makeQuery("SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?", userPk);
 
   const result = makeResult();
 
@@ -314,7 +315,7 @@ app.get("/post/:postId", (req, res) => {
 // 특정 사용자의 게시글을 조회 api
 // userLoginId
 // GET
-app.get("/:userLoginId/posts", (req, res) => {
+app.get("/account/:userLoginId/posts", (req, res) => {
   const { userLoginId } = req.params;
   const { query, params } = makeQuery("SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)", [userLoginId]);
 
@@ -364,7 +365,7 @@ app.patch("/post/:postId/title", (req, res) => {
       result.message = "수정 성공";
 
     } else {
-      result.message = "수정 실패";
+      result.message = "수정 실패, 본인만 수정 가능";
     }
 
     res.send(result);
@@ -459,7 +460,6 @@ app.delete("/post/:postId", (req, res) => {
     res.send(result);
   });
 });
-
 
 
 app.listen(8000, () => {
