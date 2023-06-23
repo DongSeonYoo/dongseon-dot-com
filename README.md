@@ -1,5 +1,7 @@
 # CRUD API Practice
 
+__DIRNAME__ = http://13.125.33.251:8000
+
 데이터 형식: JSON
 
 # 1. 계정 API
@@ -11,16 +13,17 @@
     ### Request Type: `Body`
     ```json
     {
-      "id": "ehdtjs0612",
+      "login_id": "test123",
       "pw": "1234"
     }
     ```
 
     ### Response (성공)
+    #### 성공 시 userPK반환
     ```json
     {
       "success": true,
-      "message": "로그인 성공"
+      "message": "로그인 성공, user: (userPk)"
     }
     ```
 
@@ -39,7 +42,7 @@
     ### Request Type: `Body`
     ```json
     {
-      "id": "test123",
+      "login_id": "test123",
       "pw": "1234",
       "name": "dongSeon",
       "phoneNumber": "01012345678",
@@ -99,7 +102,7 @@
       ### Request Type: `Query`
       ```json
       {
-        "id": "test123",
+        "login_id": "test123",
         "name": "dongSeon",
         "phoneNumber": "01012345678",
         "email": "test@naver.com"
@@ -168,15 +171,13 @@
       {
         "success": true,
         "message": {
-            "id": 54,
             "login_id": "test123",
-            "password": "4321",
             "name": "dongSeon",
             "phone_number": "01012345678",
             "email": "test@naver.com",
-            "created_date": "2023-06-23T07:49:58.000Z",
-            "updated_date": "2023-06-23T07:59:52.000Z"
-          }
+            "created_date": "2023-06-23T11:54:30.000Z",
+            "updated_date": "2023-06-23T11:54:30.000Z"
+        }
       }
       ```
 
@@ -250,7 +251,7 @@
 # 2. 게시글 API
 
   - ## 2.1: 게시글 작성 API
-    - URL: `"/post`
+    - URL: `"/post"`
     - Method: `POST`
 
       ### Request Type: `Body`
@@ -281,7 +282,7 @@
         ```
 
   - ## 2.2: 모든 게시글 조회 API
-    - URL: `"/posts`
+    - URL: `"/posts"`
     - Method: `GET`
 
       ### Request Type: `none`
@@ -321,7 +322,7 @@
         ```
 
   - ## 2.3: 특정 게시글 조회 API
-    - URL: `"/post/:postId`
+    - URL: `"/post/:postId"`
     - Method: `GET`
 
       ### Request Type: `params`
@@ -355,12 +356,14 @@
       ```
 
   - ## 2.3: 특정 사용자의 게시글 조회 API
-    - URL: `"/:userLoginId/posts`
+    - URL: `"/account/:userLoginId/posts"`
     - Method: `GET`
 
       ### Request Type: `params`
+
+      : 사용자의 로그인 아이디
       ```
-      "/test123/posts"
+      "/account/test123/posts"
       ```
 
       ### Response (성공)
@@ -369,30 +372,12 @@
         "success": true,
         "message": [
           {
-            "id": 54,
-            "user_id": 54,
-            "title": "dongSeon의 게시글 제목입니당",
-            "content": "dongSeon의 게시글 본문입니당",
-            "created_date": "2023-06-23T07:49:58.000Z",
-            "updated_date": "2023-06-23T07:59:52.000Z",
-            "login_id": "test123",
-            "password": "4321",
-            "name": "dongSeon",
-            "phone_number": "01012345678",
-            "email": "test@naver.com"
-        },
-        {
-            "id": 54,
-            "user_id": 54,
-            "title": "dongSeon의 게시글 제목입니당",
-            "content": "dongSeon의 게시글 본문입니당",
-            "created_date": "2023-06-23T07:49:58.000Z",
-            "updated_date": "2023-06-23T07:59:52.000Z",
-            "login_id": "test123",
-            "password": "4321",
-            "name": "dongSeon",
-            "phone_number": "01012345678",
-            "email": "test@naver.com"
+            "id": 19,
+            "user_id": 61,
+            "title": "test유저의 게시글 제목입니다",
+            "content": "test유저의 게시글 본무닙니다",
+            "created_date": "2023-06-23T12:05:59.000Z",
+            "updated_date": "2023-06-23T12:05:59.000Z"
           }
         ]
       }
@@ -408,45 +393,27 @@
 
   - ## 2.4: 게시글 제목 수정 API
     - URL: `"/post/:postId/title"`
-    - Method: `PUT`
+    - Method: `PATCH`
 
       ### Request Type: `params`
+      ### **바꾸고싶은 포스트의 pk**
       ```
-      "/test123/posts"
+      "/post/1/title"
+      ```
+
+      ### Request Type: `body`
+      ```json
+      {
+        "userId": 1,
+        "title": "제목 수정이요"
+      }
       ```
 
       ### Response (성공)
       ```json
       {
         "success": true,
-        "message": [
-          {
-            "id": 54,
-            "user_id": 54,
-            "title": "dongSeon의 게시글 제목입니당",
-            "content": "dongSeon의 게시글 본문입니당",
-            "created_date": "2023-06-23T07:49:58.000Z",
-            "updated_date": "2023-06-23T07:59:52.000Z",
-            "login_id": "test123",
-            "password": "4321",
-            "name": "dongSeon",
-            "phone_number": "01012345678",
-            "email": "test@naver.com"
-        },
-        {
-            "id": 54,
-            "user_id": 54,
-            "title": "dongSeon의 게시글 제목입니당",
-            "content": "dongSeon의 게시글 본문입니당",
-            "created_date": "2023-06-23T07:49:58.000Z",
-            "updated_date": "2023-06-23T07:59:52.000Z",
-            "login_id": "test123",
-            "password": "4321",
-            "name": "dongSeon",
-            "phone_number": "01012345678",
-            "email": "test@naver.com"
-          }
-        ]
+        "message": "수정 성공"
       }
       ```
 
@@ -454,6 +421,108 @@
       ```json
       {
         "success": false,
-        "message": "해당하는 사용자의 게시글이 존재하지 않습니다"
+        "message": "수정 실패, 본인만 수정 가능"
+      }
+      ```
+
+  - ## 2.5: 게시글 본문 수정 API
+    - URL: `"/post/:postId/content"`
+    - Method: `PATCH`
+
+      ### Request Type: `params`
+      ### **바꾸고싶은 포스트의 pk**
+      ```
+      "/post/1/content"
+      ```
+
+      ### Request Type: `body`
+      ```json
+      {
+        "userId": 1,
+        "content": "본문 수정이요"
+      }
+      ```
+
+      ### Response (성공)
+      ```json
+      {
+        "success": true,
+        "message": "수정 성공"
+      }
+      ```
+
+      ### Response (실패)
+      ```json
+      {
+        "success": false,
+        "message": "수정 실패, 본인만 수정 가능"
+      }
+      ```
+
+  - ## 2.6: 게시글 전체 수정 API
+    - URL: `"/post/:postId"`
+    - Method: `PUT`
+
+      ### Request Type: `params`
+      ### **바꾸고싶은 포스트의 pk**
+      ```
+      "/post/1"
+      ```
+
+      ### Request Type: `body`
+      ```json
+      {
+        "userId": 1,
+        "title": "제목 수정이요",
+        "content": "본문 수정이요"
+      }
+      ```
+
+      ### Response (성공)
+      ```json
+      {
+        "success": true,
+        "message": "수정 성공"
+      }
+      ```
+
+      ### Response (실패)
+      ```json
+      {
+        "success": false,
+        "message": "수정 실패, 본인만 수정 가능"
+      }
+      ```
+
+  - ## 2.7: 게시글 삭제 API
+    - URL: `"/post/:postId"`
+    - Method: `DELETE`
+
+      ### Request Type: `params`
+      ### **삭제하고싶은 포스트의 pk**
+      ```
+      "/post/1"
+      ```
+
+      ### Request Type: `body`
+      ```json
+      {
+        "userId": 1
+      }
+      ```
+
+      ### Response (성공)
+      ```json
+      {
+        "success": true,
+        "message": "삭제 성공"
+      }
+      ```
+
+      ### Response (실패)
+      ```json
+      {
+        "success": false,
+        "message": "삭제 실패, 본인만 삭제 가능"
       }
       ```
