@@ -317,9 +317,9 @@ app.get("/post/:postId", (req, res) => {
 // 특정 사용자의 게시글을 조회
 // userId
 // GET
-app.get("/posts/user/:userId", (req, res) => {
+app.get("/:userId/posts", (req, res) => {
   const { userId } = req.params;
-  const { query, params } = makeQuery("SELECT * FROM post_TB WHERE user_id = ?", [userId]);
+  const { query, params } = makeQuery("SELECT * FROM post_TB JOIN user_TB ON post_TB.user_id = user_TB.id WHERE user_TB.login_id = ?", [userId]);
 
   const result = makeResult();
 
