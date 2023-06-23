@@ -347,8 +347,31 @@ app.get("/:userId/posts", (req, res) => {
 // 게시글 제목 수정
 // userId, postId, title
 // PATCH
-app.path("/post/:postId/title", (req, res) => {
+app.patch("/post/:postId/title", (req, res) => {
+  const { postId } = req.params;
+  const { userId, title } = req.body;
+  const { query, params } = makeQuery("UPDATE post_TB SET title = ? WHERE user_id = ? AND id = ?", [title, userId, postId]);
 
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 1;
+    if (data) {
+      result.success = true;
+      result.message = "수정 성공";
+
+    } else {
+      result.message = "수정 실패";
+    }
+
+    res.send(result);
+  });
 });
 
 // 게시글 본문 수정
