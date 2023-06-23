@@ -41,7 +41,7 @@ app.post("/login", (req, res) => {
 // POST
 app.post("/account", (req, res) => {
   const { id, pw, name, phoneNumber, email } = req.body;
-  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email, created_date, updated_date) VALUES (?, ?, ?, ?, ?, now(), now())", [id, pw, name, phoneNumber, email]);
+  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)", [id, pw, name, phoneNumber, email]);
 
   const result = makeResult();
 
