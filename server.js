@@ -461,6 +461,125 @@ app.delete("/post/:postId", (req, res) => {
   });
 });
 
+// 댓글 생성 api
+// postId, userId, content
+// POST
+app.post("/post/:postId/comment", (req, res) => {
+  const { postId } = req.params;
+  const { userId, content } = req.body;
+  const { query, params } = makeQuery("INSERT INTO comment_TB (post_id, user_id, content) VALUES (?, ?, ?)", [postId, userId, content]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 0;
+    if (!data) {
+      result.success = true;
+      result.message = "댓글 작성 성공";
+    } else {
+      result.message = "댓글 작성 실패";
+    }
+
+    res.send(result);
+  });
+});
+
+// 특정 포스트의 댓글을 조회 api
+// postId
+// GET
+app.get("/post/:postId/comment", (req, res) => {
+  const { postId } = req.params;
+  const { query, params } = makeQuery("SELECT * from comment_TB WHERE post_id = ?", [postId]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results[0];
+    if (data) {
+      result.success = true;
+      result.message = data;
+
+    } else {
+      result.message = "해당하는 게시글이 존재하지 않습니다";
+    }
+
+    res.send(result);
+  });
+})
+
+// 특정 포스트의 댓글 수정 api
+// :postId, :commentId, userId, content
+// PUT
+app.put("/post/:postId/comment/:commentId", (req, res) => {
+  const { postId, commentId } = req.params;
+  const { userId, content } = req.body;
+  const { query, params } = makeQuery("UPDATE comment_TB SET content = ? WHERE post_id = ? AND user_id = ?AND id = ?", [content, postId, userId, commentId]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 0;
+    if (!data) {
+      result.success = true;
+      result.message = "댓글 수정 성공";
+
+    } else {
+      result.success = false;
+      result.message = "댓글 수정 실패 (본인 댓글이 아니거나 존재하지 않는 게시글임)";
+    }
+
+    res.send(result);
+  });
+})
+
+// 특정 포스트의 댓글 삭제 api
+// postId, commentId, userId
+// DELETE
+app.delete("/post/:postId/comment", (req, res) => {
+  const { postId } = req.params;
+  const { userId, commentId } = req.body;
+  const { query, params } = makeQuery("DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?", [postId, userId, commentId]);
+
+  const result = makeResult();
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    const data = results.affectedRows === 0;
+    if (!data) {
+      result.success = true;
+      result.message = "댓글 삭제 성공";
+
+    } else {
+      result.success = false;
+      result.message = "댓글 삭제 실패 (존재하지 않는 게시글, 댓글이거나 본인 댓글이 아님)";
+    }
+
+    res.send(result);
+  });
+});
 
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
