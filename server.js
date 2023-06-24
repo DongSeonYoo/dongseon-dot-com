@@ -9,13 +9,15 @@ db.connect();
 app.use(express.json());
 
 // 로그인 api
-// login_id, pw
+// loginId, pw
 // POST
 app.post("/login", (req, res) => {
-  const { login_id, pw } = req.body;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND password = ?", [login_id, pw]);
-
+  const { loginId, pw } = req.body;
   const result = makeResult();
+  
+  const sql = "SELECT id FROM user_TB WHERE login_id = ? AND password = ?";
+  const param = [loginId, pw];
+  const { query, params } = makeQuery(sql, param);
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -25,26 +27,23 @@ app.post("/login", (req, res) => {
     }
 
     const data = results[0];
-    if (data) {
-      result.success = true;
-      result.message = `로그인 성공, user: ${data.id}`;
-
-    } else {
-      result.message = "아이디 혹은 비밀번호가 올바르지 않습니다.";
-    }
+    result.success = !!data;
+    result.message = data ? `로그인 성공, user: ${data.id}` : `아이디 혹은 비밀번호가 존재하지 않습니다`;
 
     res.send(result);
   });
 });
 
 // 회원가입 api
-// login_id, pw, name, phoneNumber, email
+// loginId, pw, name, phoneNumber, email
 // POST
 app.post("/account", (req, res) => {
-  const { login_id, pw, name, phoneNumber, email } = req.body;
-  const { query, params } = makeQuery("INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)", [login_id, pw, name, phoneNumber, email]);
-
+  const { loginId, pw, name, phoneNumber, email } = req.body;
   const result = makeResult();
+
+  const sql = "INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)";
+  const param = [loginId, pw, name, phoneNumber, email];
+  const { query, params } = makeQuery(sql, param);
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -60,17 +59,19 @@ app.post("/account", (req, res) => {
     }
 
     res.send(result);
-  })
+  });
 });
 
 // 아이디 찾기 api
 // name, phoneNumber, email
 // GET
-app.get("/account/id", (req, res) => {
+app.get("/account/loginId", (req, res) => {
   const { name, phoneNumber, email } = req.query;
-  const { query, params } = makeQuery("SELECT login_id FROM user_TB WHERE name=? AND phone_number=? AND email=?", [name, phoneNumber, email]);
-
   const result = makeResult();
+
+  const sql = "SELECT login_id FROM user_TB WHERE name = ? AND phone_number = ? AND email = ?";
+  const param = [name, phoneNumber, email];
+  const { query, params } = makeQuery(sql, param);
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -94,12 +95,14 @@ app.get("/account/id", (req, res) => {
 
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
-// login_id, name, phoneNumber, email
+// loginId, name, phoneNumber, email
 app.get("/account/pw", (req, res) => {
-  const { login_id, name, phoneNumber, email } = req.query;
-  const { query, params } = makeQuery("SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?", [login_id, name, phoneNumber, email]);
-
+  const { loginId, name, phoneNumber, email } = req.query;
   const result = makeResult();
+
+  const sql = "SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?";
+  const param = [loginId, name, phoneNumber, email];
+  const { query, params } = makeQuery(sql, param);
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
@@ -123,10 +126,10 @@ app.get("/account/pw", (req, res) => {
 
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
-// userPk, newPassword
+// userId, newPassword
 app.post("/account/pw", (req, res) => {
-  const { userPk, newPw } = req.body;
-  const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPw, userPk]);
+  const { userId, newPw } = req.body;
+  const { query, params } = makeQuery("UPDATE user_TB SET password=? WHERE id=?", [newPw, userId]);
 
   const result = makeResult();
 
@@ -151,11 +154,11 @@ app.post("/account/pw", (req, res) => {
 });
 
 // 내 프로필 보기 api
-// userPk
+// userId
 // GET
 app.get("/account", (req, res) => {
-  const { userPk } = req.query;
-  const { query, params } = makeQuery("SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?", userPk);
+  const { userId } = req.query;
+  const { query, params } = makeQuery("SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?", userId);
 
   const result = makeResult();
 
@@ -180,11 +183,11 @@ app.get("/account", (req, res) => {
 });
 
 // 회원 정보 수정 api
-// userPk, name, phoneNumber, email
+// userId, name, phoneNumber, email
 // PUT
 app.put("/account", (req, res) => {
-  const { userPk, name, phoneNumber, email } = req.body;
-  const { query, params } = makeQuery("UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?", [name, phoneNumber, email, userPk]);
+  const { userId, name, phoneNumber, email } = req.body;
+  const { query, params } = makeQuery("UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?", [name, phoneNumber, email, userId]);
 
   const result = makeResult();
 
@@ -209,11 +212,11 @@ app.put("/account", (req, res) => {
 });
 
 // 회원 탈퇴 api
-// userPk
+// userId
 // DELETE
 app.delete("/account", (req, res) => {
-  const { userPk } = req.body;
-  const { query, params } = makeQuery("DELETE FROM user_TB WHERE id = ?", [userPk]);
+  const { userId } = req.body;
+  const { query, params } = makeQuery("DELETE FROM user_TB WHERE id = ?", [userId]);
 
   const result = makeResult();
 
@@ -238,10 +241,10 @@ app.delete("/account", (req, res) => {
 });
 
 // 게시글 작성 api
-// userPk, title, content
+// userId, title, content
 app.post("/post", (req, res) => {
-  const { userPk, title, content } = req.body; 
-  const { query, params } = makeQuery("INSERT INTO post_TB (user_id, title, content) VALUES (?, ?, ?)", [userPk, title, content]);
+  const { userId, title, content } = req.body; 
+  const { query, params } = makeQuery("INSERT INTO post_TB (user_id, title, content) VALUES (?, ?, ?)", [userId, title, content]);
 
   const result = makeResult();
 
@@ -460,14 +463,17 @@ app.delete("/post/:postId", (req, res) => {
     res.send(result);
   });
 });
-
+// --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 // 댓글 생성 api
-// postId, userId, content
+// :postId, userId, content
 // POST
 app.post("/post/:postId/comment", (req, res) => {
   const { postId } = req.params;
   const { userId, content } = req.body;
-  const { query, params } = makeQuery("INSERT INTO comment_TB (post_id, user_id, content) VALUES (?, ?, ?)", [postId, userId, content]);
+
+  const sql = "INSERT INTO comment_TB (post_id, user_id, content) VALUES (?, ?, ?)";
+  const param = [postId, userId, content];
+  const { query, params } = makeQuery(sql, param);
 
   const result = makeResult();
 
@@ -482,20 +488,24 @@ app.post("/post/:postId/comment", (req, res) => {
     if (!data) {
       result.success = true;
       result.message = "댓글 작성 성공";
-    } else {
-      result.message = "댓글 작성 실패";
     }
 
     res.send(result);
   });
 });
 
-// 특정 포스트의 댓글을 조회 api
-// postId
+// 댓글 조회 api
+// :postId
 // GET
-app.get("/post/:postId/comment", (req, res) => {
+app.get("/post/:postId/comments", (req, res) => {
+  // const { postId } = req.params;
+  // const { query, params } = makeQuery("SELECT * from comment_TB WHERE post_id = ?", [postId]);
+
   const { postId } = req.params;
-  const { query, params } = makeQuery("SELECT * from comment_TB WHERE post_id = ?", [postId]);
+
+  const sql = "SELECT * FROM comment_TB WHERE post_id = ?";
+  const param = [postId];
+  const { query, params } = makeQuery(sql, param);
 
   const result = makeResult();
 
@@ -517,7 +527,7 @@ app.get("/post/:postId/comment", (req, res) => {
 
     res.send(result);
   });
-})
+});
 
 // 특정 포스트의 댓글 수정 api
 // :postId, :commentId, userId, content
@@ -525,7 +535,10 @@ app.get("/post/:postId/comment", (req, res) => {
 app.put("/post/:postId/comment/:commentId", (req, res) => {
   const { postId, commentId } = req.params;
   const { userId, content } = req.body;
-  const { query, params } = makeQuery("UPDATE comment_TB SET content = ? WHERE post_id = ? AND user_id = ?AND id = ?", [content, postId, userId, commentId]);
+
+  const sql = "UPDATE comment_TB SET content = ? WHERE post_id = ? AND user_id = ? AND id = ?";
+  const param = [content, postId, userId, commentId];
+  const { query, params } = makeQuery(sql, param);
 
   const result = makeResult();
 
@@ -548,15 +561,22 @@ app.put("/post/:postId/comment/:commentId", (req, res) => {
 
     res.send(result);
   });
-})
+});
 
 // 특정 포스트의 댓글 삭제 api
-// postId, commentId, userId
+// :postId, :commentId, userId
 // DELETE
-app.delete("/post/:postId/comment", (req, res) => {
-  const { postId } = req.params;
-  const { userId, commentId } = req.body;
-  const { query, params } = makeQuery("DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?", [postId, userId, commentId]);
+app.delete("/post/:postId/comment/:commentId", (req, res) => {
+  // const { postId } = req.params;
+  // const { userId, commentId } = req.body;
+  // const { query, params } = makeQuery("DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?", [postId, userId, commentId]);
+
+  const { postId, commentId } = req.params;
+  const { userId } = req.body;
+
+  const sql = "DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?";
+  const param = [postId, userId, commentId];
+  const { query, params } = makeQuery(sql, param);
 
   const result = makeResult();
 
