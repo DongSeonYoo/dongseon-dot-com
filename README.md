@@ -526,3 +526,94 @@ __DIRNAME__ = http://13.125.33.251:8000
         "message": "삭제 실패, 본인만 삭제 가능"
       }
       ```
+
+# 3. 댓글 api
+
+  - ## 3.1: 댓글 작성 API
+    - URL: `"/comment"`
+    - Method: `POST`
+
+      ### Request Type: `Body`
+        ```json
+        {
+          "post_id": 19,
+          "user_id": 61,
+          "content": "댓글 리퀘스트 테스트요",
+        }
+        ```
+
+      ### Response (성공)
+        ```json
+        {
+          "success": true,
+          "message": "댓글 생성 성공"
+        }
+        ```
+
+      ### Response (실패)
+        ```json
+        {
+          "success": false,
+          "message": "댓글 생성 실패"
+        }
+        ```
+
+  - ## 3.2: 댓글 조회 API
+    - URL: `"/comment/:commentId"`
+    - Method: `GET`
+
+      ### Request Type: `Params`
+      조회하고 싶은 댓글의 pk
+      ```
+      "/comment/1"
+      ```
+
+      ### Response (성공)
+        ```json
+        {
+          "success": true,
+          "message": ""
+        }
+        ```
+
+      ### Response (실패)
+        ```json
+        {
+          "success": false,
+          "message": "댓글 생성 실패"
+        }
+        ```
+
+  - ## 3.3: 댓글 수정 API
+    - URL: `"/post/:postId/comment/:commentId"`
+    - Method: `PUT`
+
+      ### Request Type: `Params`
+      ```
+      "/post/1/comment/1"
+      ```
+
+      ### Request Type: `Body`
+      ```json
+      {
+        "userId": 1,
+        "comment": "댓글 수정 api"
+      }
+      ```
+
+      ### Response (성공)
+        ```json
+        {
+          "success": true,
+          "message": ""
+        }
+        ```
+
+      ### Response (실패)
+        ```json
+        {
+          "success": false,
+          "message": "댓글 생성 실패"
+        }
+        ```
+
