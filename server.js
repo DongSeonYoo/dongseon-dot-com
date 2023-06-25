@@ -114,7 +114,7 @@ app.get("/account/pw", (req, res) => {
     const data = results[0];
     if (data) {
       result.success = true;
-      result.message = data;
+      result.message = data.id;
 
     } else {
       result.message = "해당하는 유저가 없습니다";
