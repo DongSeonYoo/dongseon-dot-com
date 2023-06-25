@@ -320,7 +320,7 @@ app.get("/post/:postId", (req, res) => {
       result.message = results;
 
     } else {
-      result.message = "해당하는 사용자의 게시글이 존재하지 않습니다";
+      result.message = "해당하는 게시글이 존재하지 않습니다";
     }
     
     res.send(result);
@@ -488,9 +488,6 @@ app.post("/post/:postId/comment", (req, res) => {
 // :postId
 // GET
 app.get("/post/:postId/comments", (req, res) => {
-  // const { postId } = req.params;
-  // const { query, params } = makeQuery("SELECT * from comment_TB WHERE post_id = ?", [postId]);
-
   const { postId } = req.params;
 
   const sql = "SELECT * FROM comment_TB WHERE post_id = ?";
@@ -506,7 +503,7 @@ app.get("/post/:postId/comments", (req, res) => {
       return;
     }
 
-    const data = results[0];
+    const data = results;
     if (data) {
       result.success = true;
       result.message = data;
@@ -519,7 +516,7 @@ app.get("/post/:postId/comments", (req, res) => {
   });
 });
 
-// 특정 포스트의 댓글 수정 api
+// 댓글 수정 api
 // :postId, :commentId, userId, content
 // PUT
 app.put("/post/:postId/comment/:commentId", (req, res) => {
@@ -587,10 +584,10 @@ app.delete("/post/:postId/comment/:commentId", (req, res) => {
   });
 });
 
-// 특정 사용자가 작성한 게시글 조회 api
+// 특정 사용자가 작성한 게시글 조회 api (로그인 아이디 기반으로)
 // userLoginId
 // GET
-app.get("/account/:userLoginId/posts", (req, res) => {
+app.get("/:userLoginId/posts", (req, res) => {
   const { userLoginId } = req.params;
   const result = makeResult();
 
@@ -619,14 +616,14 @@ app.get("/account/:userLoginId/posts", (req, res) => {
   });
 });
 
-// 특정 사용자가 작성한 댓글 조회 api (아직로직변경안함)
+// 특정 사용자가 작성한 댓글 조회 api (로그인 아이디 기반으로)
 // userLoginId
 // GET
-app.get("/account/:userLoginId/comments", (req, res) => {
+app.get("/:userLoginId/comments", (req, res) => {
   const { userLoginId } = req.params;
   const result = makeResult();
 
-  const sql = "SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
+  const sql = "SELECT * FROM comment_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
   const param = [userLoginId];
   const { query, params } = makeQuery(sql, param);
 
