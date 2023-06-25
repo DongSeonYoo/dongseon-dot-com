@@ -601,6 +601,70 @@ app.delete("/post/:postId/comment/:commentId", (req, res) => {
   });
 });
 
+// 특정 사용자가 작성한 게시글 조회 api
+// userLoginId
+// GET
+app.get("/account/:userLoginId/posts", (req, res) => {
+  const { userLoginId } = req.params;
+  const result = makeResult();
+
+  const sql = "SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
+  const param = [userLoginId];
+  const { query, params } = makeQuery(sql, param);
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    // 게시글을 찾으면 true, 찾지 못하면 false
+    const isFindPost = results.length === 0;
+    if (!isFindPost) {
+      result.success = true;
+      result.message = results;
+
+    } else {
+      result.message = "해당하는 사용자의 게시글이 존재하지 않습니다";
+    }
+    
+    res.send(result);
+  });
+});
+
+// 특정 사용자가 작성한 댓글 조회 api (아직로직변경안함)
+// userLoginId
+// GET
+app.get("/account/:userLoginId/comments", (req, res) => {
+  const { userLoginId } = req.params;
+  const result = makeResult();
+
+  const sql = "SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
+  const param = [userLoginId];
+  const { query, params } = makeQuery(sql, param);
+
+  db.query(query, params, (error, results, fields) => {
+    if (error) {
+      result.message = error.sqlMessage;
+      res.send(result);
+      return;
+    }
+
+    // 게시글을 찾으면 true, 찾지 못하면 false
+    const isFindPost = results.length === 0;
+    if (!isFindPost) {
+      result.success = true;
+      result.message = results;
+
+    } else {
+      result.message = "해당하는 사용자의 게시글이 존재하지 않습니다";
+    }
+    
+    res.send(result);
+  });
+});
+
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 });
