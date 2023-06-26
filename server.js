@@ -26,8 +26,13 @@ app.post("/login", (req, res) => {
     }
 
     const data = results[0];
-    result.success = !!data;
-    result.message = data ? `로그인 성공, user: ${data.id}` : `아이디 혹은 비밀번호가 존재하지 않습니다`;
+    if (data) {
+      result.success = true;
+      result.message = data.id;
+
+    } else {
+      result.message = `아이디 또는 비밀번호가 올바르지 않습니다`;
+    }
 
     res.send(result);
   });
