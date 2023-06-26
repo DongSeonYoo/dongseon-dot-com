@@ -21,9 +21,7 @@ app.post("/login", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -48,9 +46,7 @@ app.post("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -77,9 +73,7 @@ app.get("/account/loginId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -109,9 +103,7 @@ app.get("/account/pw", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
     
@@ -141,9 +133,7 @@ app.post("/account/pw", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -173,9 +163,7 @@ app.get("/account/:userId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -205,9 +193,7 @@ app.put("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -237,9 +223,7 @@ app.delete("/account", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -268,9 +252,7 @@ app.post("/post", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -293,9 +275,7 @@ app.get("/posts", (req, res) => {
 
   db.query(query, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -318,9 +298,7 @@ app.get("/post/:postId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -352,9 +330,7 @@ app.patch("/post/:postId/title", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -385,9 +361,7 @@ app.patch("/post/:postId/content", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -418,9 +392,7 @@ app.put("/post/:postId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -451,9 +423,7 @@ app.delete("/post/:postId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -484,9 +454,7 @@ app.post("/post/:postId/comment", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -514,9 +482,7 @@ app.get("/post/:postId/comments", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -548,9 +514,7 @@ app.put("/post/:postId/comment/:commentId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -583,9 +547,7 @@ app.delete("/post/:postId/comment/:commentId", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -616,9 +578,7 @@ app.get("/:userLoginId/posts", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -649,9 +609,7 @@ app.get("/:userLoginId/comments", (req, res) => {
 
   db.query(query, params, (error, results, fields) => {
     if (error) {
-      console.error(error.message);
-      result.message = error.sqlMessage;
-      res.send(result);
+      printError(error, result, res);
       return;
     }
 
@@ -672,6 +630,12 @@ app.get("/:userLoginId/comments", (req, res) => {
 app.listen(8000, () => {
   console.log("8000번 포트에서 기다리는중");
 });
+
+function printError(error, result, res) {
+  console.error(error.message);
+  result.message = error.sqlMessage;
+  res.send(result);
+}
 
 function makeResult() {
   return {
