@@ -159,7 +159,7 @@ app.get("/account/:userId", (req, res) => {
   const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?";
   const param = [userId];
 
-  db.query(query, param, (error, results, fields) => {
+  db.query(sql, param, (error, results, fields) => {
     if (error) {
       printError(error, result, res);
       return;
@@ -181,9 +181,8 @@ app.get("/account/:userId", (req, res) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-app.put("/account/:userId", (req, res) => {
-  const { userId } = req.params;
-  const { name, phoneNumber, email } = req.body;
+app.put("/account", (req, res) => {
+  const { userId, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
   const sql = "UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?";
@@ -266,12 +265,11 @@ app.post("/post", (req, res) => {
 // 모든 게시글 조회 api
 // GET
 // 명사이자 단수형으로
-app.get("/posts", (req, res) => {
+app.get("/post/all", (req, res) => {
   const result = makeResult();
   const sql = "SELECT * FROM post_TB";
-  const { query } = makeQuery(sql);
 
-  db.query(query, (error, results, fields) => {
+  db.query(sql, (error, results, fields) => {
     if (error) {
       printError(error, result, res);
       return;
@@ -313,72 +311,11 @@ app.get("/post/:postId", (req, res) => {
   });
 });
 
-// 게시글 제목 수정 api
-// userId, postId, title
-// PATCH
-app.patch("/post/:postId/title", (req, res) => {
-  const { postId } = req.params;
-  const { userId, title } = req.body;
-  const result = makeResult();
-
-  const sql = "UPDATE post_TB SET title = ? WHERE user_id = ? AND id = ?";
-  const param = [title, userId, postId];
-
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results.affectedRows === 0;
-    if (!data) {
-      result.success = true;
-      result.message = "수정 성공";
-
-    } else {
-      result.message = "수정 실패, 본인만 수정 가능";
-    }
-
-    res.send(result);
-  });
-});
-
-// 게시글 본문 수정 api
-// userId, postId, content
-// PATCH
-app.patch("/post/:postId/content", (req, res) => {
-  const { postId } = req.params;
-  const { userId, content } = req.body;
-  const result = makeResult();
-
-  const sql = "UPDATE post_TB SET title = ? WHERE user_id = ? AND id = ?";
-  const param = [content, userId, postId];
-
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results.affectedRows === 0;
-    if (!data) {
-      result.success = true;
-      result.message = "수정 성공";
-
-    } else {
-      result.message = "수정 실패, 본인만 수정 가능";
-    }
-
-    res.send(result);
-  });
-});
-
 // 게시글 수정 api
 // userId, postId, title, content
 // PUT
-app.put("/post/:postId", (req, res) => {
-  const { postId } = req.params;
-  const { userId, title, content } = req.body;
+app.put("/post", (req, res) => {
+  const { postId, userId, title, content } = req.body;
   const result = makeResult();
 
   const sql = "UPDATE post_TB SET title = ?, content = ? WHERE user_id = ? AND id = ?";
@@ -406,12 +343,11 @@ app.put("/post/:postId", (req, res) => {
 // 게시글 삭제 api
 // userId, postId
 // DELETE
-app.delete("/post/:postId", (req, res) => {
-  const { postId } = req.params;
-  const { userId } = req.body;
+app.delete("/post", (req, res) => {
+  const { postId, userId } = req.body;
   const result = makeResult();
 
-  const sql = "UPDATE post_TB SET title = ?, content = ? WHERE user_id = ? AND id = ?";
+  const sql = "DELETE FROM post_TB WHERE id = ? AND user_id = ?";
   const param = [postId, userId];
 
   db.query(sql, param, (error, results, fields) => {
@@ -434,16 +370,14 @@ app.delete("/post/:postId", (req, res) => {
 
 
 // 댓글 생성 api
-// :postId, userId, content
+// postId, userId, content
 // POST
-app.post("/post/:postId/comment", (req, res) => {
-  const { postId } = req.params;
-  const { userId, content } = req.body;
+app.post("/comment", (req, res) => {
+  const { postId, userId, content } = req.body;
+  const result = makeResult();
 
   const sql = "INSERT INTO comment_TB (post_id, user_id, content) VALUES (?, ?, ?)";
   const param = [postId, userId, content];
-
-  const result = makeResult();
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
@@ -466,11 +400,10 @@ app.post("/post/:postId/comment", (req, res) => {
 // GET
 app.get("/post/:postId/comments", (req, res) => {
   const { postId } = req.params;
+  const result = makeResult();
 
   const sql = "SELECT * FROM comment_TB WHERE post_id = ?";
   const param = [postId];
-
-  const result = makeResult();
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
@@ -478,13 +411,13 @@ app.get("/post/:postId/comments", (req, res) => {
       return;
     }
 
-    const data = results;
-    if (data) {
+    const isEmptyResult = results.length === 0;
+    if (!isEmptyResult) {
       result.success = true;
-      result.message = data;
+      result.message = results;
 
     } else {
-      result.message = "해당하는 게시글이 존재하지 않습니다";
+      result.message = "게시글 또는 댓글이 존재하지 않습니다";
     }
 
     res.send(result);
@@ -492,16 +425,14 @@ app.get("/post/:postId/comments", (req, res) => {
 });
 
 // 댓글 수정 api
-// :postId, :commentId, userId, content
+// postId, commentId, userId, content
 // PUT
-app.put("/post/:postId/comment/:commentId", (req, res) => {
-  const { postId, commentId } = req.params;
-  const { userId, content } = req.body;
+app.put("/comment", (req, res) => {
+  const { userId, content, postId, commentId } = req.body;
+  const result = makeResult();
 
   const sql = "UPDATE comment_TB SET content = ? WHERE post_id = ? AND user_id = ? AND id = ?";
   const param = [content, postId, userId, commentId];
-
-  const result = makeResult();
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
@@ -529,11 +460,10 @@ app.put("/post/:postId/comment/:commentId", (req, res) => {
 app.delete("/post/:postId/comment/:commentId", (req, res) => {
   const { postId, commentId } = req.params;
   const { userId } = req.body;
+  const result = makeResult();
 
   const sql = "DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?";
   const param = [postId, userId, commentId];
-
-  const result = makeResult();
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
