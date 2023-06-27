@@ -8,7 +8,7 @@ const login = (req, res) => {
 
   const isValidateValue = validate.validateLoginInput(loginId, pw);
   if (!isValidateValue) {
-    result.message = "아이디 또는 비밀번호가 유효하지 않습니다";
+    result.message = "로그인 데이터가 유효하지 않습니다";
     res.send(result);
     return;
   }
@@ -39,6 +39,13 @@ const signup = (req, res) => {
   const { loginId, pw, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
+  const isValidateInput = validate.validateSignupInput(loginId, pw, name, phoneNumber, email);
+  if (!isValidateInput) {
+    result.message = "회원가입 데이터가 유효하지 않습니다";
+    res.send(result);
+    return; 
+  }
+
   const sql = "INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)";
   const param = [loginId, pw, name, phoneNumber, email];
 
@@ -56,11 +63,18 @@ const signup = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
 const findId = (req, res) => {
   const { name, phoneNumber, email } = req.query;
   const result = makeResult();
+
+  const isValidateInput = validate.validateFindIdInput(name, phoneNumber, email);
+  if (!isValidateInput) {
+    result.message = "아이디 찾기 데이터가 유효하지 않습니다";
+    res.send(result);
+    return; 
+  }
 
   const sql = "SELECT login_id FROM user_TB WHERE name = ? AND phone_number = ? AND email = ?";
   const param = [name, phoneNumber, email];
@@ -82,11 +96,19 @@ const findId = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
+// 비밀번호를 찾기 위한 1차 과정 (사용자 검증)
 const validateUser = (req, res) => {
   const { loginId, name, phoneNumber, email } = req.query;
   const result = makeResult();
+
+  const isValidateInput = validate.validateUserInput(loginId, name, phoneNumber, email);
+  if (!isValidateInput) {
+      result.message = "데이터 형식이 유효하지 않습니다";
+      res.send(result);
+      return;
+  }
 
   const sql = "SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?";
   const param = [loginId, name, phoneNumber, email];
@@ -108,11 +130,19 @@ const validateUser = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
+// 비밀번호를 찾기 위한 2차 과정 (비밀번호 재설정)
 const resetPw = (req, res) => {
   const { userId, newPw } = req.body;
   const result = makeResult();
+
+  const isValidateInput = validate.validateResetPwInput(userId, newPw);
+  if (!isValidateInput) {
+    result.message = "데이터가 유효하지 않습니다";
+    res.send(result);
+    return;
+  }
 
   const sql = "UPDATE user_TB SET password = ? WHERE id = ?";
   const param = [newPw, userId];
@@ -134,7 +164,7 @@ const resetPw = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
 const viewProfile = (req, res) => {
   const { userId } = req.params;
@@ -160,7 +190,7 @@ const viewProfile = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
 const modifyProfile = (req, res) => {
   const { userId, name, phoneNumber, email } = req.body;
@@ -186,7 +216,7 @@ const modifyProfile = (req, res) => {
 
     res.send(result);
   });
-}
+};
 
 const deleteUser = (req, res) => {
   const { userId } = req.body;
@@ -211,8 +241,8 @@ const deleteUser = (req, res) => {
     }
 
     res.send(result);
-  })
-}
+  });
+};
 
 module.exports = {
   login,
