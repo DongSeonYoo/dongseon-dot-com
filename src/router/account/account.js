@@ -1,38 +1,12 @@
-const router = require("express").Router();
-const common = require("../common");
-const db = require("../database/connect/mariadb");
+const express = require("express");
+const router = express.Router();
 
-const makeResult = common.makeResult;
-const printError = common.printError;
+const account = require("../account/account.controller");
 
 // 로그인 api
 // loginId, pw
 // POST
-router.post("/login", (req, res) => {
-  const { loginId, pw } = req.body;
-  const result = makeResult();
-
-  const sql = "SELECT id FROM user_TB WHERE login_id = ? AND password = ?";
-  const param = [loginId, pw];
-
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results[0];
-    if (data) {
-      result.success = true;
-      result.message = data.id;
-
-    } else {
-      result.message = `아이디 또는 비밀번호가 올바르지 않습니다`;
-    }
-
-    res.send(result);
-  });
-});
+router.post("/login", account.login);
 
 // 회원가입 api
 // loginId, pw, name, phoneNumber, email
