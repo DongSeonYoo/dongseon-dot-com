@@ -1,12 +1,21 @@
-const db = require("../../database/connect/mariadb");
+const db = require("../../../database/connect/mariadb");
+const validate = require("../../validate/validate");
 const { makeResult, printError } = require("../../common/common");
 
 const login = (req, res) => {
   const { loginId, pw } = req.body;
   const result = makeResult();
 
+  const isValidateValue = validate.validateLoginInput(loginId, pw);
+
   const sql = "SELECT id FROM user_TB WHERE login_id = ? AND password = ?";
   const param = [loginId, pw];
+
+  if (!isValidateValue) {
+    result.message = "아이디 또는 비밀번호가 유효하지 않습니다";
+    res.send(result);
+    return;
+  }
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {

@@ -1,4 +1,4 @@
-const db = require("../../database/connect/mariadb");
+const db = require("../../../database/connect/mariadb");
 const { makeResult, printError } = require("../../common/common");
 
 const createComment = (req, res) => {
