@@ -1,5 +1,5 @@
 const db = require("../../../database/connect/mariadb");
-const { makeResult, printError } = require("../../common/common");
+const { makeResult, printError } = require("../public/common");
 
 const createPost = (req, res) => {
   const { userId, title, content } = req.body;
