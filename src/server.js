@@ -3,9 +3,9 @@ const app = express();
 
 const db = require("./database/connect/mariadb");
 
-const accountApi = require("./router/account");
-const postApi = require("./router/post");
-const commentApi = require("./router/comment");
+const accountApi = require("./router/account/account");
+const postApi = require("./router/post/post");
+const commentApi = require("./router/comment/comment");
 
 app.use("/account", accountApi);
 app.use("/post", postApi);
