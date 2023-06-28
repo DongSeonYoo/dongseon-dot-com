@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const post = require("../post/post.controller");
+const post = require("../controller/post.controller");
 
 // 게시글 작성 api
 // userId, title, content

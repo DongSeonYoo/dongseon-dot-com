@@ -1,5 +1,5 @@
-const db = require("../../../database/connect/mariadb");
-const { makeResult, printError } = require("../public/common");
+const db = require("../database/connect/mariadb");
+const { makeResult, printError } = require("../controller/common/func");
 
 const createComment = (req, res) => {
   const { postId, userId, content } = req.body;

@@ -1,24 +1,32 @@
-const db = require("../../../database/connect/mariadb");
-const { makeResult, printError } = require("../public/common");
+const db = require("../database/connect/mariadb");
+const { makeResult, printError } = require("../controller/common/func");
+
+const postValidate = require("../controller/validate/postValidate");
+const validateMessage = "데이터 형식이 유효하지 않습니다";
 
 const createPost = (req, res) => {
   const { userId, title, content } = req.body;
   const result = makeResult();
 
+  const isValidateInput = postValidate.validateCreatePost(userId, title, content);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
+  
   const sql = "INSERT INTO post_TB (user_id, title, content) VALUES (?, ?, ?)";
   const param = [userId, title, content];
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
-      printError(error, result, res);
+      result.message = "존재하지 않는 사용자입니다";
+      res.send(result);
       return;
     }
 
-    const data = results.affectedRows === 0;
-    if (!data) {
-      result.success = true;
-      result.message = "작성에 성공하였습니다";
-    }
+    result.success = true;
+    result.message = "작성에 성공하였습니다";
 
     res.send(result);
   });
@@ -43,6 +51,13 @@ const readAllPost = (req, res) => {
 const readPost = (req, res) => {
   const { postId } = req.params;
   const result = makeResult();
+
+  const isValidateInput = postValidate.validateReadPost(postId);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "SELECT * FROM post_TB WHERE id = ?";
   const param = [postId];
@@ -70,6 +85,13 @@ const readPost = (req, res) => {
 const updatePost = (req, res) => {
   const { postId, userId, title, content } = req.body;
   const result = makeResult();
+
+  const isValidateInput = postValidate.validateUpdatePostInput(postId, userId, title, content);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "UPDATE post_TB SET title = ?, content = ? WHERE user_id = ? AND id = ?";
   const param = [title, content, userId, postId];

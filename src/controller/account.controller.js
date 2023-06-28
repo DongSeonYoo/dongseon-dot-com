@@ -1,14 +1,14 @@
-const db = require("../../../database/connect/mariadb");
-const validate = require("../public/validate");
-const { makeResult, printError } = require("../public/common");
+const db = require("../database/connect/mariadb");
+const { makeResult, printError } = require("../controller/common/func");
 
+const accountValidate = require("../controller/validate/accountValidate");
 const validateMessage = "데이터 형식이 유효하지 않습니다";
 
 const login = (req, res) => {
   const { loginId, pw } = req.body;
   const result = makeResult();
 
-  const isValidateValue = validate.validateLoginInput(loginId, pw);
+  const isValidateValue = accountValidate.validateLoginInput(loginId, pw);
   if (!isValidateValue) {
     result.message = validateMessage;
     res.send(result);
@@ -41,7 +41,7 @@ const signup = (req, res) => {
   const { loginId, pw, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
-  const isValidateInput = validate.validateSignupInput(loginId, pw, name, phoneNumber, email);
+  const isValidateInput = accountValidate.validateSignupInput(loginId, pw, name, phoneNumber, email);
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
@@ -71,7 +71,7 @@ const findId = (req, res) => {
   const { name, phoneNumber, email } = req.query;
   const result = makeResult();
 
-  const isValidateInput = validate.validateFindIdInput(name, phoneNumber, email);
+  const isValidateInput = accountValidate.validateFindIdInput(name, phoneNumber, email);
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
@@ -105,7 +105,7 @@ const validateUser = (req, res) => {
   const { loginId, name, phoneNumber, email } = req.query;
   const result = makeResult();
 
-  const isValidateInput = validate.validateUserInput(loginId, name, phoneNumber, email);
+  const isValidateInput = accountValidate.validateUserInput(loginId, name, phoneNumber, email);
   if (!isValidateInput) {
       result.message = validateMessage;
       res.send(result);
@@ -139,7 +139,7 @@ const resetPw = (req, res) => {
   const { userId, newPw } = req.body;
   const result = makeResult();
 
-  const isValidateInput = validate.validateResetPwInput(userId, newPw);
+  const isValidateInput = accountValidate.validateResetPwInput(userId, newPw);
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
@@ -172,7 +172,7 @@ const viewProfile = (req, res) => {
   const { userId } = req.params;
   const result = makeResult();
 
-  const isValidateInput = validate.validateViewProfileInput(userId);
+  const isValidateInput = accountValidate.validateViewProfileInput(userId);
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
@@ -205,7 +205,7 @@ const modifyProfile = (req, res) => {
   const { userId, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
-  const isValidateInput = validate.validateModifyPrifileInput(userId, name, phoneNumber, email);
+  const isValidateInput = accountValidate.validateModifyPrifileInput(userId, name, phoneNumber, email);
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
@@ -237,7 +237,7 @@ const deleteUser = (req, res) => {
   const { userId } = req.body;
   const result = makeResult();
 
-  const validateUserInput = validate.validateDeleteUserInput(userId);
+  const validateUserInput = accountValidate.validateDeleteUserInput(userId);
   if (!validateUserInput) {
     result.message = validateMessage;
     res.send(result);
