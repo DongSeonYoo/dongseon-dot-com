@@ -1,9 +1,19 @@
 const db = require("../database/connect/mariadb");
 const { makeResult, printError } = require("../controller/common/func");
 
+const commentValidate = require("../controller/validate/commentValidate");
+const validateMessage = "데이터 형식이 유효하지 않습니다";
+
 const createComment = (req, res) => {
   const { postId, userId, content } = req.body;
   const result = makeResult();
+
+  const isValidateValue = commentValidate.validateCreateCommentInput(postId, userId, content);
+  if (!isValidateValue) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "INSERT INTO comment_TB (post_id, user_id, content) VALUES (?, ?, ?)";
   const param = [postId, userId, content];
@@ -27,6 +37,13 @@ const createComment = (req, res) => {
 const readComment = (req, res) => {
   const { postId } = req.params;
   const result = makeResult();
+
+  const isValidateValue = commentValidate.validateReadCommentInput(postId);
+  if (!isValidateValue) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "SELECT * FROM comment_TB WHERE post_id = ?";
   const param = [postId];
@@ -53,6 +70,13 @@ const readComment = (req, res) => {
 const updateComment = (req, res) => {
   const { userId, content, postId, commentId } = req.body;
   const result = makeResult();
+
+  const isValidateValue = commentValidate.validateUpdateCommentInput(userId, content, postId, commentId);
+  if (!isValidateValue) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "UPDATE comment_TB SET content = ? WHERE post_id = ? AND user_id = ? AND id = ?";
   const param = [content, postId, userId, commentId];
@@ -81,6 +105,13 @@ const deleteComment = (req, res) => {
   const { postId, commentId, userId } = req.body;
   const result = makeResult();
 
+  const isValidateValue = commentValidate.validateDeleteCommentInput(postId, commentId, userId);
+  if (!isValidateValue) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
+
   const sql = "DELETE FROM comment_TB WHERE post_id = ? AND user_id = ? AND id = ?";
   const param = [postId, userId, commentId];
 
@@ -107,6 +138,13 @@ const deleteComment = (req, res) => {
 const readUserComment = (req, res) => {
   const { userLoginId } = req.params;
   const result = makeResult();
+
+  const isValidateValue = commentValidate.validateReadUserCommentInput(userLoginId);
+  if (!isValidateValue) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "SELECT * FROM comment_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
   const param = [userLoginId];
