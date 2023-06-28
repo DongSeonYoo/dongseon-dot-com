@@ -30,6 +30,6 @@ router.delete("/", post.deletePost);
 // 특정 사용자가 작성한 게시글 조회 api (로그인 아이디 기반으로)
 // userLoginId
 // GET
-router.get("/user/:userLoginId", post.deletePost);
+router.get("/user/:userLoginId", post.getUserPost);
 
 module.exports = router;
