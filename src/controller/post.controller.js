@@ -119,6 +119,13 @@ const deletePost = (req, res) => {
   const { postId, userId } = req.body;
   const result = makeResult();
 
+  const isValidateInput = postValidate.validateDeletePostInput(postId, userId);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
+
   const sql = "DELETE FROM post_TB WHERE id = ? AND user_id = ?";
   const param = [postId, userId];
 
@@ -143,6 +150,13 @@ const deletePost = (req, res) => {
 const getUserPost = (req, res) => {
   const { userLoginId } = req.params;
   const result = makeResult();
+
+  const isValidateInput = postValidate.validateGetUserPostInput(userLoginId);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "SELECT * FROM post_TB WHERE user_id IN (SELECT id FROM user_TB WHERE login_id = ?)";
   const param = [userLoginId];
