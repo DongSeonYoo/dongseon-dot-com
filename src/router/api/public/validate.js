@@ -1,12 +1,14 @@
-const idRegex = /^[A-Za-z0-9]{8,15}$/;
+const loginIdRegex = /^[A-Za-z0-9]{8,15}$/;
 const pwRegex = /^.{10,17}$/;
 const nameRegex = /^[가-힣a-zA-Z]{2,8}$/;
 const phoneNumberRegex = /^0\d{10}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+const isNumber = (number) => !isNaN(Number(number));
+
 
 const validateLoginInput = (loginId, pw) => {
-  if (!idRegex.test(loginId)) {
+  if (!loginIdRegex.test(loginId)) {
     return false;
   } 
 
@@ -18,7 +20,7 @@ const validateLoginInput = (loginId, pw) => {
 }
 
 const validateSignupInput = (loginId, pw, name, phoneNumber, email) => {
-  if (!idRegex.test(loginId)) {
+  if (!loginIdRegex.test(loginId)) {
     return false;
   }
 
@@ -58,7 +60,7 @@ const validateFindIdInput = (name, phoneNumber, email) => {
 }
 
 const validateUserInput = (loginId, name, phoneNumber, email) => {
-  if (!idRegex.test(loginId)) {
+  if (!loginIdRegex.test(loginId)) {
     return false;
   }
 
@@ -78,11 +80,47 @@ const validateUserInput = (loginId, name, phoneNumber, email) => {
 }
 
 const validateResetPwInput = (userId, newPw) => {
-  if (isNaN(Number(userId))) {
+  if (!isNumber(userId)) {
     return false;
   }
 
   if (!pwRegex.test(newPw)) {
+    return false;
+  }
+
+  return true;
+}
+
+const validateViewProfileInput = (userId) => {
+  if (!isNumber(userId)) {
+    return false;
+  }
+
+  return true;
+}
+
+const validateModifyPrifileInput = (userId, name, phoneNumber, email) => {
+  if (!isNumber(userId)) {
+    return false;
+  }
+
+  if (!nameRegex.test(name)) {
+    return false;
+  }
+
+  if (!phoneNumberRegex.test(phoneNumber)) {
+    return false;
+  }
+
+  if (!emailRegex.test(email)) {
+    return false;
+  }
+
+  return true;
+}
+
+const validateDeleteUserInput = (userId) => {
+  if (!isNumber(userId)) {
     return false;
   }
 
@@ -96,4 +134,7 @@ module.exports = {
   validateFindIdInput,
   validateUserInput,
   validateResetPwInput,
+  validateViewProfileInput,
+  validateModifyPrifileInput,
+  validateDeleteUserInput
 }
