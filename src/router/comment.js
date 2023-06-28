@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const commentCtrl = require("../controller/comment.controller");
+const commentCtrl = require("../router/controller/comment.controller");
 // 댓글 생성 api
 // postId, userId, content
 // POST

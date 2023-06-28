@@ -1,4 +1,4 @@
-const { loginIdRegex, pwRegex, nameRegex, phoneNumberRegex, emailRegex } = require("../common/regex");
+const { loginIdRegex, pwRegex, nameRegex, phoneNumberRegex, emailRegex } = require("../regex");
 const isNumber = (number) => !isNaN(Number(number));
 
 const validateLoginInput = (loginId, pw) => {

@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const accountCtrl = require("../controller/account.controller");
+const accountCtrl = require("../router/controller/account.controller");
 
 // 로그인 api
 // loginId, pw

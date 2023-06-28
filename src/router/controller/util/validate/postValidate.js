@@ -1,4 +1,4 @@
-const { loginIdRegex } = require("../common/regex");
+const { loginIdRegex } = require("../regex");
 const isNumber = (number) => !isNaN(Number(number));
 
 const maxTitleLength = 20;

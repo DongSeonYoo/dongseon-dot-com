@@ -1,7 +1,7 @@
-const db = require("../database/connect/mariadb");
-const { makeResult, printError } = require("../controller/common/func");
+const db = require("../../database/connect/mariadb");
+const { makeResult, printError } = require("../controller/util/func");
 
-const commentValidate = require("../controller/validate/commentValidate");
+const commentValidate = require("../controller/util/validate/commentValidate");
 const validateMessage = "데이터 형식이 유효하지 않습니다";
 
 const createComment = (req, res) => {
