@@ -2,13 +2,15 @@ const db = require("../../../database/connect/mariadb");
 const validate = require("../public/validate");
 const { makeResult, printError } = require("../public/common");
 
+const validateMessage = "데이터 형식이 유효하지 않습니다";
+
 const login = (req, res) => {
   const { loginId, pw } = req.body;
   const result = makeResult();
 
   const isValidateValue = validate.validateLoginInput(loginId, pw);
   if (!isValidateValue) {
-    result.message = "로그인 데이터가 유효하지 않습니다";
+    result.message = validateMessage;
     res.send(result);
     return;
   }
@@ -41,7 +43,7 @@ const signup = (req, res) => {
 
   const isValidateInput = validate.validateSignupInput(loginId, pw, name, phoneNumber, email);
   if (!isValidateInput) {
-    result.message = "회원가입 데이터가 유효하지 않습니다";
+    result.message = validateMessage;
     res.send(result);
     return; 
   }
@@ -71,7 +73,7 @@ const findId = (req, res) => {
 
   const isValidateInput = validate.validateFindIdInput(name, phoneNumber, email);
   if (!isValidateInput) {
-    result.message = "아이디 찾기 데이터가 유효하지 않습니다";
+    result.message = validateMessage;
     res.send(result);
     return; 
   }
@@ -105,7 +107,7 @@ const validateUser = (req, res) => {
 
   const isValidateInput = validate.validateUserInput(loginId, name, phoneNumber, email);
   if (!isValidateInput) {
-      result.message = "데이터 형식이 유효하지 않습니다";
+      result.message = validateMessage;
       res.send(result);
       return;
   }
@@ -139,7 +141,7 @@ const resetPw = (req, res) => {
 
   const isValidateInput = validate.validateResetPwInput(userId, newPw);
   if (!isValidateInput) {
-    result.message = "데이터가 유효하지 않습니다";
+    result.message = validateMessage;
     res.send(result);
     return;
   }
@@ -170,6 +172,13 @@ const viewProfile = (req, res) => {
   const { userId } = req.params;
   const result = makeResult();
 
+  const isValidateInput = validate.validateViewProfileInput(userId);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
+
   const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?";
   const param = [userId];
 
@@ -196,6 +205,12 @@ const modifyProfile = (req, res) => {
   const { userId, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
+  const isValidateInput = validate.validateModifyPrifileInput(userId, name, phoneNumber, email);
+  if (!isValidateInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
   const sql = "UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?";
   const param = [name, phoneNumber, email, userId];
 
@@ -211,7 +226,7 @@ const modifyProfile = (req, res) => {
       result.message = "수정에 성공하였습니다";
 
     } else {
-      result.message = "수정에 실패하였습니다";
+      result.message = "수정에 실패하였습니다 (존재하지 않는 유저)";
     }
 
     res.send(result);
@@ -221,6 +236,13 @@ const modifyProfile = (req, res) => {
 const deleteUser = (req, res) => {
   const { userId } = req.body;
   const result = makeResult();
+
+  const validateUserInput = validate.validateDeleteUserInput(userId);
+  if (!validateUserInput) {
+    result.message = validateMessage;
+    res.send(result);
+    return;
+  }
 
   const sql = "DELETE FROM user_TB WHERE id = ?";
   const param = [userId];
@@ -237,7 +259,7 @@ const deleteUser = (req, res) => {
       result.message = "탈퇴되었습니다";
 
     } else {
-      result.message = "탈퇴에 실패하였습니다";
+      result.message = "탈퇴에 실패하였습니다 (존재하지 않는 유저)";
     }
 
     res.send(result);
