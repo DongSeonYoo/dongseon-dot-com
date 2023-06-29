@@ -8,10 +8,10 @@ const postApi = require("./src/router/post");
 const commentApi = require("./src/router/comment");
 
 app.use(express.json());
+app.use(express.static("public"));
+
 app.use("/account", accountApi);
 app.use("/post", postApi);
 app.use("/comment", commentApi);
-
-db.connect();
 
 module.exports = app;
