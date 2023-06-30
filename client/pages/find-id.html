@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+
+  <link rel="stylesheet" type="text/css" href="../styles/find-id.css">
+</head>
+<body>
+
+  <section id="container" role="main">
+
+    <div id="content">
+      <h1 id="title">아이디 찾기 페이지</h1>
+
+      <div class="join_content">
+        <h4 class="description">이름: 한글 OR 영문 (2 ~ 8)</h4>
+
+        <span class="input-box">
+          <input id="name-text-field" placeholder="이름" class="info-text-field" type="text">
+        </span>
+
+        <h4 class="description">전화번호: (- 제외 11자리, 0부터 시작)</h4>
+
+        <span class="input-box">
+          <input id="phonenumber-text-field" class="info-text-field" placeholder="전화번호" type="text">
+        </span>
+
+        <h4 class="description">이메일 (아이디 @ 주소.com)</h4>
+
+        <span class="input-box">
+          <input id="email-text-field" class="info-text-field" placeholder="이메일" type="text">
+        </span>
+
+      </div>
+
+      <button id="find-submit-button" class="find-id-page-button" onclick="clickFindId()">
+        아이디 찾기
+      </button>
+
+      <button id="home-button" class="find-id-page-button" type="button">
+        홈으로 가기
+      </button>
+
+    </div>
+
+  </section>
+
+  <script src="../scripts/find-id.js">
+  </script>
+</body>
+</html>

@@ -90,10 +90,21 @@ h2 {
   text-decoration: underline;
 }
 
+#login-modal-open-button {
+  background-color: #c7d1c0;
+  padding: 8px 12px;
+  margin: 0px 4px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#login-modal-open-button:hover {
+  background-color: green;
+}
+
 .login-only-button {
   border: none;
   border-radius: 10px;
-  margin: 2px;
 }
 
 .login-only-button:hover {
@@ -216,7 +227,7 @@ h2 {
 }
 
 #home {
-  background-image: url(image/home-background-image.jpg);
+  background-image: url(../assets/home-background-image.jpg);
   background-position: center;
   padding-top: 150px;
 }

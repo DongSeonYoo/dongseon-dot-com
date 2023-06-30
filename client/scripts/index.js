@@ -42,6 +42,8 @@ const modalClose = () => {
   document.querySelector(".modal").classList.add("hidden");
 }
 
+document.querySelector("#login-modal-open-button").addEventListener("click", modalOpen);
+
 document.querySelector("#modal-close-button").addEventListener("click", modalClose);
 document.querySelector(".background").addEventListener("click", modalClose);
 
@@ -63,3 +65,8 @@ if (signupBtn !== null) {
     location.href = "../signup/signup.jsp";
   })
 }
+
+const findIdBtn = document.querySelector("#find-id-button");
+findIdBtn.addEventListener("click", () => {
+  location.href = "../pages/find-id.html";
+})
