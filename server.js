@@ -1,14 +1,12 @@
 const express = require("express");
 const app = express();
 
-const db = require("./src/database/connect/mariadb");
-
 const accountApi = require("./src/router/account");
 const postApi = require("./src/router/post");
 const commentApi = require("./src/router/comment");
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use(express.static("client/"));
 
 app.use("/account", accountApi);
 app.use("/post", postApi);
