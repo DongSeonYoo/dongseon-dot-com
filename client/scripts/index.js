@@ -51,12 +51,6 @@ document.querySelector("#modal-close-button").addEventListener("click", modalClo
 document.querySelector(".background").addEventListener("click", modalClose);
 
 // 회원가입, 아이디 찾기, 비밀번호 찾기 버튼 이벤트
-if (signupBtn !== null) {
-  signupBtn.addEventListener("click", () => {
-    location.href = "../signup/signup.jsp";
-  });
-}
-
 findIdBtn.addEventListener("click", () => {
   location.href = "../pages/find-id.html";
 });
@@ -64,6 +58,10 @@ findIdBtn.addEventListener("click", () => {
 findPwBtn.addEventListener("click", () => {
   location.href = "../pages/user-validate.html";
 });
+
+signupBtn.addEventListener("click", () => {
+  location.href = "../pages/signup.html";
+})
 
 // 로그인 유효성 검사
 const validate = () => {

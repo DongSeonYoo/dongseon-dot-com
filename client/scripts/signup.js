@@ -1,11 +1,11 @@
 const idField = document.getElementById('id-text-field');
 const pwField = document.getElementById('pw-text-field');
 const pwCheckField = document.getElementById('pw-check-text-field');
-const nicknameField = document.getElementById('nickname-text-field');
+const nicknameField = document.getElementById('name-text-field');
 const emailField = document.getElementById('email-text-field');
 const phoneNumberField = document.getElementById('phonenumber-text-field');
 
-const loginIdRegex = /^[A-Za-z0-9]{8,15}$/;
+const loginIdRegex = /^[A-Za-z0-9]{5,15}$/;
 const pwRegex = /^.{10,17}$/;
 const nameRegex = /^[가-힣a-zA-Z]{2,8}$/;
 const phoneNumberRegex = /^0\d{10}$/;
@@ -19,7 +19,7 @@ const validate = () => {
   }
 
   if (!loginIdRegex.test(idField.value)) {
-    alert("아이디는 영문자, 숫자 조합의 5~30자 이내 문자열이어야 합니다.");
+    alert("아이디는 영문자, 숫자 조합의 5 ~ 15자 이내 문자열이어야 합니다.");
     idField.focus();
     return false;
   }
@@ -84,6 +84,42 @@ const validate = () => {
 const clickSignup = () => {
   if (validate()) {
     fetchData();
+  }
+}
+
+const fetchData = async () => {
+  const loginId = document.getElementById("id-text-field").value;
+  const pw = document.getElementById("pw-text-field").value;
+  const name = document.getElementById("name-text-field").value;
+  const phoneNumber = document.getElementById("phonenumber-text-field").value;
+  const email = document.getElementById("email-text-field").value;
+
+  try {
+    const res = await fetch("/account/signup", {
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": JSON.stringify({
+        "loginId": loginId,
+        "pw": pw,
+        "name": name,
+        "phoneNumber": phoneNumber,
+        "email": email
+      })
+    });
+
+    const json = await res.json();
+    if (json.success) {
+      location.href = "/";
+
+    } else {
+      alert(json.message);
+      location.reload();
+    }
+
+  } catch (err) {
+    alert(err);
   }
 }
 
