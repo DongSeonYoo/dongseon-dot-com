@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+
+  <link rel="stylesheet" type="text/css" href="../styles/reset-pw.css">
+</head>
+
+<body>
+
+  <section id="container" role="main">
+
+    <div id="content">
+
+      <h1 id="title">비번 재설정 페이지입니다.</h1>
+
+      <div class="join_content">
+        <h4>새로운 비밀번호</h4>
+
+        <span class="input-box">
+          <input id="new-pw-text-field" class="info-text-field" placeholder="새롭게 설정할 비밀번호" type="password"
+            name="password_value">
+        </span>
+
+        <h4>비밀번호 재확인</h4>
+
+        <span class="input-box">
+          <input id="check-password-text-field" class="info-text-field" placeholder="비밀번호 재확인" type="password">
+        </span>
+
+      </div>
+
+      <button id="find-submit-button" class="find-pw-page-button" onclick="clickResetPw()">
+        비번 재설정
+      </button>
+
+      <button id="home-button" class="find-pw-page-button">
+        홈으로 가기
+      </button>
+
+    </div>
+  </section>
+
+  <script src="../scripts/reset-pw.js">
+  </script>
+</body>
+
+</html>

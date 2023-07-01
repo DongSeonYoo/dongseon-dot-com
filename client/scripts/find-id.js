@@ -1,3 +1,7 @@
+document.querySelector("#home-button").addEventListener('click', () => {
+  location.href = "/";
+});
+
 function validate() {
   const name = document.getElementById("name-text-field").value;
   const phoneNumber = document.getElementById("phonenumber-text-field").value;
@@ -50,22 +54,27 @@ function validate() {
   return true;
 }
 
-document.querySelector("#home-button").addEventListener('click', () => {
-  location.href = "/";
-})
-
 function clickFindId() {
   const isValidValues = validate();
 
   if (isValidValues) {
-    const name = document.getElementById("name-text-field").value;
-    const phoneNumber = document.getElementById("phonenumber-text-field").value;
-    const email = document.getElementById("email-text-field").value;
+    fetchData();
+  }
+}
 
-    const queryString = `name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
+const fetchData = async () => {
+  const name = document.getElementById("name-text-field").value;
+  const phoneNumber = document.getElementById("phonenumber-text-field").value;
+  const email = document.getElementById("email-text-field").value;
 
-    fetch(`/account/loginId?${queryString}`)
-      .then((res) => res.json())
-      .then((json) => alert(JSON.stringify(json.message)))
+  const queryString = `name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
+
+  try {
+    const res = await fetch("/account/loginId?" + queryString);
+    const json = await res.json();
+
+    alert(JSON.stringify(json));
+  } catch (err) {
+    alert(err);
   }
 }
