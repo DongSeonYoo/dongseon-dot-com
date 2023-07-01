@@ -55,7 +55,6 @@ const fetchData = async () => {
 
     const json = await res.json();
     if (json.success) {
-      alert("비밀번호가 변경되었습니다.");
       sessionStorage.clear();
       location.href = "/";
 
