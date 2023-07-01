@@ -2,11 +2,11 @@ const { loginIdRegex, pwRegex, nameRegex, phoneNumberRegex, emailRegex } = requi
 const isNumber = (number) => !isNaN(Number(number));
 
 const validateLoginInput = (loginId, pw) => {
-  if (!loginIdRegex.test(loginId)) {
+  if (loginId.length <= 0 || loginId.length >= 20) {
     return false;
-  } 
+  }
 
-  if (!pwRegex.test(pw)) {
+  if (pw.length <= 0 || pw.length >= 20) {
     return false;
   }
 
