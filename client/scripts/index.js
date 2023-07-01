@@ -85,12 +85,11 @@ const validate = () => {
 const clickLogin = () => {
   const isValidateLoginValue = validate();
   if (isValidateLoginValue) {
-    fetchData();
+    loginFetch();
   }
 }
 
-
-const fetchData = async () => {
+const loginFetch = async () => {
   try {
     const id = idInput.value;
     const pw = pwInput.value;
@@ -116,14 +115,52 @@ const fetchData = async () => {
       alert("로그인 실패: " + json.message);
       clearInputFields();
     }
-    
+
   } catch (error) {
     alert(error);
   }
 }
 
-
 const clearInputFields = () => {
   idInput.value = "";
   pwInput.value = "";
 };
+
+if (sessionStorage.getItem("loginUserSession")) {
+  const loginModalBtn = document.getElementById("login-modal-open-button");
+  const navMenuDiv = document.getElementById("nav-menu");
+  const navbarDiv = document.getElementById("nav-bar");
+  const tempDiv = document.createElement("div");
+  const communityAtag = document.createElement("a");
+  const viewProfileAtag = document.createElement("a");
+  const viewProfileButton = document.createElement("button");
+  const logoutBtn = document.createElement("button");
+
+  // 로그인 버튼 제거
+  loginModalBtn.style.display = "none";
+
+  // 커뮤니티로 가는 링크 추가
+  communityAtag.classList.add("nav-menu-item");
+  communityAtag.href = "/community/community.jsp";
+  communityAtag.innerHTML = "커뮤니티";
+  navMenuDiv.appendChild(communityAtag);
+
+  // 내 프로필 보기 버튼
+  viewProfileAtag.href = "../pages/view-profile.html";
+  viewProfileButton.classList.add("login-only-button");
+  viewProfileButton.innerHTML = "내 프로필";
+  viewProfileAtag.appendChild(viewProfileButton);
+  tempDiv.appendChild(viewProfileAtag);
+  navbarDiv.appendChild(tempDiv);
+
+  // 로그아웃 버튼
+  logoutBtn.classList.add("login-only-button");
+  logoutBtn.innerHTML = "로그아웃";
+  logoutBtn.addEventListener("click", () => {
+    sessionStorage.clear();
+    location.reload();
+  });
+
+  tempDiv.appendChild(logoutBtn);
+  navbarDiv.appendChild(tempDiv);
+}
