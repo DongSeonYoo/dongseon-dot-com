@@ -52,16 +52,16 @@ document.querySelector(".background").addEventListener("click", modalClose);
 
 // 회원가입, 아이디 찾기, 비밀번호 찾기 버튼 이벤트
 findIdBtn.addEventListener("click", () => {
-  location.href = "../pages/find-id.html";
+  location.href = "http://13.125.33.251:8000/find-id";
 });
 
 findPwBtn.addEventListener("click", () => {
-  location.href = "../pages/user-validate.html";
+  location.href = "http://13.125.33.251:8000/user-validate";
 });
 
 signupBtn.addEventListener("click", () => {
-  location.href = "../pages/signup.html";
-})
+  location.href = "http://13.125.33.251:8000/signup";
+});
 
 // 로그인 유효성 검사
 const validate = () => {

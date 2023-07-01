@@ -115,7 +115,7 @@ const fetchData = async () => {
 
     } else {
       alert(json.message);
-      location.reload();
+            
     }
 
   } catch (err) {
