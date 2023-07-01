@@ -52,15 +52,15 @@ document.querySelector(".background").addEventListener("click", modalClose);
 
 // 회원가입, 아이디 찾기, 비밀번호 찾기 버튼 이벤트
 findIdBtn.addEventListener("click", () => {
-  location.href = "http://13.125.33.251:8000/find-id";
+  location.href = "/find-id";
 });
 
 findPwBtn.addEventListener("click", () => {
-  location.href = "http://13.125.33.251:8000/user-validate";
+  location.href = "/user-validate";
 });
 
 signupBtn.addEventListener("click", () => {
-  location.href = "http://13.125.33.251:8000/signup";
+  location.href = "/signup";
 });
 
 // 로그인 유효성 검사
@@ -146,7 +146,7 @@ if (sessionStorage.getItem("loginUserSession")) {
   navMenuDiv.appendChild(communityAtag);
 
   // 내 프로필 보기 버튼
-  viewProfileAtag.href = "../pages/view-profile.html";
+  viewProfileAtag.href = `/view-profile`;
   viewProfileButton.classList.add("login-only-button");
   viewProfileButton.innerHTML = "내 프로필";
   viewProfileAtag.appendChild(viewProfileButton);
