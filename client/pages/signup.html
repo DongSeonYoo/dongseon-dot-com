@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+
+  <link rel="stylesheet" type="text/css" href="../styles/signup.css">
+</head>
+
+<body>
+
+  <section id="container" role="main">
+
+    <div id="content">
+
+      <div class="join_content">
+        <h4>아이디</h4>
+
+        <span class="input-box">
+          <input id="id-text-field" placeholder="영문자, 숫자 조합의 문자열 (5~30자)" class="info-text-field" type="text"
+            name="id_value">
+        </span>
+
+        <h4>비밀번호</h4>
+
+        <span class="input-box">
+          <input id="pw-text-field" class="info-text-field" placeholder="영문자 + 숫자 + 특수문자 조합 (8~25자)" type="password"
+            name="pw_value">
+        </span>
+
+        <h4>비밀번호 확인</h4>
+
+        <span class="input-box">
+          <input id="pw-check-text-field" class="info-text-field" type="password">
+        </span>
+
+        <h4>닉네임</h4>
+
+        <span class="input-box">
+          <input id="nickname-text-field" class="info-text-field" placeholder="닉네임은 영문자, 한글, 숫자 조합 (2~20자)" type="text"
+            name="nickname_value">
+        </span>
+
+        <h4>이메일</h4>
+
+        <span class="input-box">
+          <input id="email-text-field" class="info-text-field" type="text" name="email_value">
+        </span>
+
+      </div>
+
+      <button id="submit-button" class="signup-page-button">
+        회원가입
+      </button>
+
+      <button id="home-button" class="signup-page-button">
+        홈으로 가기
+      </button>
+
+    </div>
+  </section>
+
+  <script src="../scripts/signup.js"></script>
+</body>
+
+</html>
