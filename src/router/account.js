@@ -26,7 +26,7 @@ router.get("/pw", accountCtrl.validateUser);
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
 // userId, newPw
-router.post("/pw", accountCtrl.resetPw);
+router.put("/pw", accountCtrl.resetPw);
 
 // 프로필 보기 api
 // userId
