@@ -18,39 +18,42 @@
         <h4>아이디</h4>
 
         <span class="input-box">
-          <input id="id-text-field" placeholder="영문자, 숫자 조합의 문자열 (5~30자)" class="info-text-field" type="text"
-            name="id_value">
+          <input id="id-text-field" placeholder="영문자, 숫자 조합의 문자열 (5~30자)" class="info-text-field" type="text">
         </span>
 
         <h4>비밀번호</h4>
 
         <span class="input-box">
-          <input id="pw-text-field" class="info-text-field" placeholder="영문자 + 숫자 + 특수문자 조합 (8~25자)" type="password"
-            name="pw_value">
+          <input id="pw-text-field" class="info-text-field" placeholder="영문자 + 숫자 + 특수문자 조합 (8~25자)" type="password">
         </span>
 
         <h4>비밀번호 확인</h4>
 
         <span class="input-box">
-          <input id="pw-check-text-field" class="info-text-field" type="password">
+          <input id="pw-check-text-field" class="info-text-field" placeholder="동일한 비밀번호를 입력해주세요" type="password">
         </span>
 
         <h4>닉네임</h4>
 
         <span class="input-box">
-          <input id="nickname-text-field" class="info-text-field" placeholder="닉네임은 영문자, 한글, 숫자 조합 (2~20자)" type="text"
-            name="nickname_value">
+          <input id="nickname-text-field" class="info-text-field" placeholder="닉네임은 영문자, 한글, 숫자 조합 (2~20자)" type="text">
+        </span>
+
+        <h4>전화번호 ex) 01000000000</h4>
+
+        <span class="input-box">
+          <input id="phonenumber-text-field" class="info-text-field" placeholder="010으로 시작하는 숫자 11자리" type="text">
         </span>
 
         <h4>이메일</h4>
 
         <span class="input-box">
-          <input id="email-text-field" class="info-text-field" type="text" name="email_value">
+          <input id="email-text-field" class="info-text-field" type="text">
         </span>
 
       </div>
 
-      <button id="submit-button" class="signup-page-button">
+      <button id="submit-button" class="signup-page-button" onclick="clickSignup()">
         회원가입
       </button>
 
