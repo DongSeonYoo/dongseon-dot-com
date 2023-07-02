@@ -58,8 +58,9 @@ body {
   margin-right: 5px;
 }
 
-.edit-profile-button {
+#edit-profile-button {
   background-color: #007bff;
+  cursor: pointer;
 }
 
 .home-button {
