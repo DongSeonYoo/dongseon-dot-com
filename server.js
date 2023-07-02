@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const path = require("path");
 
 const pagesRoute = require("./src/router/pages");
 const accountApi = require("./src/router/account");
@@ -11,6 +10,7 @@ app.use(express.json());
 app.use(express.static("client/"));
 
 app.use("/", pagesRoute);
+
 app.use("/account", accountApi);
 app.use("/post", postApi);
 app.use("/comment", commentApi);

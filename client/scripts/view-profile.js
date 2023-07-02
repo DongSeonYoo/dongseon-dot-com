@@ -89,7 +89,7 @@ const inputValidate = (existingName, existingPhoneNumber, existingEmail) => {
 }
 
 editProfileBtn.addEventListener("click", () => {
-  if (inputValidate(existingName, existingEmail, existingEmail)) {
+  if (inputValidate(existingName, existingPhoneNumber, existingEmail)) {
     editProfileFetch();
   }
 })

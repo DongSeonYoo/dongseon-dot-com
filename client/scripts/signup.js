@@ -114,8 +114,7 @@ const fetchData = async () => {
       location.href = "/";
 
     } else {
-      alert(json.message);
-            
+      console.error(json.message);
     }
 
   } catch (err) {
