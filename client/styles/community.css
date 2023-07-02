@@ -1,0 +1,42 @@
+#container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.post {
+  display: flex;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  align-items: center;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+
+  cursor: pointer;
+}
+
+.post:hover {
+  opacity: .5;
+}
+
+.post-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.post-date, .post-author {
+  font-size: 14px;
+  margin: 5px 0;
+}
+
+#create-post-button {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+
+  margin-bottom: 20px;
+}
