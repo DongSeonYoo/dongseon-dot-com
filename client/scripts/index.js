@@ -141,7 +141,7 @@ if (sessionStorage.getItem("loginUserSession")) {
 
   // 커뮤니티로 가는 링크 추가
   communityAtag.classList.add("nav-menu-item");
-  communityAtag.href = "/community/community.jsp";
+  communityAtag.href = "/community";
   communityAtag.innerHTML = "커뮤니티";
   navMenuDiv.appendChild(communityAtag);
 
