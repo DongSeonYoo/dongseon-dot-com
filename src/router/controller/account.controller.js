@@ -2,7 +2,7 @@ const db = require("../../database/connect/mariadb");
 const { makeResult, printError } = require("../controller/util/func");
 
 const accountValidate = require("../controller/util/validate/accountValidate");
-const validateMessage = "데이터 형식이 유효하지 않습니다";
+const validateMessage = "데이터 형식이 유효하지 않습니다, (regex테스트 실패)";
 
 const login = (req, res) => {
   const { loginId, pw } = req.body;
