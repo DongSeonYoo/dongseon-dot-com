@@ -4,6 +4,10 @@
   padding: 20px;
 }
 
+button {
+  cursor: pointer;
+}
+
 .post {
   display: flex;
   border: 1px solid #ccc;
