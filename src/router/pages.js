@@ -8,4 +8,10 @@ router.get("/:pageName", (req, res) => {
   res.sendFile(filePath);
 });
 
+router.get("/:pageName/:pathVariable", (req, res) => {
+  const pageName = req.params.pageName;
+  const filePath = path.join(__dirname, `../../client/pages/${pageName}.html`);
+  res.sendFile(filePath);
+})
+
 module.exports = router;
