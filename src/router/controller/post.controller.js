@@ -75,7 +75,7 @@ const readPost = (req, res) => {
     const isFindPost = results.length === 0;
     if (!isFindPost) {
       result.success = true;
-      result.message = results;
+      result.message = results[0];
     } else {
       result.message = "해당하는 게시글이 존재하지 않습니다";
     }
