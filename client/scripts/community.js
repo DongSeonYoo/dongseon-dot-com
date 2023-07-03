@@ -34,6 +34,15 @@ async function getAllPostsFetch() {
   } catch (error) {
     console.error(error);
   }
+
+  const post = document.querySelectorAll(".post");
+  post.forEach((postElement) => {
+    postElement.addEventListener("click", () => {
+      const postId = postElement.querySelector("input").value;
+
+      location.href = `/post/${postId}`;
+    })
+  });
 }
 
 function makePostList(post) {
