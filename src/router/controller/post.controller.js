@@ -62,8 +62,8 @@ const readPost = (req, res) => {
     return res.send(result);
   }
 
-  const sql = "SELECT * FROM post_TB WHERE id = ?";
-  const param = [postId];
+  const sql = "SELECT post_TB.*, user_TB.name AS author_name FROM post_TB JOIN user_TB ON post_TB.user_id = user_TB.id WHERE post_TB.id = ?";
+  const param = postId;
 
   db.query(sql, param, (error, results, fields) => {
     if (error) {
