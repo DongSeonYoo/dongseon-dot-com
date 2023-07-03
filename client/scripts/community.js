@@ -21,13 +21,12 @@ async function getAllPostsFetch() {
     const json = await result.json();
 
     if (json.success) {
-
       json.message.forEach(post => {
         makePostList(post);
       });
       
     } else {
-      alert("데이터베이스 오류");
+      alert("데이터베이스 오류: " + json.message);
       location.href = "/";
     }
 
