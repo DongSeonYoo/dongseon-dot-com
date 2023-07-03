@@ -11,8 +11,8 @@ app.use(express.static("client/"));
 
 app.use("/", pagesRoute);
 
-app.use("/account", accountApi);
-app.use("/post", postApi);
-app.use("/comment", commentApi);
+app.use("/api/account", accountApi);
+app.use("/api/post", postApi);
+app.use("/api/comment", commentApi);
 
 module.exports = app;
