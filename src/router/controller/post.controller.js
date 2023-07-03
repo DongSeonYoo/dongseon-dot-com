@@ -4,6 +4,8 @@ const { makeResult, printError } = require("../controller/util/func");
 const postValidate = require("../controller/util/validate/postValidate");
 const validateMessage = "데이터 형식이 유효하지 않습니다";
 
+const path = require("path");
+
 const createPost = (req, res) => {
   const { userId, title, content } = req.body;
   const result = makeResult();
@@ -36,7 +38,7 @@ const readAllPost = (req, res) => {
   const result = makeResult();
   const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name 
                 AS author_name FROM post_TB JOIN user_TB 
-                ON post_TB.user_id = user_TB.id`
+                ON post_TB.user_id = user_TB.id ORDER BY created_date DESC`
 
   db.query(sql, (error, results, fields) => {
     if (error) {
@@ -57,8 +59,7 @@ const readPost = (req, res) => {
   const isValidateInput = postValidate.validateReadPost(postId);
   if (!isValidateInput) {
     result.message = validateMessage;
-    res.send(result);
-    return;
+    return res.send(result);
   }
 
   const sql = "SELECT * FROM post_TB WHERE id = ?";
@@ -75,7 +76,6 @@ const readPost = (req, res) => {
     if (!isFindPost) {
       result.success = true;
       result.message = results;
-
     } else {
       result.message = "해당하는 게시글이 존재하지 않습니다";
     }
