@@ -13,6 +13,11 @@ body {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+#post-title {
+  font-size: 40px;
+  font-weight: bold;
+}
+
 h1 {
   text-align: center;
 }
@@ -31,11 +36,6 @@ h1 {
   gap: 20px;
 }
 
-#post-title {
-  font-size: 20px;
-  margin-top: 0;
-}
-
 .post-info {
   font-size: 14px;
   color: #888;
@@ -46,7 +46,14 @@ h1 {
   margin-bottom: 10px;
 }
 
-#comments {
+#post-content {
+  width: 600px;
+  height: 200px;
+  border: 1px solid #b1b1b1;
+  border-radius: 5px;
+}
+
+.comments {
   margin-top: 20px;
 }
 
@@ -54,6 +61,7 @@ h1 {
   border: 1px solid #ccc;
   padding: 10px;
   margin-bottom: 10px;
+  border-radius: 10px;
 }
 
 .comment h3 {
