@@ -45,7 +45,7 @@ const createPostFetch = async () => {
 
   try {
     const userId = sessionStorage.getItem("loginUserSession")
-    const result = await fetch("/post", {
+    const result = await fetch("/api/post", {
       "method": "POST",
       "headers": {
         "Content-Type": "application/json"

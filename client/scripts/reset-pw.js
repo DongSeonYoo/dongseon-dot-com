@@ -42,7 +42,7 @@ const fetchData = async () => {
   const newPw = document.getElementById("new-pw-text-field").value;
 
   try {
-    const res = await fetch("/account/pw", {
+    const res = await fetch("/api/account/pw", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

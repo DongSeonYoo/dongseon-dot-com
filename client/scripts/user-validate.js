@@ -72,7 +72,7 @@ const fetchData = async () => {
   const queryString = `loginId=${loginId}&name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
 
   try {
-    const response = await fetch("/account/pw?" + queryString);
+    const response = await fetch("/api/account/pw?" + queryString);
     const json = await response.json();
 
     if (json.success) {

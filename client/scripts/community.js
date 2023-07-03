@@ -12,11 +12,9 @@ createPostBtn.addEventListener("click", () => {
   location.href = "/write-post"
 });
 
-getAllPostsFetch();
-
 async function getAllPostsFetch() {
   try {
-    const result = await fetch("/post/all");
+    const result = await fetch("/api/post/all");
     const json = await result.json();
 
     if (json.success) {

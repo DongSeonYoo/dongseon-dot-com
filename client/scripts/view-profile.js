@@ -18,7 +18,7 @@ async function viewProfileFetch() {
     const userId = sessionStorage.getItem("loginUserSession");
     const pathVariable = userId;
 
-    const result = await fetch("/account/" + pathVariable);
+    const result = await fetch("/api/account/" + pathVariable);
     const json = await result.json();
 
     if (json.success) {
@@ -101,7 +101,7 @@ const editProfileFetch = async () => {
   const email = emailForm.value;
 
   try {
-    const res = await fetch("/account", {
+    const res = await fetch("/api/account", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -117,15 +117,18 @@ const editProfileFetch = async () => {
     const json = await res.json();
 
     if (json.success) {
-      alert(json.message);
       location.href = "/";
 
     } else {
-      alert(json.message);
+      alert("데이터베이스 오류: " + json.message);
+      console.error(error);
+      location.href = "/";
     }
 
   } catch (error) {
-    console.log(error);
+    alert("데이터베이스 오류: " + error.message);
+    console.error(error);
+    location.href = "/";
   }
 }
 

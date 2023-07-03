@@ -95,7 +95,7 @@ const fetchData = async () => {
   const email = document.getElementById("email-text-field").value;
 
   try {
-    const res = await fetch("/account/signup", {
+    const res = await fetch("/api/account/signup", {
       "method": "POST",
       "headers": {
         "Content-Type": "application/json"

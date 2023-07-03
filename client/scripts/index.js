@@ -94,7 +94,7 @@ const loginFetch = async () => {
     const id = idInput.value;
     const pw = pwInput.value;
 
-    const res = await fetch("/account/login", {
+    const res = await fetch("/api/account/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -70,7 +70,7 @@ const fetchData = async () => {
   const queryString = `name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
 
   try {
-    const res = await fetch("/account/loginId?" + queryString);
+    const res = await fetch("/api/account/loginId?" + queryString);
     const json = await res.json();
 
     alert(JSON.stringify(json));
