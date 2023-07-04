@@ -38,7 +38,7 @@ const readAllPost = (req, res) => {
   const result = makeResult();
   const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name 
                 AS author_name FROM post_TB JOIN user_TB 
-                ON post_TB.user_id = user_TB.id ORDER BY created_date DESC`
+                ON post_TB.user_id = user_TB.id ORDER BY created_date DESC LIMIT 8`
 
   db.query(sql, (error, results, fields) => {
     if (error) {
