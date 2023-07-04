@@ -119,8 +119,8 @@ async function clickCommentSubmitBtn() {
     return;
   }
 
-  if (commentContent.value.length > 200) {
-    alert("댓글은 200자 내로 입력해주세요");
+  if (commentContent.value.length > 300) {
+    alert("댓글은 300자 내로 입력해주세요");
     return;
   }
 
