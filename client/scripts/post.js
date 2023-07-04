@@ -81,11 +81,18 @@ function makeManagePostUI() {
   postInfoArea.appendChild(buttonZone);
 }
 
-function clickPostModifyButton() {
-
+async function clickPostModifyButton() {
+  location.href = `/modify-post/${postId}`;
 }
 
 async function clickPostDeleteButton() {
+
+  const askDelete = confirm("게시글을 삭제하시겠습니까?");
+
+  if (!askDelete) {
+    return;  
+  }
+
   try {
     const result = await fetch("/api/post", {
       "method": "DELETE",
