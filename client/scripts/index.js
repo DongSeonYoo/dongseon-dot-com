@@ -11,17 +11,55 @@ const signupBtn = document.querySelector("#sign-up-button");
 const findIdBtn = document.querySelector("#find-id-button");
 const findPwBtn = document.getElementById("find-pw-button");
 
+const a = location.href;
+console.log(a);
+
 // 요소의 높이 계산
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
+
+if (sessionStorage.getItem("loginUserSession")) {
+  const loginModalBtn = document.getElementById("login-modal-open-button");
+  
+  const navbarDiv = document.getElementById("nav-bar");
+  const tempDiv = document.createElement("div");
+  
+  const viewProfileAtag = document.createElement("a");
+  const viewProfileButton = document.createElement("button");
+  const logoutBtn = document.createElement("button");
+
+  // 로그인 버튼 제거
+  loginModalBtn.style.display = "none";
+
+  // 내 프로필 보기 버튼
+  viewProfileAtag.href = `/view-profile`;
+  viewProfileButton.classList.add("login-only-button");
+  viewProfileButton.innerHTML = "내 프로필";
+  viewProfileAtag.appendChild(viewProfileButton);
+  tempDiv.appendChild(viewProfileAtag);
+  navbarDiv.appendChild(tempDiv);
+
+  // 로그아웃 버튼
+  logoutBtn.classList.add("login-only-button");
+  logoutBtn.innerHTML = "로그아웃";
+  logoutBtn.addEventListener("click", () => {
+    sessionStorage.clear();
+    location.reload();
+  });
+
+  tempDiv.appendChild(logoutBtn);
+  navbarDiv.appendChild(tempDiv);
+}
 
 // 스크롤 이벤트 처리
 document.addEventListener('scroll', () => {
   if (window.scrollY > navBarHeight) {
     navBar.classList.add("navbar-draw-color");
+
   } else {
     navBar.classList.remove("navbar-draw-color");
   }
+
   home.style.opacity = 1 - window.scrollY / homeHeight;
 });
 
@@ -125,42 +163,3 @@ const clearInputFields = () => {
   idInput.value = "";
   pwInput.value = "";
 };
-
-if (sessionStorage.getItem("loginUserSession")) {
-  const loginModalBtn = document.getElementById("login-modal-open-button");
-  const navMenuDiv = document.getElementById("nav-menu");
-  const navbarDiv = document.getElementById("nav-bar");
-  const tempDiv = document.createElement("div");
-  const communityAtag = document.createElement("a");
-  const viewProfileAtag = document.createElement("a");
-  const viewProfileButton = document.createElement("button");
-  const logoutBtn = document.createElement("button");
-
-  // 로그인 버튼 제거
-  loginModalBtn.style.display = "none";
-
-  // 커뮤니티로 가는 링크 추가
-  communityAtag.classList.add("nav-menu-item");
-  communityAtag.href = "/community";
-  communityAtag.innerHTML = "커뮤니티";
-  navMenuDiv.appendChild(communityAtag);
-
-  // 내 프로필 보기 버튼
-  viewProfileAtag.href = `/view-profile`;
-  viewProfileButton.classList.add("login-only-button");
-  viewProfileButton.innerHTML = "내 프로필";
-  viewProfileAtag.appendChild(viewProfileButton);
-  tempDiv.appendChild(viewProfileAtag);
-  navbarDiv.appendChild(tempDiv);
-
-  // 로그아웃 버튼
-  logoutBtn.classList.add("login-only-button");
-  logoutBtn.innerHTML = "로그아웃";
-  logoutBtn.addEventListener("click", () => {
-    sessionStorage.clear();
-    location.reload();
-  });
-
-  tempDiv.appendChild(logoutBtn);
-  navbarDiv.appendChild(tempDiv);
-}
