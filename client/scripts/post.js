@@ -1,6 +1,7 @@
 const commentsSection = document.querySelector(".comments");
 const commentsCount = document.getElementById("comment-count");
 const postInfoArea = document.getElementById("post-info-area");
+const backBtn = document.getElementById("back-button");
 
 const userId = sessionStorage.getItem("loginUserSession");
 const postId = parseUrl();
@@ -15,6 +16,10 @@ window.onload = async () => {
   }
   displayComment();
 }
+
+backBtn.addEventListener("click", () => {
+  history.back();
+})
 
 function parseUrl() {
   const url = window.location.href.split("/");
