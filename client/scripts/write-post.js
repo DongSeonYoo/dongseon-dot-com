@@ -1,6 +1,11 @@
 const submitBtn = document.getElementById("submit-button");
 const cancelBtn = document.getElementById("cancel-button");
 
+window.onload = () => {
+  if (!sessionStorage.getItem("loginUserSession")) {
+    location.href = "/";
+  }
+}
 
 submitBtn.addEventListener("click", () => {
   if (validateInput()) {
