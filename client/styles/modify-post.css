@@ -1,0 +1,65 @@
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding-top: 70px;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin-bottom: 10px;
+}
+
+.content {
+  margin-bottom: 10px;
+}
+
+.form-area {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+#input-title {
+  height: 30px;
+}
+
+#input-content {
+  height: 200px;
+}
+
+input {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.button-container {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.buttons {
+  width: 200px;
+  height: 35px;
+  margin: 5px;
+
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#cancel-button {
+  background-color: #ccc;
+}
+
+#submit-button{
+  background-color: #50d350;
+}
+
+#submit-button:hover{
+  background-color: #267c26;
+}
