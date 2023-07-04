@@ -12,7 +12,12 @@ homeBtn.addEventListener("click", () => {
 })
 
 createPostBtn.addEventListener("click", () => {
-  location.href = "/write-post"
+  if (sessionStorage.getItem("loginUserSession")) {
+    location.href = "/write-post";
+
+  } else {
+    alert("로그인 후 이용해주세요");
+  }
 });
 
 async function getAllPostsFetch() {
