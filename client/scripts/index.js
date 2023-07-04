@@ -18,7 +18,7 @@ console.log(a);
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
 
-if (sessionStorage.getItem("loginUserSession")) {
+if (localStorage.getItem("loginUserSession")) {
   const loginModalBtn = document.getElementById("login-modal-open-button");
   
   const navbarDiv = document.getElementById("nav-bar");
@@ -43,7 +43,7 @@ if (sessionStorage.getItem("loginUserSession")) {
   logoutBtn.classList.add("login-only-button");
   logoutBtn.innerHTML = "로그아웃";
   logoutBtn.addEventListener("click", () => {
-    sessionStorage.clear();
+    localStorage.clear();
     location.reload();
   });
 
@@ -111,7 +111,7 @@ const validate = () => {
     return false;
   }
 
-  if (idValue.length > 10 || pwValue.length > 20) {
+  if (idValue.length > 15 || pwValue.length > 17) {
     alert("아이디 또는 비밀번호의 길이가 너무 깁니다");
     return false;
   }
@@ -146,7 +146,7 @@ const loginFetch = async () => {
     const json = await res.json();
     if (json.success) {
       const userPk = json.message;
-      sessionStorage.setItem("loginUserSession", userPk);
+      localStorage.setItem("loginUserSession", userPk);
       location.reload();
 
     } else {

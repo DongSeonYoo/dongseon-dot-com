@@ -3,7 +3,7 @@ const commentsCount = document.getElementById("comment-count");
 const postInfoArea = document.getElementById("post-info-area");
 const backBtn = document.getElementById("back-button");
 
-const userId = sessionStorage.getItem("loginUserSession");
+const userId = localStorage.getItem("loginUserSession");
 const postId = parseUrl();
 
 window.onload = async () => {

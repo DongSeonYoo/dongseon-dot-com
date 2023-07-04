@@ -12,7 +12,7 @@ homeBtn.addEventListener("click", () => {
 })
 
 createPostBtn.addEventListener("click", () => {
-  if (sessionStorage.getItem("loginUserSession")) {
+  if (localStorage.getItem("loginUserSession")) {
     location.href = "/write-post";
 
   } else {

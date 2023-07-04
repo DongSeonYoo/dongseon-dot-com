@@ -77,7 +77,7 @@ const fetchData = async () => {
 
     if (json.success) {
       const userPk = json.message;
-      sessionStorage.setItem("resetPwSession", userPk);
+      localStorage.setItem("resetPwSession", userPk);
       location.href = "/reset-pw";
 
     } else {

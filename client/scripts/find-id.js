@@ -73,7 +73,8 @@ const fetchData = async () => {
     const res = await fetch("/api/account/loginId?" + queryString);
     const json = await res.json();
 
-    alert(JSON.stringify(json));
+    alert(json.message);
+    location.href = "/";
   } catch (err) {
     alert(err);
   }

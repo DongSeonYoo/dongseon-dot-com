@@ -38,7 +38,7 @@ const clickResetPw = () => {
 }
 
 const fetchData = async () => {
-  const userId = sessionStorage.getItem("resetPwSession");
+  const userId = localStorage.getItem("resetPwSession");
   const newPw = document.getElementById("new-pw-text-field").value;
 
   try {
@@ -55,7 +55,7 @@ const fetchData = async () => {
 
     const json = await res.json();
     if (json.success) {
-      sessionStorage.clear();
+      localStorage.clear();
       location.href = "/";
 
     } else {
