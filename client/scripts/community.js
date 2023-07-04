@@ -51,6 +51,7 @@ async function getAllPostsFetch() {
 
 function makePostList(post) {
   const postDiv = document.createElement("div");
+  const postInfoSection = document.createElement("section");
   const postTitle = document.createElement("h2");
   const postDate = document.createElement("p");
   const postAuthor = document.createElement("p");
@@ -59,20 +60,25 @@ function makePostList(post) {
   const createDate = new Date(post.created_date);
 
   postTitle.innerHTML = post.title;
-  postDate.innerHTML = createDate.toDateString();
-  postAuthor.innerHTML = "작성자: " + post.author_name;
   postId.value = post.id;
 
+  postDate.innerHTML = createDate.toDateString();
+  postAuthor.innerHTML = "작성자: " + post.author_name;
+
+  postInfoSection.appendChild(postDate);
+  postInfoSection.appendChild(postAuthor);
+
   postDiv.appendChild(postTitle);
-  postDiv.appendChild(postAuthor);
-  postDiv.appendChild(postDate);
+  postDiv.appendChild(postInfoSection);
   postDate.appendChild(postId);
 
   posts.appendChild(postDiv);
 
+  postId.type = "hidden";
+
   postTitle.classList.add("post-title");
   postAuthor.classList.add("post-author");
   postDate.classList.add("post-date");
-  postId.type = "hidden";
   postDiv.classList.add("post");
+  postInfoSection.id = "post-info-section";
 }

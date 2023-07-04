@@ -10,6 +10,7 @@ button {
 
 .post {
   display: flex;
+  flex-direction: column;
   border: 1px solid #ccc;
   margin-bottom: 10px;
   align-items: center;
@@ -17,6 +18,12 @@ button {
   justify-content: space-evenly;
 
   cursor: pointer;
+}
+
+#post-info-section {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
 }
 
 .post:hover {
