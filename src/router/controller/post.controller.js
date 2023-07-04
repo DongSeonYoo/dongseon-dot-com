@@ -62,7 +62,11 @@ const readPost = (req, res) => {
     return res.send(result);
   }
 
-  const sql = "SELECT post_TB.*, user_TB.name AS author_name FROM post_TB JOIN user_TB ON post_TB.user_id = user_TB.id WHERE post_TB.id = ?";
+  const sql = `SELECT post_TB.*, 
+               user_TB.name AS author_name 
+               FROM post_TB 
+               JOIN user_TB ON post_TB.user_id = user_TB.id 
+               WHERE post_TB.id = ?`;
   const param = postId;
 
   db.query(sql, param, (error, results, fields) => {
@@ -141,8 +145,9 @@ const deletePost = (req, res) => {
     if (!isDeleted) {
       result.success = true;
       result.message = "삭제 성공";
+
     } else {
-      result.message = "삭제 실패, 본인만 삭제 가능";
+      result.message = "삭제 실패, 게시글이 존재하지 않거나 본인만 삭제 가능합니다";
     }
 
     res.send(result);
