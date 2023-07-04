@@ -80,8 +80,25 @@ function clickPostModifyButton() {
 
 }
 
-function clickPostDeleteButton() {
+async function clickPostDeleteButton() {
+  try {
+    const result = await fetch("/api/post", {
+      "method": "DELETE",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": JSON.stringify({
+        "userId": userId,
+        "postId": postId,
+      })
+    });
 
+  } catch (error) {
+    alert("데이터베이스 오류");
+    console.error(error);
+  }
+
+  location.href = "/community";
 }
 
 async function clickCommentSubmitBtn() {
