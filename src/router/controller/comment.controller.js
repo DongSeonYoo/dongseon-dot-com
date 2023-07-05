@@ -46,7 +46,7 @@ const readComment = (req, res) => {
   }
 
   // const sql = "SELECT * FROM comment_TB WHERE post_id = ?";
-  const sql = `SELECT comment_TB.id, comment_TB.content, comment_TB.created_date, comment_TB.updated_date, 
+  const sql = `SELECT comment_TB.id, comment_TB.user_id, comment_TB.content, comment_TB.created_date, comment_TB.updated_date, 
                user_TB.name AS author_name 
                FROM comment_TB JOIN user_TB ON comment_TB.user_id = user_TB.id 
                WHERE post_id = ?`
