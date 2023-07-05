@@ -25,10 +25,12 @@ h1 {
 
 #input-title {
   height: 30px;
+  border-radius: 10px;
 }
 
 #input-content {
   height: 200px;
+  border-radius: 10px;
 }
 
 input {

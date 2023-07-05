@@ -1,3 +1,8 @@
+body {
+  background-image: url(../assets/home-background-image.jpg);
+  background-position: center;
+}
+
 #container {
   max-width: 600px;
   margin: 0 auto;
@@ -16,6 +21,8 @@ button {
   align-items: center;
   flex-wrap: nowrap;
   justify-content: space-evenly;
+  background-color: #eae5de;
+  border-radius: 20px;
 
   cursor: pointer;
 }

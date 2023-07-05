@@ -155,7 +155,7 @@ const loginFetch = async () => {
     }
 
   } catch (error) {
-    alert(error);
+    alert("error: " + error + "(서버 꺼져있는듯)");
   }
 }
 
