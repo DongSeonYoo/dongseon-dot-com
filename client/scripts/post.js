@@ -50,6 +50,11 @@ function makeCommentList(comment) {
   commentDiv.appendChild(commentInfoArea);
   commentDiv.appendChild(commentContent);
 
+  // 만약 현재 보고있는 유저와 댓글의 아이디가 일치하면 (댓글주인일경우)
+  if (userId == comment.user_id) {
+    makeMamnageCommentUI(commentDiv, comment.id);
+  }
+
   commentsSection.appendChild(commentDiv);
 
   commentDiv.classList.add("comment");
@@ -81,7 +86,21 @@ function makeManagePostUI() {
   postInfoArea.appendChild(buttonZone);
 }
 
-async function clickPostModifyButton() {
+function makeMamnageCommentUI(commentDiv, commentId) {
+  const commentModifyBtn = document.createElement("button");
+  const commentDeleteBtn = document.createElement("button");
+
+  commentModifyBtn.innerHTML = "수정";
+  commentDeleteBtn.innerHTML = "삭제";
+
+  commentDiv.appendChild(commentModifyBtn);
+  commentDiv.appendChild(commentDeleteBtn);
+
+  // commentModifyBtn.onclick = clickCommentModifyButton;
+  commentDeleteBtn.onclick = () => clickCommentDeleteButton(commentId);
+}
+
+function clickPostModifyButton() {
   location.href = `/modify-post/${postId}`;
 }
 
@@ -105,16 +124,21 @@ async function clickPostDeleteButton() {
       })
     });
 
+    if (result.success) {
+      location.href = "/community";
+
+    } else {
+      alert("삭제 실패: " + result.message);
+    }
+
   } catch (error) {
-    alert("데이터베이스 오류");
+    alert("데이터베이스 오류: " + error);
     console.error(error);
   }
-
-  location.href = "/community";
 }
 
 async function clickCommentSubmitBtn() {
-  let commentContent = document.getElementById("comment-input");
+  const commentContent = document.getElementById("comment-input");
 
   if (!userId) {
     alert("로그인 후 이용해주세요");
@@ -135,11 +159,35 @@ async function clickCommentSubmitBtn() {
   if (json.success) {
     commentsSection.innerHTML = "";
     commentContent.value = "";
-
     displayComment();
 
   } else {
     alert("댓글 작성에 실패하였습니다: " + json.message);
+  }
+}
+
+async function clickCommentModifyButton() {
+  const commentInfoArea = document.querySelector(".comment-info-area");
+  const modifyCommentInput = document.createElement("input");
+  modifyCommentInput.value = "qwer"
+
+  commentInfoArea.appendChild(modifyCommentInput);
+
+}
+
+async function clickCommentDeleteButton(commentId) {
+  const askDelete = confirm("댓글을 삭제하시겠습니까?");
+  if (!askDelete) {
+    return;
+  }
+
+  const json = await deleteCommentFetch(postId, commentId, userId);
+  if (json.success) {
+    commentsSection.innerHTML = "";
+    displayComment();
+
+  } else {
+    alert("댓글 삭제에 실패하였습니다" + json.message);
   }
 }
 
@@ -155,8 +203,8 @@ async function displayPost() {
     const postCreateDate = document.getElementById("post-create-date");
     const postUpdateDate = document.getElementById("post-update-date");
     
-    const parsingUpdatedDate = new Date(post.updated_date).toLocaleString();
-    const parsingCreateDate = new Date(post.created_date).toDateString();
+    const parsingUpdatedDate = new Date(post.updated_date).toLocaleDateString();
+    const parsingCreateDate = new Date(post.created_date).toLocaleString();
 
     postTitle.innerHTML = post.title;
     postAuthor.innerHTML = "작성자: " + post.author_name;
@@ -181,6 +229,9 @@ async function displayComment() {
       json.message.forEach(comment => {
         makeCommentList(comment);
       });
+
+    } else {
+      console.log("실패: " + json.message);
     }
 
   } catch (error) {
@@ -231,5 +282,26 @@ async function writeCommentFetch(postId, userId, content) {
     alert("데이터베이스 오류");
     console.error(error);
     location.href = "/";
+  }
+}
+
+async function deleteCommentFetch(postId, commentId, userId) {
+  try {
+    const result = await fetch("/api/comment", {
+      "method": "DELETE",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": JSON.stringify({
+        "postId": postId,
+        "commentId": commentId,
+        "userId": userId
+      })
+    });
+
+    return await result.json();
+
+  } catch (error) {
+    console.error(error);
   }
 }
