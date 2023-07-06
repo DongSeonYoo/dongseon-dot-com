@@ -18,7 +18,7 @@ const login = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
     const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
     const params = [loginId, pw];
     const data = await client.query(sql, params)
@@ -33,11 +33,11 @@ const login = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "데이터베이스 오류";
+    result.message = "POST /api/account/ error: " + error.message;
     
   } finally {
     res.send(result);
-    client.end();
+    await client.end();
   };
 };
 
@@ -54,7 +54,7 @@ const signup = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
     const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
     const params = [loginId, pw, name, phoneNumber, email];
     const data = await client.query(sql, params);
@@ -62,11 +62,11 @@ const signup = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "데이터베이스 오류: " + error;
+    result.message = "POST /api/account/ error: " + error.message;
 
   } finally {
     res.send(result);
-    client.end();
+    await client.end();
   }
 };
 
@@ -83,7 +83,7 @@ const findId = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
     const sql = "SELECT login_id FROM user_TB WHERE name = $1 AND phone_number = $2 AND email = $3";
     const params = [name, phoneNumber, email];
     const data = await client.query(sql, params);
@@ -99,11 +99,11 @@ const findId = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "데이터베이스 오류: " + error;
+    result.message = "GET /api/account/findId/ error: " + error.message;
 
   } finally {
     res.send(result);
-    client.end();
+    await client.end();
   }
 };
 
@@ -121,7 +121,7 @@ const validateUser = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
     const sql = `SELECT id FROM user_TB WHERE login_id = $1 AND name = $2 AND phone_number = $3 AND email = $4`;
 
     const params = [loginId, name, phoneNumber, email];
@@ -137,11 +137,11 @@ const validateUser = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "/api/account/" + error;
+    result.message = "GET /api/account/ error: " + error.message;
 
   } finally {
     res.send(result);
-    client.end();
+    await client.end();
   }
 };
 
@@ -160,7 +160,7 @@ const resetPw = async (req, res) => {
   const client = createClient();
 
   try {
-    client.connect();
+    await client.connect();
     const sql = "UPDATE user_TB SET password = $1 WHERE id = $2";
     const param = [newPw, userId];
     const data = await client.query(sql, param);
@@ -174,11 +174,11 @@ const resetPw = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error;
+    result.message = "PUT /api/account/ error: " + error.message;
 
   } finally {
     client.end();
-    res.send(result);
+    await res.send(result);
   }
 };
 
@@ -195,7 +195,7 @@ const viewProfile = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
 
     const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = $1";
     const params = [userId];
@@ -211,9 +211,9 @@ const viewProfile = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "/api/account/:userId/" + error.message;
+    result.message = "/api/account/:userId/ error: " + error.message;
   } finally {
-    client.end();
+    await client.end();
     res.send(result);
   }
 };
@@ -231,9 +231,10 @@ const modifyProfile = async (req, res) => {
 
   const client = createClient();
   try {
-    client.connect();
+    await client.connect();
     const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
     const param = [name, phoneNumber, email, userId];
+
     const data = await client.query(sql, param);
     if (data.rowCount !== 0) {
       result.success = true;
@@ -245,10 +246,10 @@ const modifyProfile = async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error;
+    result.message = "DELETE /api/account/ error: " + error.message;
     
   } finally {
-    client.end();
+    await client.end();
     res.send(result);
   }
 };
