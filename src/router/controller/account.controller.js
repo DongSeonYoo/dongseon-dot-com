@@ -1,10 +1,11 @@
-const db = require("../../database/connect/mariadb");
+// const db = require("../../database/connect/mariadb");
+const createClient = require("../../database/connect/postgresql");
 const { makeResult, printError } = require("../controller/util/func");
 
 const accountValidate = require("../controller/util/validate/accountValidate");
 const validateMessage = "데이터 형식이 유효하지 않습니다, (regex테스트 실패)";
 
-const login = (req, res) => {
+const login = async (req, res) => {
   const { loginId, pw } = req.body;
   const result = makeResult();
 
@@ -15,29 +16,32 @@ const login = (req, res) => {
     return;
   }
 
-  const sql = "SELECT id FROM user_TB WHERE login_id = ? AND password = ?";
-  const param = [loginId, pw];
+  const client = createClient();
+  try {
+    client.connect();
+    const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
+    const params = [loginId, pw];
+    const data = await client.query(sql, params)
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results[0];
-    if (data) {
+    const row = data.rows;
+    if (row.length !== 0) {
       result.success = true;
-      result.message = data.id;
-
-    } else {
-      result.message = `아이디 또는 비밀번호가 올바르지 않습니다`;
+      result.message = row[0].id;
+    }  else {
+      result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = "데이터베이스 오류";
+    
+  } finally {
     res.send(result);
-  });
+    client.end();
+  };
 };
 
-const signup = (req, res) => {
+const signup = async (req, res) => {
   const { loginId, pw, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
@@ -45,29 +49,28 @@ const signup = (req, res) => {
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
-    return; 
+    return;
   }
 
-  const sql = "INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES (?, ?, ?, ?, ?)";
-  const param = [loginId, pw, name, phoneNumber, email];
+  const client = createClient();
+  try {
+    client.connect();
+    const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
+    const params = [loginId, pw, name, phoneNumber, email];
+    const data = await client.query(sql, params);
+    result.message = data;
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
+  } catch (error) {
+    console.error(error);
+    result.message = "데이터베이스 오류: " + error;
 
-    const isRegistered = results.affectedRows === 0;
-    if (!isRegistered) {
-      result.success = true;
-      result.message = "회원가입 성공";
-    }
-
+  } finally {
     res.send(result);
-  });
+    client.end();
+  }
 };
 
-const findId = (req, res) => {
+const findId = async (req, res) => {
   const { name, phoneNumber, email } = req.query;
   const result = makeResult();
 
@@ -75,67 +78,75 @@ const findId = (req, res) => {
   if (!isValidateInput) {
     result.message = validateMessage;
     res.send(result);
-    return; 
+    return;
   }
 
-  const sql = "SELECT login_id FROM user_TB WHERE name = ? AND phone_number = ? AND email = ?";
-  const param = [name, phoneNumber, email];
+  const client = createClient();
+  try {
+    client.connect();
+    const sql = "SELECT login_id FROM user_TB WHERE name = $1 AND phone_number = $2 AND email = $3";
+    const params = [name, phoneNumber, email];
+    const data = await client.query(sql, params);
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results[0];
-    if (data) {
+    const row = data.rows[0];
+    if (row.length !== 0) {
       result.success = true;
-      result.message = data.login_id;
+      result.message = row.login_id;
 
     } else {
-      result.message = "해당하는 아이디가 없습니다";
+      result.message = "해당하는 아이디가 존재하지 않습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = "데이터베이스 오류: " + error;
+
+  } finally {
     res.send(result);
-  });
+    client.end();
+  }
 };
 
 // 비밀번호를 찾기 위한 1차 과정 (사용자 검증)
-const validateUser = (req, res) => {
+const validateUser = async (req, res) => {
   const { loginId, name, phoneNumber, email } = req.query;
   const result = makeResult();
 
   const isValidateInput = accountValidate.validateUserInput(loginId, name, phoneNumber, email);
   if (!isValidateInput) {
-      result.message = validateMessage;
-      res.send(result);
-      return;
+    result.message = validateMessage;
+    res.send(result);
+    return;
   }
 
-  const sql = "SELECT id FROM user_TB WHERE login_id = ? AND name = ? AND phone_number = ? AND email = ?";
-  const param = [loginId, name, phoneNumber, email];
+  const client = createClient();
+  try {
+    client.connect();
+    const sql = `SELECT id FROM user_TB WHERE login_id = $1 AND name = $2 AND phone_number = $3 AND email = $4`;
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
+    const params = [loginId, name, phoneNumber, email];
+    const data = await client.query(sql, params);
 
-    const data = results[0];
-    if (data) {
+    const row = data.rows;
+    if (row.length !== 0) {
       result.success = true;
-      result.message = data.id;
-
+      result.message = row[0].id;
     } else {
-      result.message = "해당하는 유저가 없습니다";
+      result.message = "해당하는 사용자가 존재하지 않습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = "/api/account/" + error;
+
+  } finally {
     res.send(result);
-  });
+    client.end();
+  }
 };
 
 // 비밀번호를 찾기 위한 2차 과정 (비밀번호 재설정)
-const resetPw = (req, res) => {
+const resetPw = async (req, res) => {
   const { userId, newPw } = req.body;
   const result = makeResult();
 
@@ -146,29 +157,32 @@ const resetPw = (req, res) => {
     return;
   }
 
-  const sql = "UPDATE user_TB SET password = ? WHERE id = ?";
-  const param = [newPw, userId];
+  const client = createClient();
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const isModified = results.affectedRows === 0;
-    if (!isModified) {
+  try {
+    client.connect();
+    const sql = "UPDATE user_TB SET password = $1 WHERE id = $2";
+    const param = [newPw, userId];
+    const data = await client.query(sql, param);
+    if (data.rowCount !== 0) {
       result.success = true;
-      result.message = "재설정 성공";
+      result.message = "수정 성공"
 
     } else {
-      result.message = "재설정 실패, 해당하는 사용자를 찾지 못했습니다";
+      result.message = "해당하는 유저가 존재하지 않습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = error;
+
+  } finally {
+    client.end();
     res.send(result);
-  });
+  }
 };
 
-const viewProfile = (req, res) => {
+const viewProfile = async (req, res) => {
   const { userId } = req.params;
   const result = makeResult();
 
@@ -179,29 +193,32 @@ const viewProfile = (req, res) => {
     return;
   }
 
-  const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = ?";
-  const param = [userId];
+  const client = createClient();
+  try {
+    client.connect();
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
+    const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = $1";
+    const params = [userId];
+    const data = await client.query(sql, params);
 
-    const data = results[0];
-    if (data) {
+    const row = data.rows;
+    if (row.length !== 0) {
       result.success = true;
-      result.message = data;
-
+      result.message = row[0];
     } else {
-      result.message = "조회에 실패하였습니다. (존재하지 않는 유저)";
+      result.message = "해당하는 사용자가 없습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = "/api/account/:userId/" + error.message;
+  } finally {
+    client.end();
     res.send(result);
-  });
+  }
 };
 
-const modifyProfile = (req, res) => {
+const modifyProfile = async (req, res) => {
   const { userId, name, phoneNumber, email } = req.body;
   const result = makeResult();
 
@@ -211,28 +228,32 @@ const modifyProfile = (req, res) => {
     res.send(result);
     return;
   }
-  const sql = "UPDATE user_TB SET name = ?, phone_number = ?, email = ? WHERE id = ?";
-  const param = [name, phoneNumber, email, userId];
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results.affectedRows === 0;
-    if (!data) {
+  const client = createClient();
+  try {
+    client.connect();
+    const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
+    const param = [name, phoneNumber, email, userId];
+    const data = await client.query(sql, param);
+    if (data.rowCount !== 0) {
       result.success = true;
-      result.message = "수정에 성공하였습니다";
+      result.message = "수정 성공"
 
     } else {
-      result.message = "수정에 실패하였습니다 (존재하지 않는 유저)";
+      result.message = "해당하는 유저가 존재하지 않습니다";
     }
 
+  } catch (error) {
+    console.error(error);
+    result.message = error;
+    
+  } finally {
+    client.end();
     res.send(result);
-  });
+  }
 };
 
+// 이친구는 promise로 해보겠습니다
 const deleteUser = (req, res) => {
   const { userId } = req.body;
   const result = makeResult();
@@ -244,26 +265,30 @@ const deleteUser = (req, res) => {
     return;
   }
 
-  const sql = "DELETE FROM user_TB WHERE id = ?";
-  const param = [userId];
+  const client = createClient();
+  client.connect()
+  .then(() => {
+    const sql = "DELETE FROM user_TB WHERE id = $1";
+    const param = [userId];
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    const data = results.affectedRows === 0;
-    if (!data) {
+    return client.query(sql, param);
+  })
+  .then((data) => {
+    if (data.rowCount !== 0) {
       result.success = true;
-      result.message = "탈퇴되었습니다";
-
+      result.message = "삭제 성공";
     } else {
-      result.message = "탈퇴에 실패하였습니다 (존재하지 않는 유저)";
+      result.message = "해당하는 사용자가 존재하지 않습니다";
     }
-
+  })
+  .catch((err) => {
+    result.message = "DELETE /api/account/" + err.message;
+    console.error(err);
+  })
+  .finally(() => {
+    client.end();
     res.send(result);
-  });
+  })
 };
 
 module.exports = {
