@@ -1,10 +1,8 @@
-const db = require("../../database/connect/mariadb");
+const createClient = require("../../database/connect/postgresql");
 const { makeResult, printError } = require("../controller/util/func");
 
 const postValidate = require("../controller/util/validate/postValidate");
 const validateMessage = "데이터 형식이 유효하지 않습니다";
-
-const path = require("path");
 
 const createPost = (req, res) => {
   const { userId, title, content } = req.body;
@@ -16,41 +14,56 @@ const createPost = (req, res) => {
     res.send(result);
     return;
   }
-  
-  const sql = "INSERT INTO post_TB (user_id, title, content) VALUES (?, ?, ?)";
-  const param = [userId, title, content];
 
-  db.query(sql, param, (error, results, fields) => {
-    if (error) {
-      result.message = "존재하지 않는 사용자입니다";
+  const client = createClient();
+  client.connect()
+    .then(() => {
+      const sql = `INSERT INTO post_TB (user_id, title, content) VALUES ($1, $2, $3)`;
+      const params = [userId, title, content];
+
+      return client.query(sql, params);
+    })
+    .then((data) => {
+      if (data.rowCount !== 0) {
+        result.success = true;
+        result.message = "게시글 작성 성공";
+      }
+    })
+    .catch((error) => {
+      result.message = "POST /api/post/ error: " + error;
+    })
+    .finally(() => {
+      client.end();
       res.send(result);
-      return;
-    }
-
-    result.success = true;
-    result.message = "작성에 성공하였습니다";
-
-    res.send(result);
-  });
+    })
 };
 
 const readAllPost = (req, res) => {
   const result = makeResult();
-  const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
+  const client = createClient();
+  client.connect()
+    .then(() => {
+      const result = makeResult();
+      const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
                FROM post_TB 
                JOIN user_TB ON post_TB.user_id = user_TB.id 
                ORDER BY created_date DESC LIMIT 8`
 
-  db.query(sql, (error, results, fields) => {
-    if (error) {
-      printError(error, result, res);
-      return;
-    }
-
-    result.success = true;
-    result.message = results;
-    res.send(result);
-  });
+      return client.query(sql);
+    })
+    .then((data) => {
+      if (data.rows.length !== 0) {
+        result.success = true;
+        result.message = data.rows;
+      }
+    })
+    .catch((error) => {
+      result.message = "GET /api/post/all";
+    })
+    .finally (() => {
+      client.end();
+      res.send(result);
+    });
 };
 
 const readPost = (req, res) => {
