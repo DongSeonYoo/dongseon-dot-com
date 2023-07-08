@@ -4,19 +4,48 @@ const router = express.Router();
 const createClient = require("../database/connect/postgresql");
 const { makeResult, printError } = require("../module/util/func");
 const accountValidate = require("../module/util/validate/accountValidate");
-const validateMessage = "데이터 형식이 유효하지 않습니다, (regex테스트 실패)";
-// const accountCtrl = require("../router/controller/account.controller");
+
+function Validate(data) {
+  this.isValid = true;
+
+  this.checkInput = () => {
+    if (typeof data === undefined || data === "") {
+      this.isValid = false;
+    }
+
+    return this;
+  }
+
+  this.checkLength = (minLength, maxLength) => {
+    if (data.length < minLength || data.length > maxLength) {
+      this.isValid = false;
+    }
+
+    return this;
+  }
+}
+
+const data = (data) => {
+  return new Validate(data);
+}
 
 // 로그인 api
 // loginId, pw
 // POST
+// 어떤걸 검증? 길이만 검증한다. 아이디(1 ~ 30) 비밀번호 (1 ~ 20)
 router.post("/login", async (req, res) => {
   const { loginId, pw } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: true,
+    data: "",
+    errorMessage: ""
+  };
 
-  const isValidateValue = accountValidate.validateLoginInput(loginId, pw);
-  if (!isValidateValue) {
-    result.message = validateMessage;
+  const idValidate = data(loginId).checkInput().checkLength(1, 30).isValid;
+  const pwValidate = data(pw).checkInput().checkLength(1, 20).isValid;
+  if (!idValidate || !pwValidate) {
+    result.isSuccess = false;
+    result.errorMessage = "유효하지 않은 데이터 형식입니다";
     res.send(result);
     return;
   }
@@ -30,15 +59,16 @@ router.post("/login", async (req, res) => {
 
     const row = data.rows;
     if (row.length !== 0) {
-      result.success = true;
-      result.message = row[0].id;
+      result.isSuccess = true;
+      result.data = row[0].id;
     }  else {
-      result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
+      result.isSuccess = false;
+      result.errorMessage = "아이디 또는 비밀번호가 올바르지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = "POST /api/account/ error: " + error.message;
+    result.errorMessage = "POST /api/account/ error: " + error.message;
     
   } finally {
     res.send(result);
