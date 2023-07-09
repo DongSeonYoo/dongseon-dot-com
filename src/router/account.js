@@ -1,51 +1,32 @@
 const express = require("express");
 const router = express.Router();
-
 const createClient = require("../database/connect/postgresql");
-const { makeResult, printError } = require("../module/util/func");
-const accountValidate = require("../module/util/validate/accountValidate");
-
-function Validate(data) {
-  this.isValid = true;
-
-  this.checkInput = () => {
-    if (typeof data === undefined || data === "") {
-      this.isValid = false;
-    }
-
-    return this;
-  }
-
-  this.checkLength = (minLength, maxLength) => {
-    if (data.length < minLength || data.length > maxLength) {
-      this.isValid = false;
-    }
-
-    return this;
-  }
-}
-
-const data = (data) => {
-  return new Validate(data);
-}
+const data = require("../module/util/validate");
 
 // 로그인 api
 // loginId, pw
 // POST
-// 어떤걸 검증? 길이만 검증한다. 아이디(1 ~ 30) 비밀번호 (1 ~ 20)
 router.post("/login", async (req, res) => {
   const { loginId, pw } = req.body;
   const result = {
-    isSuccess: true,
+    isSuccess: false,
     data: "",
-    errorMessage: ""
+    message: "",
+    db: {
+      errorMessage: "",
+    }
   };
 
   const idValidate = data(loginId).checkInput().checkLength(1, 30).isValid;
   const pwValidate = data(pw).checkInput().checkLength(1, 20).isValid;
-  if (!idValidate || !pwValidate) {
-    result.isSuccess = false;
-    result.errorMessage = "유효하지 않은 데이터 형식입니다";
+  if (!idValidate) {
+    result.message = "아이디의 길이가 너무 깁니다";
+    res.send(result);
+    return;
+  }
+
+  if (!pwValidate) {
+    result.message = "비밀번호의 길이가 너무 깁니다";
     res.send(result);
     return;
   }
@@ -61,15 +42,16 @@ router.post("/login", async (req, res) => {
     if (row.length !== 0) {
       result.isSuccess = true;
       result.data = row[0].id;
-    }  else {
+      result.message = "로그인 성공";
+    } else {
       result.isSuccess = false;
-      result.errorMessage = "아이디 또는 비밀번호가 올바르지 않습니다";
+      result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.errorMessage = "POST /api/account/ error: " + error.message;
-    
+    result.db.errorMessage = "POST /api/account/ error: " + error.message;
+
   } finally {
     res.send(result);
     await client.end();
@@ -81,11 +63,46 @@ router.post("/login", async (req, res) => {
 // POST
 router.post("/signup", async (req, res) => {
   const { loginId, pw, name, phoneNumber, email } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = accountValidate.validateSignupInput(loginId, pw, name, phoneNumber, email);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const idValidate = data(loginId).checkInput().checkIdRegex().isValid;
+  const pwValidate = data(pw).checkInput().checkPwRegex().isValid;
+  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
+  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
+  if (!idValidate) {
+    result.message = "아이디 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!pwValidate) {
+    result.message = "비밀번호 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = "이름 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = "전화번호 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = "이메일 형식이 올바르지 않습니다";
     res.send(result);
     return;
   }
@@ -96,11 +113,16 @@ router.post("/signup", async (req, res) => {
     const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
     const params = [loginId, pw, name, phoneNumber, email];
     const data = await client.query(sql, params);
-    result.message = data;
+    if (data.rowCount !== 0) {
+      result.isSuccess = true;
+      result.message = "회원가입 성공";
+    } else {
+      result.db.errorMessage = "회원가입 실패 (데이터베이스 오류)";
+    }
 
   } catch (error) {
     console.error(error);
-    result.message = "POST /api/account/ error: " + error.message;
+    result.db.errorMessage = "POST /api/account/ error: " + error.message;
 
   } finally {
     res.send(result);
@@ -113,11 +135,32 @@ router.post("/signup", async (req, res) => {
 // GET
 router.get("/loginId", async (req, res) => {
   const { name, phoneNumber, email } = req.query;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = accountValidate.validateFindIdInput(name, phoneNumber, email);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
+  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
+  if (!nameValidate) {
+    result.message = "이름 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = "전화번호 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = "이메일 형식이 올바르지 않습니다";
     res.send(result);
     return;
   }
@@ -128,11 +171,10 @@ router.get("/loginId", async (req, res) => {
     const sql = "SELECT login_id FROM user_TB WHERE name = $1 AND phone_number = $2 AND email = $3";
     const params = [name, phoneNumber, email];
     const data = await client.query(sql, params);
-
-    const row = data.rows[0];
-    if (row.length !== 0) {
-      result.success = true;
-      result.message = row.login_id;
+    if (data.rows.length !== 0) {
+      result.isSuccess = true;
+      result.data = data.rows[0].login_id;
+      result.message = "아이디 찾기 성공";
 
     } else {
       result.message = "해당하는 아이디가 존재하지 않습니다";
@@ -140,7 +182,7 @@ router.get("/loginId", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "GET /api/account/findId/ error: " + error.message;
+    result.db.errorMessage = "GET /api/account/findId/ error: " + error.message;
 
   } finally {
     res.send(result);
@@ -150,14 +192,43 @@ router.get("/loginId", async (req, res) => {
 
 // 비밀번호 찾기 api
 // 1.(사용자 인증 단계)
+// GET
 // loginId, name, phoneNumber, email
 router.get("/pw", async (req, res) => {
   const { loginId, name, phoneNumber, email } = req.query;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: ""
+    }
+  }
 
-  const isValidateInput = accountValidate.validateUserInput(loginId, name, phoneNumber, email);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const idValidate = data(loginId).checkInput().checkIdRegex().isValid;
+  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
+  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
+  if (!idValidate) {
+    result.message = "아이디 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = "이름 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = "전화번호 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = "이메일 형식이 올바르지 않습니다";
     res.send(result);
     return;
   }
@@ -169,18 +240,18 @@ router.get("/pw", async (req, res) => {
 
     const params = [loginId, name, phoneNumber, email];
     const data = await client.query(sql, params);
+    if (data.rows.length !== 0) {
+      result.isSuccess = true;
+      result.data = data.rows[0].id;
+      result.message = "해당하는 사용자가 존재하지 않습니다";
 
-    const row = data.rows;
-    if (row.length !== 0) {
-      result.success = true;
-      result.message = row[0].id;
     } else {
       result.message = "해당하는 사용자가 존재하지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = "GET /api/account/ error: " + error.message;
+    result.db.errorMessage = "GET /api/account/ error: " + error.message;
 
   } finally {
     res.send(result);
@@ -190,20 +261,33 @@ router.get("/pw", async (req, res) => {
 
 // 비밀번호 찾기 api
 // 2.(비밀번호 재설정 단계)
+// PUT
 // userId, newPw
 router.put("/pw", async (req, res) => {
   const { userId, newPw } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: ""
+    }
+  }
+  const userIdValidate = data(userId).checkInput().checkLength().isNumber().isValid;
+  const newPwValidate = data(newPw).checkInput().checkPwRegex().isValid;
+  if (!userIdValidate) {
+    result.message = "올바르지 않은 사용자 pk입니다";
+    res.send(result);
+    return;
+  }
 
-  const isValidateInput = accountValidate.validateResetPwInput(userId, newPw);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  if (!newPwValidate) {
+    result.message = "올바르지 않은 비밀번호 형식입니다";
     res.send(result);
     return;
   }
 
   const client = createClient();
-
   try {
     await client.connect();
     const sql = "UPDATE user_TB SET password = $1 WHERE id = $2";
@@ -232,11 +316,17 @@ router.put("/pw", async (req, res) => {
 // GET
 router.get("/:userId", async (req, res) => {
   const { userId } = req.params;
-  const result = makeResult();
-
-  const isValidateInput = accountValidate.validateViewProfileInput(userId);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: ""
+    }
+  }
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
+  if (!userIdValidate) {
+    result.message = "유저 식별값 형식이 유효하지 않습니다";
     res.send(result);
     return;
   }
@@ -244,22 +334,21 @@ router.get("/:userId", async (req, res) => {
   const client = createClient();
   try {
     await client.connect();
-
-    const sql = "SELECT login_id, name, phone_number, email, created_date, updated_date from user_TB WHERE id = $1";
+    const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
+                    FROM user_TB WHERE id = $1`;
     const params = [userId];
     const data = await client.query(sql, params);
-
-    const row = data.rows;
-    if (row.length !== 0) {
-      result.success = true;
-      result.message = row[0];
+    if (data.rows.length !== 0) {
+      result.isSuccess = true;
+      result.data = data.rows[0];
     } else {
       result.message = "해당하는 사용자가 없습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = "/api/account/:userId/ error: " + error.message;
+    result.db.errorMessage = "/api/account/:userId/ error: " + error.message;
+
   } finally {
     await client.end();
     res.send(result);
@@ -271,11 +360,39 @@ router.get("/:userId", async (req, res) => {
 // PUT
 router.put("/", async (req, res) => {
   const { userId, name, phoneNumber, email } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: ""
+    }
+  }
 
-  const isValidateInput = accountValidate.validateModifyPrifileInput(userId, name, phoneNumber, email);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
+  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
+  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
+  if (!userIdValidate) {
+    result.message = "유저 식별값 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = "이름 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = "전화번호 형식이 올바르지 않습니다";
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = "이메일 형식이 올바르지 않습니다";
     res.send(result);
     return;
   }
@@ -288,7 +405,7 @@ router.put("/", async (req, res) => {
 
     const data = await client.query(sql, param);
     if (data.rowCount !== 0) {
-      result.success = true;
+      result.isSuccess = true;
       result.message = "수정 성공"
 
     } else {
@@ -297,8 +414,8 @@ router.put("/", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = "DELETE /api/account/ error: " + error.message;
-    
+    result.db.errorMessage = "DELETE /api/account/ error: " + error.message;
+
   } finally {
     await client.end();
     res.send(result);
@@ -310,39 +427,46 @@ router.put("/", async (req, res) => {
 // DELETE
 router.delete("/", (req, res) => {
   const { userId } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: ""
+    }
+  }
 
-  const validateUserInput = accountValidate.validateDeleteUserInput(userId);
-  if (!validateUserInput) {
-    result.message = validateMessage;
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
+  if (!userIdValidate) {
+    result.message = "유저 식별값 형식이 올바르지 않습니다"
     res.send(result);
-    return;
+    return; Z
   }
 
   const client = createClient();
   client.connect()
-  .then(() => {
-    const sql = "DELETE FROM user_TB WHERE id = $1";
-    const param = [userId];
+    .then(() => {
+      const sql = "DELETE FROM user_TB WHERE id = $1";
+      const param = [userId];
 
-    return client.query(sql, param);
-  })
-  .then((data) => {
-    if (data.rowCount !== 0) {
-      result.success = true;
-      result.message = "삭제 성공";
-    } else {
-      result.message = "해당하는 사용자가 존재하지 않습니다";
-    }
-  })
-  .catch((err) => {
-    result.message = "DELETE /api/account/" + err.message;
-    console.error(err);
-  })
-  .finally(() => {
-    client.end();
-    res.send(result);
-  })
+      return client.query(sql, param);
+    })
+    .then((data) => {
+      if (data.rowCount !== 0) {
+        result.isSuccess = true;
+        result.message = "삭제 성공";
+      } else {
+        result.message = "해당하는 사용자가 존재하지 않습니다";
+      }
+    })
+    .catch((err) => {
+      result.db.errorMessage = "DELETE /api/account/" + err.message;
+      console.error(err);
+    })
+    .finally(() => {
+      client.end();
+      res.send(result);
+    })
 });
 
 module.exports = router;
