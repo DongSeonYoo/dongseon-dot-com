@@ -3,6 +3,10 @@ const router = express.Router();
 const createClient = require("../database/connect/postgresql");
 const data = require("../module/util/validate");
 
+const validate = {
+  message: "데이터 형식이 유효하지 않습니다"
+}
+
 // 로그인 api
 // loginId, pw
 // POST
@@ -17,16 +21,10 @@ router.post("/login", async (req, res) => {
     }
   };
 
-  const idValidate = data(loginId).checkInput().checkLength(1, 30).isValid;
-  const pwValidate = data(pw).checkInput().checkLength(1, 20).isValid;
-  if (!idValidate) {
-    result.message = "아이디의 길이가 너무 깁니다";
-    res.send(result);
-    return;
-  }
-
-  if (!pwValidate) {
-    result.message = "비밀번호의 길이가 너무 깁니다";
+  const idValidate = data(loginId).checkInput().checkLength(1, 20);
+  const pwValidate = data(pw).checkInput().checkLength(1, 15);
+  if (!idValidate || !pwValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -72,37 +70,13 @@ router.post("/signup", async (req, res) => {
     }
   };
 
-  const idValidate = data(loginId).checkInput().checkIdRegex().isValid;
-  const pwValidate = data(pw).checkInput().checkPwRegex().isValid;
-  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
-  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
-  if (!idValidate) {
-    result.message = "아이디 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!pwValidate) {
-    result.message = "비밀번호 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!nameValidate) {
-    result.message = "이름 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!phoneNumberValidate) {
-    result.message = "전화번호 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!emailValidate) {
-    result.message = "이메일 형식이 올바르지 않습니다";
+  const idValidate = data(loginId).checkInput().checkIdRegex();
+  const pwValidate = data(pw).checkInput().checkPwRegex();
+  const nameValidate = data(name).checkInput().checkNameRegex();
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
+  const emailValidate = data(email).checkInput().checkEmailRegex();
+  if (!idValidate || !pwValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -144,23 +118,11 @@ router.get("/loginId", async (req, res) => {
     }
   };
 
-  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
-  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
-  if (!nameValidate) {
-    result.message = "이름 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!phoneNumberValidate) {
-    result.message = "전화번호 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!emailValidate) {
-    result.message = "이메일 형식이 올바르지 않습니다";
+  const nameValidate = data(name).checkInput().checkLength(2, 8);
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkLength(1, 11);
+  const emailValidate = data(email).checkInput().checkLength(1, 320);
+  if (!nameValidate || !phoneNumberValidate || !emailValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -205,30 +167,12 @@ router.get("/pw", async (req, res) => {
     }
   }
 
-  const idValidate = data(loginId).checkInput().checkIdRegex().isValid;
-  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
-  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
-  if (!idValidate) {
-    result.message = "아이디 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!nameValidate) {
-    result.message = "이름 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!phoneNumberValidate) {
-    result.message = "전화번호 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!emailValidate) {
-    result.message = "이메일 형식이 올바르지 않습니다";
+  const idValidate = data(loginId).checkInput().checkLength(1, 20);
+  const nameValidate = data(name).checkInput().checkLength(1, 10);
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkLength(1, 11);
+  const emailValidate = data(email).checkInput().checkLength(1, 50);
+  if (!idValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -243,7 +187,6 @@ router.get("/pw", async (req, res) => {
     if (data.rows.length !== 0) {
       result.isSuccess = true;
       result.data = data.rows[0].id;
-      result.message = "해당하는 사용자가 존재하지 않습니다";
 
     } else {
       result.message = "해당하는 사용자가 존재하지 않습니다";
@@ -273,16 +216,11 @@ router.put("/pw", async (req, res) => {
       errorMessage: ""
     }
   }
-  const userIdValidate = data(userId).checkInput().checkLength().isNumber().isValid;
-  const newPwValidate = data(newPw).checkInput().checkPwRegex().isValid;
-  if (!userIdValidate) {
-    result.message = "올바르지 않은 사용자 pk입니다";
-    res.send(result);
-    return;
-  }
 
-  if (!newPwValidate) {
-    result.message = "올바르지 않은 비밀번호 형식입니다";
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const newPwValidate = data(newPw).checkInput().checkPwRegex();
+  if (!userIdValidate || !newPwValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -306,8 +244,8 @@ router.put("/pw", async (req, res) => {
     result.message = "PUT /api/account/ error: " + error.message;
 
   } finally {
-    client.end();
-    await res.send(result);
+    await client.end();
+    res.send(result);
   }
 });
 
@@ -324,9 +262,9 @@ router.get("/:userId", async (req, res) => {
       errorMessage: ""
     }
   }
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
   if (!userIdValidate) {
-    result.message = "유저 식별값 형식이 유효하지 않습니다";
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -369,30 +307,12 @@ router.put("/", async (req, res) => {
     }
   }
 
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
-  const nameValidate = data(name).checkInput().checkNameRegex().isValid;
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex().isValid;
-  const emailValidate = data(email).checkInput().checkEmailRegex().isValid;
-  if (!userIdValidate) {
-    result.message = "유저 식별값 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!nameValidate) {
-    result.message = "이름 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!phoneNumberValidate) {
-    result.message = "전화번호 형식이 올바르지 않습니다";
-    res.send(result);
-    return;
-  }
-
-  if (!emailValidate) {
-    result.message = "이메일 형식이 올바르지 않습니다";
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const nameValidate = data(name).checkInput().checkNameRegex();
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
+  const emailValidate = data(email).checkInput().checkEmailRegex();
+  if (!userIdValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
+    result.message = validate.message;
     res.send(result);
     return;
   }
@@ -436,11 +356,11 @@ router.delete("/", (req, res) => {
     }
   }
 
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10).isNumber().isValid;
+  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
   if (!userIdValidate) {
-    result.message = "유저 식별값 형식이 올바르지 않습니다"
+    result.message = validate.message;
     res.send(result);
-    return; Z
+    return;
   }
 
   const client = createClient();
