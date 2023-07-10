@@ -3,8 +3,18 @@ const router = express.Router();
 const createClient = require("../database/connect/postgresql");
 const data = require("../module/util/validate");
 
-const validate = {
-  message: "데이터 형식이 유효하지 않습니다"
+const maxUserIdLength = 10;
+const maxLoginIdLength = 20;
+const maxPwLength = 15;
+const maxNameLength = 8;
+const maxEmailLength = 320;
+const inputError = {
+  userId: "유저 식별값 형식이 올바르지 않습니다",
+  loginId: "로그인 아이디 형식이 올바르지 않습니다",
+  pw: "비밀번호 형식이 올바르지 않습니다",
+  name: "이름 형식이 올바르지 않습니다",
+  phoneNumber: "전화번호 형식이 올바르지 않습니다",
+  email: "이메일 형식이 올바르지 않습니다"
 }
 
 // 로그인 api
@@ -21,10 +31,16 @@ router.post("/login", async (req, res) => {
     }
   };
 
-  const idValidate = data(loginId).checkInput().checkLength(1, 20);
-  const pwValidate = data(pw).checkInput().checkLength(1, 15);
-  if (!idValidate || !pwValidate) {
-    result.message = validate.message;
+  const idValidate = data(loginId).checkInput().checkLength(1, maxLoginIdLength);
+  const pwValidate = data(pw).checkInput().checkLength(1, maxPwLength);
+  if (!idValidate) {
+    result.message = inputError.loginId;
+    res.send(result);
+    return;
+  }
+
+  if (!pwValidate) {
+    result.message = inputError.pw;
     res.send(result);
     return;
   }
@@ -75,8 +91,32 @@ router.post("/signup", async (req, res) => {
   const nameValidate = data(name).checkInput().checkNameRegex();
   const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
   const emailValidate = data(email).checkInput().checkEmailRegex();
-  if (!idValidate || !pwValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
-    result.message = validate.message;
+  if (!idValidate) {
+    result.message = inputError.loginId;
+    res.send(result);
+    return;
+  }
+
+  if (!pwValidate) {
+    result.message = inputError.pw;
+    res.send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = inputError.name;
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = inputError.phoneNumber;
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = inputError.email;
     res.send(result);
     return;
   }
@@ -118,11 +158,23 @@ router.get("/loginId", async (req, res) => {
     }
   };
 
-  const nameValidate = data(name).checkInput().checkLength(2, 8);
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkLength(1, 11);
-  const emailValidate = data(email).checkInput().checkLength(1, 320);
-  if (!nameValidate || !phoneNumberValidate || !emailValidate) {
-    result.message = validate.message;
+  const nameValidate = data(name).checkInput().checkLength(2, maxNameLength);
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
+  const emailValidate = data(email).checkInput().checkLength(1, maxEmailLength);
+  if (!nameValidate) {
+    result.message = inputError.name;
+    res.send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = inputError.phoneNumber;
+    res.send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = inputError.email;
     res.send(result);
     return;
   }
@@ -167,13 +219,31 @@ router.get("/pw", async (req, res) => {
     }
   }
 
-  const idValidate = data(loginId).checkInput().checkLength(1, 20);
-  const nameValidate = data(name).checkInput().checkLength(1, 10);
-  const phoneNumberValidate = data(phoneNumber).checkInput().checkLength(1, 11);
-  const emailValidate = data(email).checkInput().checkLength(1, 50);
-  if (!idValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
-    result.message = validate.message;
-    res.send(result);
+  const idValidate = data(loginId).checkInput().checkLength(1, maxLoginIdLength);
+  const nameValidate = data(name).checkInput().checkLength(1, maxNameLength);
+  const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
+  const emailValidate = data(email).checkInput().checkLength(1, maxEmailLength);
+  if (!idValidate) {
+    result.message = inputError.loginId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = inputError.name;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = inputError.phoneNumber;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = inputError.email;
+    res.status(400).send(result);
     return;
   }
 
@@ -217,10 +287,16 @@ router.put("/pw", async (req, res) => {
     }
   }
 
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
   const newPwValidate = data(newPw).checkInput().checkPwRegex();
-  if (!userIdValidate || !newPwValidate) {
-    result.message = validate.message;
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.send(result);
+    return;
+  }
+
+  if (!newPwValidate) {
+    result.message = inputError.pw;
     res.send(result);
     return;
   }
@@ -262,10 +338,10 @@ router.get("/:userId", async (req, res) => {
       errorMessage: ""
     }
   }
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
   if (!userIdValidate) {
-    result.message = validate.message;
-    res.send(result);
+    result.message = inputError.userId;
+    res.status(400).send(result);
     return;
   }
 
@@ -307,13 +383,31 @@ router.put("/", async (req, res) => {
     }
   }
 
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
   const nameValidate = data(name).checkInput().checkNameRegex();
   const phoneNumberValidate = data(phoneNumber).checkInput().checkPhoneNumberRegex();
   const emailValidate = data(email).checkInput().checkEmailRegex();
-  if (!userIdValidate || !nameValidate || !phoneNumberValidate || !emailValidate) {
-    result.message = validate.message;
-    res.send(result);
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!nameValidate) {
+    result.message = inputError.name;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!phoneNumberValidate) {
+    result.message = inputError.phoneNumber;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!emailValidate) {
+    result.message = inputError.email;
+    res.status(400).send(result);
     return;
   }
 
@@ -356,10 +450,10 @@ router.delete("/", (req, res) => {
     }
   }
 
-  const userIdValidate = data(userId).checkInput().checkLength(1, 10);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
   if (!userIdValidate) {
-    result.message = validate.message;
-    res.send(result);
+    result.message = inputError.userId;
+    res.status(400).send(result);
     return;
   }
 

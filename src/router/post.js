@@ -2,21 +2,50 @@ const express = require("express");
 const router = express.Router();
 
 const createClient = require("../database/connect/postgresql");
-const { makeResult, printError } = require("../module/util/func");
+const data = require("../module/util/validate");
 
-const postValidate = require("../module/util/validate/postValidate");
-const validateMessage = "데이터 형식이 유효하지 않습니다";
+const maxUserIdLength = 10;
+const maxPostIdLength = 10;
+const maxPostTitleLength = 200;
+const maxPostContentLength = 500;
+const inputError = {
+  userId: "userId 형식이 올바르지 않습니다",
+  postId: "postId 형식이 올바르지 않습니다",
+  title: "title 형식이 올바르지 않습니다",
+  content: "content 형식이 올바르지 않습니다",
+}
 
 // 게시글 작성 api
 // userId, title, content
 router.post("/", (req, res) => {
   const { userId, title, content } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = postValidate.validateCreatePost(userId, title, content);
-  if (!isValidateInput) {
-    result.message = validateMessage;
-    res.send(result);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  const titleValidate = data(title).checkInput().checkLength(1, maxPostTitleLength);
+  const contentValidate = data(content).checkInput().checkLength(1, maxPostContentLength);
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!titleValidate) {
+    result.message = inputError.title;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!contentValidate) {
+    result.message = inputError.content;
+    res.status(400).send(result);
     return;
   }
 
@@ -30,12 +59,12 @@ router.post("/", (req, res) => {
     })
     .then((data) => {
       if (data.rowCount !== 0) {
-        result.success = true;
-        result.message = "게시글 작성 성공";
+        result.isSuccess = true;
       }
     })
     .catch((error) => {
-      result.message = "POST /api/post/ error: " + error;
+      result.message = "존재하지 않는 사용자입니다";
+      result.db.errorMessage = "POST /api/post/ error: " + error.message;
     })
     .finally(() => {
       client.end();
@@ -47,28 +76,33 @@ router.post("/", (req, res) => {
 // GET
 // 명사이자 단수형으로
 router.get("/all", (req, res) => {
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
   const client = createClient();
   client.connect()
     .then(() => {
-      const result = makeResult();
       const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
                FROM post_TB 
                JOIN user_TB ON post_TB.user_id = user_TB.id 
                ORDER BY created_date DESC LIMIT 8`
-
       return client.query(sql);
     })
     .then((data) => {
       if (data.rows.length !== 0) {
-        result.success = true;
-        result.message = data.rows;
+        result.isSuccess = true;
+        result.data = data.rows;
       }
     })
     .catch((error) => {
-      result.message = "GET /api/post/all";
+      result.db.errorMessage = "GET /api/post/all/ error: " + error.messageg;
     })
-    .finally (() => {
+    .finally(() => {
       client.end();
       res.send(result);
     });
@@ -79,12 +113,20 @@ router.get("/all", (req, res) => {
 // GET
 router.get("/:postId", (req, res) => {
   const { postId } = req.params;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = postValidate.validateReadPost(postId);
-  if (!isValidateInput) {
-    result.message = validateMessage;
-    return res.send(result);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
+    return;
   }
 
   const client = createClient();
@@ -101,14 +143,14 @@ router.get("/:postId", (req, res) => {
     })
     .then((data) => {
       if (data.rows.length !== 0) {
-        result.success = true;
-        result.message = data.rows[0];
+        result.isSuccess = true;
+        result.data = data.rows[0];
       } else {
         result.message = "해당하는 게시글이 존재하지 않습니다";
       }
     })
     .catch((error) => {
-      result.message = "GET /api/post/:userId/ error: " + error.message;
+      result.db.errorMessage = "GET /api/post/:userId/ error: " + error.message;
     })
     .finally(() => {
       client.end();
@@ -121,14 +163,43 @@ router.get("/:postId", (req, res) => {
 // PUT
 router.put("/", (req, res) => {
   const { postId, userId, title, content } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = postValidate.validateUpdatePostInput(postId, userId, title, content);
-  if (!isValidateInput) {
-    result.message = validateMessage;
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  const titleValidate = data(title).checkInput().checkLength(1, maxPostTitleLength);
+  const contentValdiate = data(content).checkInput().checkLength(1, maxPostContentLength);
+  if (!userIdValidate) {
+    result.status(400).message = inputError.userId;
     res.send(result);
     return;
   }
+
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!titleValidate) {
+    result.message = inputError.title;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!contentValdiate) {
+    result.message = inputError.connect;
+    res.status(400).send(result);
+    return;
+  }
+
 
   const client = createClient();
   client.connect()
@@ -158,14 +229,29 @@ router.put("/", (req, res) => {
 // DELETE
 router.delete("/", (req, res) => {
   const { postId, userId } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateInput = postValidate.validateDeletePostInput(postId, userId);
-  if (!isValidateInput) {
-    result.message = validateMessage;
-    res.send(result);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.status(400).send(result);
     return;
   }
+
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
+    return;
+  }
+
 
   const client = createClient();
   client.connect()
@@ -184,7 +270,7 @@ router.delete("/", (req, res) => {
       }
     })
     .catch((error) => {
-      result.message = "DELETE /api/post/ error: " + error.message;
+      result.db.errorMessage = "DELETE /api/post/ error: " + error.message;
     })
     .finally(() => {
       client.end();

@@ -2,22 +2,51 @@ const express = require("express");
 const router = express.Router();
 
 const createClient = require("../database/connect/postgresql");
-const { makeResult, printError } = require("../module/util/func");
-const commentValidate = require("../module/util/validate/commentValidate");
-const validateMessage = "데이터 형식이 유효하지 않습니다, (regex테스트 실패)";
-// const commentCtrl = require("../router/controller/comment.controller");
+const data = require("../module/util/validate");
+
+const maxUserIdLength = 10;
+const maxPostIdLength = 10;
+const maxCommentIdLength = 10;
+const maxCommentContentLength = 300;
+const inputError = {
+  userId: "userId 형식이 올바르지 않습니다",
+  postId: "postId 형식이 올바르지 않습니다",
+  title: "title 형식이 올바르지 않습니다",
+  content: "content 형식이 올바르지 않습니다",
+}
 
 // 댓글 생성 api
 // postId, userId, content
 // POST
 router.post("/", async (req, res) => {
   const { postId, userId, content } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateValue = commentValidate.validateCreateCommentInput(postId, userId, content);
-  if (!isValidateValue) {
-    result.message = validateMessage;
-    res.send(result);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  const contentValdiate = data(content).checkInput().checkLength(1, maxCommentContentLength);
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.send(400).send(result);
+    return;
+  }
+
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.send(400).send(result);
+    return;
+  }
+
+  if (!contentValdiate) {
+    result.message = inputError.content;
+    res.send(400).send(result);
     return;
   }
 
@@ -29,14 +58,14 @@ router.post("/", async (req, res) => {
 
     const data = await client.query(sql, params);
     if (data.rowCount !== 0) {
-      result.success = true;
+      result.isSuccess = true;
       result.message = "댓글 작성에 성공하였습니다";
     } else {
       result.message = "댓글 작성에 실패하였습니다";
     }
 
   } catch (error) {
-    result.message = "POST /api/comment/ error: " + error.message;
+    result.db.errorMessage = "POST /api/comment/ error: " + error.message;
 
   } finally {
     await client.end();
@@ -49,12 +78,19 @@ router.post("/", async (req, res) => {
 // GET
 router.get("/post/:postId", async (req, res) => {
   const { postId } = req.params;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateValue = commentValidate.validateReadCommentInput(postId);
-  if (!isValidateValue) {
-    result.message = validateMessage;
-    res.send(result);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
     return;
   }
 
@@ -69,14 +105,14 @@ router.get("/post/:postId", async (req, res) => {
 
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      result.success = true;
-      result.message = data.rows;
+      result.isSuccess = true;
+      result.data = data.rows;
     } else {
       result.message = "해당 게시글에 댓글이 존재하지 않습니다";
     }
     
   } catch (error) {
-    result.message = "GET /api/comment/ error: " + error.message;
+    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
 
   } finally {
     await client.end();
@@ -89,12 +125,40 @@ router.get("/post/:postId", async (req, res) => {
 // PUT
 router.put("/", async (req, res) => {
   const { userId, content, postId, commentId } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
+  
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  const commentIdValidate = data(commentId).checkInput().checkLength(1, maxCommentIdLength);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  const contentValidate = data(content).checkInput().checkLength(1, maxCommentContentLength);
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
+    return;
+  }
 
-  const isValidateValue = commentValidate.validateUpdateCommentInput(userId, content, postId, commentId);
-  if (!isValidateValue) {
-    result.message = validateMessage;
-    res.send(result);
+  if (!commentIdValidate) {
+    result.message = inputError.commentId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!contentValidate) {
+    result.message = inputError.content;
+    res.status(400).send(result);
     return;
   }
 
@@ -106,13 +170,13 @@ router.put("/", async (req, res) => {
 
     const data = await client.query(sql, param);
     if (data.rowCount !== 0) {
-      result.success = true;
+      result.isSuccess = true;
       result.message = "댓글 수정에 성공하였습니다";
     } else {
       result.message = "댓글 수정에 실패하였습니다";
     }
   } catch (error) {
-    result.message = "GET /api/comment/ error: " + error.message;
+    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
   } finally {
     await client.end();
     res.send(result);
@@ -124,12 +188,33 @@ router.put("/", async (req, res) => {
 // DELETE
 router.delete("/", async (req, res) => {
   const { postId, commentId, userId } = req.body;
-  const result = makeResult();
+  const result = {
+    isSuccess: false,
+    data: "",
+    message: "",
+    db: {
+      errorMessage: "",
+    }
+  };
 
-  const isValidateValue = commentValidate.validateDeleteCommentInput(postId, commentId, userId);
-  if (!isValidateValue) {
-    result.message = validateMessage;
-    res.send(result);
+  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
+  const commentIdValidate = data(commentId).checkInput().checkLength(1, maxCommentIdLength);
+  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
+  if (!postIdValidate) {
+    result.message = inputError.postId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!commentIdValidate) {
+    result.message = inputError.commentId;
+    res.status(400).send(result);
+    return;
+  }
+
+  if (!userIdValidate) {
+    result.message = inputError.userId;
+    res.status(400).send(result);
     return;
   }
 
@@ -141,13 +226,13 @@ router.delete("/", async (req, res) => {
 
     const data = await client.query(sql, params)
     if (data.rowCount !== 0) {
-      result.success = true;
+      result.isSuccess = true;
       result.message = "댓글 삭제 성공";
     } else {
       result.message = "댓글 삭제 실패"
     }
   } catch (error) {
-    result.message = "GET /api/comment/ error: " + error.message;
+    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
 
   } finally {
     await client.end();
