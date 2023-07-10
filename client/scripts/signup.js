@@ -110,7 +110,7 @@ const fetchData = async () => {
     });
 
     const json = await res.json();
-    if (json.success) {
+    if (json.isSuccess) {
       location.href = "/";
 
     } else {

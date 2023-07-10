@@ -75,8 +75,8 @@ const fetchData = async () => {
     const response = await fetch("/api/account/pw?" + queryString);
     const json = await response.json();
 
-    if (json.success) {
-      const userPk = json.message;
+    if (json.isSuccess) {
+      const userPk = json.data;
       localStorage.setItem("resetPwSession", userPk);
       location.href = "/reset-pw";
 

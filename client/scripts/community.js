@@ -25,8 +25,8 @@ async function getAllPostsFetch() {
     const result = await fetch("/api/post/all");
     const json = await result.json();
 
-    if (json.success) {
-      json.message.forEach(post => {
+    if (json.isSuccess) {
+      json.data.forEach(post => {
         makePostList(post);
       });
       

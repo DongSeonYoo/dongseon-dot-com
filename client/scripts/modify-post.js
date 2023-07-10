@@ -75,8 +75,8 @@ async function loadPostData(postId) {
     const result = await fetch("/api/post/" + postId);
     const json = await result.json();
 
-    postTitle.value = json.message.title;
-    postContent.value = json.message.content;
+    postTitle.value = json.data.title;
+    postContent.value = json.data.content;
 
     existingValue.title = json.message.title;
     existingValue.content = json.message.content;
@@ -103,11 +103,11 @@ async function modifyPostFetch(titleValue, contentValue) {
     });
 
     const json = await result.json();
-    if (json.success) {
+    if (json.isSuccess) {
       location.href = "/community";
 
     } else {
-      alert("데이터베이스 오류: " + json.message);
+      alert("데이터베이스 오류: " + JSON.stringify(json));
     }
 
   } catch (error) {

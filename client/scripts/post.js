@@ -124,11 +124,8 @@ async function clickPostDeleteButton() {
       })
     });
 
-    if (result.success) {
-      location.href = "/community";
-
-    } else {
-      alert("삭제 실패: " + result.message);
+    if (result.isSuccess) {
+      location.href = "/community.js";
     }
 
   } catch (error) {
@@ -156,7 +153,7 @@ async function clickCommentSubmitBtn() {
   }
 
   const json = await writeCommentFetch(postId, userId, commentContent.value);
-  if (json.success) {
+  if (json.isSuccess) {
     commentsSection.innerHTML = "";
     commentContent.value = "";
     displayComment();
@@ -182,7 +179,7 @@ async function clickCommentDeleteButton(commentId) {
   }
 
   const json = await deleteCommentFetch(postId, commentId, userId);
-  if (json.success) {
+  if (json.isSuccess) {
     commentsSection.innerHTML = "";
     displayComment();
 
@@ -194,8 +191,8 @@ async function clickCommentDeleteButton(commentId) {
 async function displayPost() {
   const json = await loadPostFetch(postId);
 
-  if (json.success) {
-    const post = json.message;
+  if (json.isSuccess) {
+    const post = json.data;
 
     const postTitle = document.getElementById("post-title");
     const postAuthor = document.getElementById("post-author");
@@ -224,9 +221,9 @@ async function displayComment() {
   try {
     const json = await loadCommentFetch(postId);
 
-    if (json.success) {
-      commentsCount.innerHTML = json.message.length + "개의 댓글";
-      json.message.forEach(comment => {
+    if (json.isSuccess) {
+      commentsCount.innerHTML = json.data.length + "개의 댓글";
+      json.data.forEach(comment => {
         makeCommentList(comment);
       });
 

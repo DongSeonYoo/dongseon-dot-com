@@ -63,11 +63,11 @@ const createPostFetch = async () => {
     });
 
     const json = await result.json();
-    if (json.success) {
+    if (json.isSuccess) {
       location.href = "/community";
       
     } else {
-      alert("데이터베이스 에러: " + json.message);
+      alert("데이터베이스 에러: " + json.db.errorMessage);
       location.href = "/";
     }
 

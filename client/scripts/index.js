@@ -144,8 +144,8 @@ const loginFetch = async () => {
     });
 
     const json = await res.json();
-    if (json.success) {
-      const userPk = json.message;
+    if (json.isSuccess) {
+      const userPk = json.data;
       localStorage.setItem("loginUserSession", userPk);
       location.reload();
 

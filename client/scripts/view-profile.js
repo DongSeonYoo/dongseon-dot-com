@@ -21,8 +21,8 @@ async function viewProfileFetch() {
     const result = await fetch("/api/account/" + pathVariable);
     const json = await result.json();
 
-    if (json.success) {
-      const user = json.message;
+    if (json.isSuccess) {
+      const user = json.data;
 
       idForm.innerHTML = user.login_id;
       nameForm.value = user.name;

@@ -54,7 +54,7 @@ const fetchData = async () => {
     });
 
     const json = await res.json();
-    if (json.success) {
+    if (json.isSuccess) {
       localStorage.clear();
       location.href = "/";
 
