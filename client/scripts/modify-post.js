@@ -23,7 +23,7 @@ submitBtn.addEventListener("click", () => {
     const titleValue = document.getElementById("input-title").value;
     const contentValue = document.getElementById("input-content").value;
 
-    modifyPostFetch(titleValue, titleValue);
+    modifyPostFetch(titleValue, contentValue);
   }
 });
 
