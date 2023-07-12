@@ -139,7 +139,7 @@ const loginFetch = async () => {
       },
       body: JSON.stringify({
         loginId: id,
-        pw: pw
+        password: pw
       })
     });
 

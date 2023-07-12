@@ -4,32 +4,19 @@ const cancelBtn = document.getElementById("cancel-button");
 const postTitle = document.getElementById("input-title");
 const postContent = document.getElementById("input-content");
 
+const userId = localStorage.getItem("loginUserSession");
+const postId = parseUrl();
+
 let existingValue = {
   title: "",
   content: "",
 };
-
-const userId = localStorage.getItem("loginUserSession");
-const postId = parseUrl();
 
 if (!userId) {
   location.href = "/";
 }
 
 loadPostData(postId);
-
-submitBtn.addEventListener("click", () => {
-  if (validateInput()) {
-    const titleValue = document.getElementById("input-title").value;
-    const contentValue = document.getElementById("input-content").value;
-
-    modifyPostFetch(titleValue, contentValue);
-  }
-});
-
-cancelBtn.addEventListener("click", () => {
-  location.href = "/community";
-});
 
 const validateInput = () => {
   const titleValue = document.getElementById("input-title").value;
@@ -104,10 +91,10 @@ async function modifyPostFetch(titleValue, contentValue) {
 
     const json = await result.json();
     if (json.isSuccess) {
-      location.href = "/community";
+      location.href = `/post/${postId}`;
 
     } else {
-      alert("데이터베이스 오류: " + JSON.stringify(json));
+      alert(json.message);
     }
 
   } catch (error) {
@@ -115,3 +102,16 @@ async function modifyPostFetch(titleValue, contentValue) {
     console.error(error);
   }
 }
+
+submitBtn.addEventListener("click", () => {
+  if (validateInput()) {
+    const titleValue = document.getElementById("input-title").value;
+    const contentValue = document.getElementById("input-content").value;
+
+    modifyPostFetch(titleValue, contentValue);
+  }
+});
+
+cancelBtn.addEventListener("click", () => {
+  location.href = "/community";
+});

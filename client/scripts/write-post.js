@@ -26,8 +26,8 @@ const validateInput = () => {
     return false;
   }
 
-  if (titleValue.length > 30) {
-    alert("제목이 너무 깁니다 20자 내로 입력해주세요");
+  if (titleValue.length > 40) {
+    alert("제목이 너무 깁니다 40자 내로 입력해주세요");
     return false;
   }
 
@@ -36,8 +36,8 @@ const validateInput = () => {
     return false;
   }
 
-  if (contentValue.length > 300) {
-    alert("본문의 내용이 너무 깁니다 300자 내로 입력해주세요");
+  if (contentValue.length > 500) {
+    alert("본문의 내용이 너무 깁니다 500자 내로 입력해주세요");
     return false;
   }
 
@@ -67,7 +67,7 @@ const createPostFetch = async () => {
       location.href = "/community";
       
     } else {
-      alert("데이터베이스 에러: " + json.db.errorMessage);
+      alert("데이터베이스 에러: " + json.message);
       location.href = "/";
     }
 

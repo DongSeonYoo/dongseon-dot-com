@@ -75,8 +75,11 @@ const fetchData = async () => {
 
     if (json.isSuccess) {
       alert(json.data);
+      location.href = "/";
+    } else {
+      alert("해당하는 사용자가 존재하지 않습니다");
+      location.reload();
     }
-    location.href = "/";
   } catch (err) {
     alert(err);
   }

@@ -18,7 +18,7 @@ window.onload = async () => {
 }
 
 backBtn.addEventListener("click", () => {
-  history.back();
+  location.href = "/community"
 })
 
 function parseUrl() {
@@ -109,7 +109,7 @@ async function clickPostDeleteButton() {
   const askDelete = confirm("게시글을 삭제하시겠습니까?");
 
   if (!askDelete) {
-    return;  
+    return;
   }
 
   try {
@@ -119,15 +119,16 @@ async function clickPostDeleteButton() {
         "Content-Type": "application/json"
       },
       "body": JSON.stringify({
-        "userId": userId,
-        "postId": postId,
+        "userId": `${userId}`,
+        "postId": `${postId}`,
       })
     });
-
-    if (result.isSuccess) {
-      location.href = "/community.js";
+    const data = await result.json();
+    if (data.isSuccess) {
+      location.href = "/community";
+    } else {
+      alert(data.message);
     }
-
   } catch (error) {
     alert("데이터베이스 오류: " + error);
     console.error(error);
@@ -169,7 +170,6 @@ async function clickCommentModifyButton() {
   modifyCommentInput.value = "qwer"
 
   commentInfoArea.appendChild(modifyCommentInput);
-
 }
 
 async function clickCommentDeleteButton(commentId) {
@@ -181,7 +181,7 @@ async function clickCommentDeleteButton(commentId) {
   const json = await deleteCommentFetch(postId, commentId, userId);
   if (json.isSuccess) {
     commentsSection.innerHTML = "";
-    displayComment();
+    await displayComment();
 
   } else {
     alert("댓글 삭제에 실패하였습니다" + json.message);
@@ -223,12 +223,14 @@ async function displayComment() {
 
     if (json.isSuccess) {
       commentsCount.innerHTML = json.data.length + "개의 댓글";
-      json.data.forEach(comment => {
-        makeCommentList(comment);
-      });
+      if (json.data.length !== 0) {
+        json.data.forEach(comment => {
+          makeCommentList(comment);
+        });
+      } else {
+        // 댓글이 없으면?
 
-    } else {
-      console.log("실패: " + json.message);
+      }
     }
 
   } catch (error) {
@@ -295,8 +297,11 @@ async function deleteCommentFetch(postId, commentId, userId) {
         "userId": userId
       })
     });
-
-    return await result.json();
+    
+    const json = await result.json();
+    if (json.isSuccess) {
+      location.reload();
+    }
 
   } catch (error) {
     console.error(error);

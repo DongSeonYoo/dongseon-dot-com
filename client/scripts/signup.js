@@ -102,7 +102,7 @@ const fetchData = async () => {
       },
       "body": JSON.stringify({
         "loginId": loginId,
-        "pw": pw,
+        "password": pw,
         "name": name,
         "phoneNumber": phoneNumber,
         "email": email
@@ -114,7 +114,7 @@ const fetchData = async () => {
       location.href = "/";
 
     } else {
-      console.error(json.message);
+      alert(json.message)
     }
 
   } catch (err) {

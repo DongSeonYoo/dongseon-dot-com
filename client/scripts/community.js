@@ -31,11 +31,12 @@ async function getAllPostsFetch() {
       });
       
     } else {
-      alert("데이터베이스 오류: " + json.message);
-      location.href = "/";
+      const noPostTitle = document.getElementById("no-post-title");
+      noPostTitle.innerHTML = "게시글이 존재하지 않습니다";
     }
 
   } catch (error) {
+    alert("데이터베이스 오류: " + error);
     console.error(error);
   }
 

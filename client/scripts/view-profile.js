@@ -116,13 +116,10 @@ const editProfileFetch = async () => {
 
     const json = await res.json();
 
-    if (json.success) {
+    if (json.isSuccess) {
       location.href = "/";
-
     } else {
-      alert("데이터베이스 오류: " + json.message);
-      console.error(error);
-      location.href = "/";
+      alert(json.message);
     }
 
   } catch (error) {
