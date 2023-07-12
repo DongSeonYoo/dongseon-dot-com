@@ -2,18 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const createClient = require("../database/connect/postgresql");
-const data = require("../module/util/validate");
+const exception = require("../module/exception");
+const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
 
-const maxUserIdLength = 10;
-const maxPostIdLength = 10;
-const maxCommentIdLength = 10;
-const maxCommentContentLength = 300;
-const inputError = {
-  userId: "userId 형식이 올바르지 않습니다",
-  postId: "postId 형식이 올바르지 않습니다",
-  title: "title 형식이 올바르지 않습니다",
-  content: "content 형식이 올바르지 않습니다",
-}
 
 // 댓글 생성 api
 // postId, userId, content
@@ -23,35 +14,16 @@ router.post("/", async (req, res) => {
   const result = {
     isSuccess: false,
     data: "",
-    message: "",
-    db: {
-      errorMessage: "",
-    }
+    message: ""
   };
+  let client = null;
 
-  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
-  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
-  const contentValdiate = data(content).checkInput().checkLength(1, maxCommentContentLength);
-  if (!postIdValidate) {
-    result.message = inputError.postId;
-    res.send(400).send(result);
-    return;
-  }
-
-  if (!userIdValidate) {
-    result.message = inputError.userId;
-    res.send(400).send(result);
-    return;
-  }
-
-  if (!contentValdiate) {
-    result.message = inputError.content;
-    res.send(400).send(result);
-    return;
-  }
-
-  const client = createClient();
   try {
+    exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
+    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
+    exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
+
+    client = createClient();
     await client.connect();
     const sql = `INSERT INTO comment_TB (post_id, user_id, content) VALUES ($1, $2, $3)`;
     const params = [postId, userId, content];
@@ -59,16 +31,16 @@ router.post("/", async (req, res) => {
     const data = await client.query(sql, params);
     if (data.rowCount !== 0) {
       result.isSuccess = true;
-      result.message = "댓글 작성에 성공하였습니다";
-    } else {
-      result.message = "댓글 작성에 실패하였습니다";
     }
 
   } catch (error) {
-    result.db.errorMessage = "POST /api/comment/ error: " + error.message;
-
+    console.error(error);
+    result.message = error.message;
+    
   } finally {
-    await client.end();
+    if (client) {
+      await client.end();
+    }
     res.send(result);
   }
 });
@@ -81,21 +53,14 @@ router.get("/post/:postId", async (req, res) => {
   const result = {
     isSuccess: false,
     data: "",
-    message: "",
-    db: {
-      errorMessage: "",
-    }
+    message: ""
   };
+  let client = null;
 
-  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
-  if (!postIdValidate) {
-    result.message = inputError.postId;
-    res.status(400).send(result);
-    return;
-  }
-
-  const client = createClient();
   try {
+    exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
+
+    client = createClient();
     await client.connect();
     const sql = `SELECT comment_TB.id, comment_TB.user_id, comment_TB.content, comment_TB.created_date, comment_TB.updated_date, 
                user_TB.name AS author_name 
@@ -108,14 +73,17 @@ router.get("/post/:postId", async (req, res) => {
       result.isSuccess = true;
       result.data = data.rows;
     } else {
-      result.message = "해당 게시글에 댓글이 존재하지 않습니다";
+      result.message = "댓글이 존재하지 않습니다";
     }
     
   } catch (error) {
-    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
+    console.error(error);
+    result.message = error.message;
 
   } finally {
-    await client.end();
+    if (client) {
+      await client.end();
+    }
     res.send(result);
   }
 });
@@ -128,57 +96,35 @@ router.put("/", async (req, res) => {
   const result = {
     isSuccess: false,
     data: "",
-    message: "",
-    db: {
-      errorMessage: "",
-    }
+    message: ""
   };
-  
-  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
-  const commentIdValidate = data(commentId).checkInput().checkLength(1, maxCommentIdLength);
-  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
-  const contentValidate = data(content).checkInput().checkLength(1, maxCommentContentLength);
-  if (!postIdValidate) {
-    result.message = inputError.postId;
-    res.status(400).send(result);
-    return;
-  }
+  let client = null;
 
-  if (!commentIdValidate) {
-    result.message = inputError.commentId;
-    res.status(400).send(result);
-    return;
-  }
-
-  if (!userIdValidate) {
-    result.message = inputError.userId;
-    res.status(400).send(result);
-    return;
-  }
-
-  if (!contentValidate) {
-    result.message = inputError.content;
-    res.status(400).send(result);
-    return;
-  }
-
-  const client = createClient();
   try {
+    exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
+    exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
+    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
+    exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
+    
+    client = createClient();
     await client.connect();
     const sql = "UPDATE comment_TB SET content = $1 WHERE post_id = $2 AND user_id = $3 AND id = $4";
-    const param = [content, postId, userId, commentId];
-
-    const data = await client.query(sql, param);
+    const params = [content, postId, userId, commentId];
+    const data = await client.query(sql, params)
     if (data.rowCount !== 0) {
       result.isSuccess = true;
-      result.message = "댓글 수정에 성공하였습니다";
     } else {
-      result.message = "댓글 수정에 실패하였습니다";
+      result.message = "해당하는 댓글이 존재하지 않습니다";
     }
+
   } catch (error) {
-    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
+    console.error(error);
+    result.message = error.message;
+
   } finally {
-    await client.end();
+    if (client) {
+      await client.end();
+    }
     res.send(result);
   }
 });
@@ -191,51 +137,33 @@ router.delete("/", async (req, res) => {
   const result = {
     isSuccess: false,
     data: "",
-    message: "",
-    db: {
-      errorMessage: "",
-    }
+    message: ""
   };
+  let client = null;
 
-  const postIdValidate = data(postId).checkInput().checkLength(1, maxPostIdLength);
-  const commentIdValidate = data(commentId).checkInput().checkLength(1, maxCommentIdLength);
-  const userIdValidate = data(userId).checkInput().checkLength(1, maxUserIdLength);
-  if (!postIdValidate) {
-    result.message = inputError.postId;
-    res.status(400).send(result);
-    return;
-  }
-
-  if (!commentIdValidate) {
-    result.message = inputError.commentId;
-    res.status(400).send(result);
-    return;
-  }
-
-  if (!userIdValidate) {
-    result.message = inputError.userId;
-    res.status(400).send(result);
-    return;
-  }
-
-  const client = createClient();
   try {
+    exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
+    exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
+    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength)
+
+    client = createClient();
     await client.connect();
     const sql = "DELETE FROM comment_TB WHERE post_id = $1 AND user_id = $2 AND id = $3";
     const params = [postId, userId, commentId];
-
-    const data = await client.query(sql, params)
+    const data = await client.query(sql, params);
     if (data.rowCount !== 0) {
       result.isSuccess = true;
-      result.message = "댓글 삭제 성공";
     } else {
-      result.message = "댓글 삭제 실패"
+      result.message = "해당하는 댓글이 존재하지 않습니다";
     }
-  } catch (error) {
-    result.db.errorMessage = "GET /api/comment/ error: " + error.message;
 
+  } catch (error) {
+    console.error(error);
+    result.message = error.message;
   } finally {
-    await client.end();
+    if (client) {
+      await client.end();
+    }
     res.send(result);
   }
 });
