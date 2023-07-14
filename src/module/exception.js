@@ -2,7 +2,12 @@ const { loginIdRegex, pwRegex, nameRegex, phoneNumberRegex, emailRegex } = requi
 
 function Exception(input, name) {
   this.checkInput = () => {
-    if (typeof input === undefined || input === "") throw new Error(`(${name}): 값이 비어있습니다`);
+    if (typeof input === undefined || input === "") {
+      const error = Error(`(${name}): 값이 비어있습니다`);
+      error.status = 400;
+      
+      throw error;
+    }
     return this;
   }
 
