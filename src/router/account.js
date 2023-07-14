@@ -23,20 +23,24 @@ router.post("/login", async (req, res) => {
 
     client = createClient();
     await client.connect();
-    const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
+    const sql = "SELECT id FROM user_TB WHERE ogin_id = $1 AND password = $2";
     const params = [loginId, password];
 
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
       result.isSuccess = true;
       result.data = data.rows[0].id;
+      res.status(200);
+
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
+      res.status(401);
     }
 
   } catch (error) {
     console.error(error);
     result.message = error.message;
+    res.status(400);
 
   } finally {
     if (client) {
