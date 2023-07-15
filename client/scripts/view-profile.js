@@ -15,7 +15,7 @@ viewProfileFetch();
 
 async function viewProfileFetch() {
   try {
-    const userId = localStorage.getItem("loginUserSession");
+    const userId = sessionStorage.getItem("loginUserSession");
     const pathVariable = userId;
 
     const result = await fetch("/api/account/" + pathVariable);
@@ -95,7 +95,7 @@ editProfileBtn.addEventListener("click", () => {
 })
 
 const editProfileFetch = async () => {
-  const userId = localStorage.getItem("loginUserSession");
+  const userId = sessionStorage.getItem("loginUserSession");
   const name = nameForm.value;
   const phoneNumber = phoneNumberForm.value;
   const email = emailForm.value;

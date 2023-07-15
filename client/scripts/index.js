@@ -18,7 +18,7 @@ console.log(a);
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
 
-if (localStorage.getItem("loginUserSession")) {
+if (sessionStorage.getItem("loginUserSession")) {
   const loginModalBtn = document.getElementById("login-modal-open-button");
   
   const navbarDiv = document.getElementById("nav-bar");
@@ -43,7 +43,7 @@ if (localStorage.getItem("loginUserSession")) {
   logoutBtn.classList.add("login-only-button");
   logoutBtn.innerHTML = "로그아웃";
   logoutBtn.addEventListener("click", () => {
-    localStorage.clear();
+    sessionStorage.clear();
     location.reload();
   });
 
@@ -146,7 +146,7 @@ const loginFetch = async () => {
     const json = await res.json();
     if (json.isSuccess) {
       const userPk = json.data;
-      localStorage.setItem("loginUserSession", userPk);
+      sessionStorage.setItem("loginUserSession", userPk);
       location.reload();
 
     } else {

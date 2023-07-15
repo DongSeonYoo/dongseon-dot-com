@@ -9,10 +9,10 @@ getAllPostsFetch();
 
 homeBtn.addEventListener("click", () => {
   location.href = "/";
-})
+});
 
 createPostBtn.addEventListener("click", () => {
-  if (localStorage.getItem("loginUserSession")) {
+  if (sessionStorage.getItem("loginUserSession")) {
     location.href = "/write-post";
 
   } else {

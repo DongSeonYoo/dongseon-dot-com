@@ -2,7 +2,7 @@ const submitBtn = document.getElementById("submit-button");
 const cancelBtn = document.getElementById("cancel-button");
 
 window.onload = () => {
-  if (!localStorage.getItem("loginUserSession")) {
+  if (!sessionStorage.getItem("loginUserSession")) {
     location.href = "/";
   }
 }
@@ -49,7 +49,7 @@ const createPostFetch = async () => {
   const contentValue = document.getElementById("input-content").value;
 
   try {
-    const userId = localStorage.getItem("loginUserSession")
+    const userId = sessionStorage.getItem("loginUserSession")
     const result = await fetch("/api/post", {
       "method": "POST",
       "headers": {

@@ -3,7 +3,7 @@ const commentsCount = document.getElementById("comment-count");
 const postInfoArea = document.getElementById("post-info-area");
 const backBtn = document.getElementById("back-button");
 
-const userId = localStorage.getItem("loginUserSession");
+const userId = sessionStorage.getItem("loginUserSession");
 const postId = parseUrl();
 
 window.onload = async () => {
@@ -39,7 +39,7 @@ function makeCommentList(comment) {
   const parsedCreatedDate = new Date(comment.created_date).toLocaleString();
   const parsedUpdatedDate = new Date(comment.updated_date).toDateString();
 
-  commentAuthor.innerHTML = "작성자: " + comment.author_name;
+  commentAuthor.innerHTML = "작성자: " + comment.authorName;
   commentCreatedDate.innerHTML = "작성일: " + parsedCreatedDate;
   commentUpdatedDate.innerHTML = "최근 수정일: " + parsedUpdatedDate;
   commentContent.innerHTML = comment.content;
@@ -255,7 +255,7 @@ async function loadCommentFetch(postId) {
 
     return await result.json();
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 }
 

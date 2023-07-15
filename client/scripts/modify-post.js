@@ -4,7 +4,7 @@ const cancelBtn = document.getElementById("cancel-button");
 const postTitle = document.getElementById("input-title");
 const postContent = document.getElementById("input-content");
 
-const userId = localStorage.getItem("loginUserSession");
+const userId = sessionStorage.getItem("loginUserSession");
 const postId = parseUrl();
 
 let existingValue = {
