@@ -6,7 +6,7 @@ const pagesRoute = require("./src/router/pages");
 const accountApi = require("./src/router/account");
 const postApi = require("./src/router/post");
 const commentApi = require("./src/router/comment");
-
+const logApi = require("./src/router/log");
 require("dotenv").config();
 
 app.use(express.json());
@@ -15,9 +15,11 @@ app.use((req, res, next) => {
   const originResultSend = res.send;
 
   res.send = function(result) {
-    if(typeof(result) !== 'string'){
+    // if(typeof result !== 'string'){} ?
+    if(typeof result !== 'string' && req.originalUrl.split('/')[2] !== "log") {
       logging(req, res, result);
     }
+
     return originResultSend.call(this, result);
   }
   next();
