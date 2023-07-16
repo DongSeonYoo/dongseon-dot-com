@@ -29,5 +29,11 @@ app.use("/", pagesRoute);
 app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
+app.use("/api/log", logApi);
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(500);
+})
 
 module.exports = app;
