@@ -8,10 +8,9 @@ const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneN
 // 로그인 api
 // loginId, password
 // POST
-router.post("/login", async (req, res) => {
+router.post("/login", async (req, res, next) => {
   const { loginId, password } = req.body;
   const result = {
-    isSuccess: false,
     data: "",
     message: ""
   };
@@ -23,15 +22,12 @@ router.post("/login", async (req, res) => {
 
     client = createClient();
     await client.connect();
-    const sql = "SELECT id FROM user_TB WHERE ogin_id = $1 AND password = $2";
+    const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
     const params = [loginId, password];
-
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      result.isSuccess = true;
       result.data = data.rows[0].id;
       res.status(200);
-
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
       res.status(401);
@@ -40,7 +36,11 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     result.message = error.message;
-    res.status(400);
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {
@@ -50,10 +50,136 @@ router.post("/login", async (req, res) => {
   };
 });
 
+// 아이디 중복체크 api
+// GET
+// pathVariable: loginId
+router.get("/id/duplicate/:loginId", async (req, res, next) => {
+  const { loginId } = req.params;
+  const result = {
+    data: false,
+    message: "",
+  };
+
+  try {
+    exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
+    
+    client = createClient();
+    await client.connect();
+    const sql = "SELECT id FROM user_TB WHERE login_id = $1";
+    const params = [loginId];
+    const data = await client.query(sql, params);
+    if (data.rows.length !== 0) {
+      res.status(200);
+      result.data = true;
+    } else {
+      res.status(200);
+      result.data = false;
+    }
+    
+  } catch (error) {
+    console.error(error);
+    result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
+  } finally {
+    if (client) {
+      await client.end();
+    }
+    res.send(result);
+  }
+});
+
+// 전화번호 중복체크 api
+// GET
+// pathVariable: phoneNumber
+router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
+  const { phoneNumber } = req.params;
+  const result = {
+    data: false,
+    message: "",
+  };
+
+  try {
+    exception(phoneNumber, "phoneNumber").checkInput().checkLength(1, maxPhoneNumberLength);
+    
+    client = createClient();
+    await client.connect();
+    const sql = "SELECT phone_number FROM user_TB WHERE phone_number = $1";
+    const params = [phoneNumber];
+    const data = await client.query(sql, params);
+    if (data.rows.length !== 0) {
+      res.status(200);
+      result.data = true;
+    } else {
+      res.status(200);
+      result.data = false;
+    }
+    
+  } catch (error) {
+    console.error(error);
+    result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
+  } finally {
+    if (client) {
+      await client.end();
+    }
+    res.send(result);
+  }
+})
+
+// 이메일 중복체크 api
+// GET
+// pathVariable: email
+router.get("/email/duplicate/:email", async (req, res, next) => {
+  const { email } = req.params;
+  const result = {
+    data: false,
+    message: "",
+  };
+
+  try {
+    exception(email, "email").checkInput().checkLength(1, maxEmailLength);
+    
+    client = createClient();
+    await client.connect();
+    const sql = "SELECT email FROM user_TB WHERE email = $1";
+    const params = [email];
+    const data = await client.query(sql, params);
+    if (data.rows.length !== 0) {
+      res.status(200);
+      result.data = true;
+    } else {
+      res.status(200);
+      result.data = false;
+    }
+    
+  } catch (error) {
+    console.error(error);
+    result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
+  } finally {
+    if (client) {
+      await client.end();
+    }
+    res.send(result);
+  }
+})
+
 // 회원가입 api
 // loginId, password, name, phoneNumber, email
 // POST
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req, res, next) => {
   const { loginId, password, name, phoneNumber, email } = req.body;
   const result = {
     isSuccess: false,
@@ -78,11 +204,17 @@ router.post("/signup", async (req, res) => {
     if (data.rowCount !== 0) {
       result.isSuccess = true;
       result.message = "회원가입 성공";
+      res.status(200);
     }
 
   } catch (error) {
     console.error(error)
     result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {
@@ -272,7 +404,7 @@ router.put("/", async (req, res) => {
     exception(name, "name").checkInput().checkNameRegex();
     exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
     exception(email, "email").checkInput().checkEmailRegex();
-    
+
     client = createClient();
     await client.connect();
     const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
@@ -320,11 +452,11 @@ router.delete("/", async (req, res) => {
     } else {
       result.message = "해당하는 사용자가 존재하지 않습니다";
     }
-    
+
   } catch (error) {
     console.error(error);
     result.message = error.message;
-    
+
   } finally {
     if (client) {
       await client.end();

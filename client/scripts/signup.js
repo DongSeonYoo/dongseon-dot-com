@@ -11,7 +11,39 @@ const nameRegex = /^[가-힣a-zA-Z]{2,8}$/;
 const phoneNumberRegex = /^0\d{10}$/;
 const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
+let isIdDuplicate = false;
+let isPhoneNumberDuplicate = false;
+let isEmailDuplicate = false;
+
 const validate = () => {
+  if (!idInputValidate()) {
+    return false;
+  }
+
+  if (!pwInputValidate()) {
+    return false;
+  }
+
+  if (!nicknameInputValidate()) {
+    return false;
+  }
+
+  if (!phoneNumberInputValidate()) {
+    return false;
+  }
+
+  if (!emailInputValidate()) {
+    return false;
+  }
+
+  if (!isCheckDuplicateButton()) {
+    return false;
+  }
+
+  return true;
+};
+
+const idInputValidate = () => {
   if (idField.value === "") {
     alert("아이디를 입력해주세요");
     idField.focus();
@@ -24,6 +56,10 @@ const validate = () => {
     return false;
   }
 
+  return true;
+}
+
+const pwInputValidate = () => {
   if (pwField.value === "") {
     alert("비밀번호를 입력해주세요");
     pwField.focus();
@@ -36,12 +72,10 @@ const validate = () => {
     return false;
   }
 
-  if (pwField.value !== pwCheckField.value) {
-    alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
-    pwCheckField.focus();
-    return false;
-  }
+  return true;
+}
 
+const nicknameInputValidate = () => {
   if (nicknameField.value === "") {
     alert("닉네임을 입력해주세요");
     nicknameField.focus();
@@ -49,11 +83,15 @@ const validate = () => {
   }
 
   if (!nameRegex.test(nicknameField.value)) {
-    alert("닉네임은 영문자, 한글, 숫자 조합의 2~20자 이내 문자열이어야 합니다.");
+    alert("닉네임은 영문자, 한글, 숫자 조합의 2~8자 이내 문자열이어야 합니다.");
     nicknameField.focus();
     return false;
   }
 
+  return true;
+};
+
+const phoneNumberInputValidate = () => {
   if (phoneNumberField.value === "") {
     alert("전화번호를 입력해주세요");
     phoneNumberField.focus();
@@ -66,6 +104,10 @@ const validate = () => {
     return false;
   }
 
+  return true;
+};
+
+const emailInputValidate = () => {
   if (emailField.value === "") {
     alert("이메일을 입력해주세요");
     emailField.focus();
@@ -81,18 +123,112 @@ const validate = () => {
   return true;
 };
 
-const clickSignup = () => {
-  if (validate()) {
-    fetchData();
+const isCheckDuplicateButton = () => {
+  if (!isIdDuplicate) {
+    alert("아이디 중복체크를 완료해주세요");
+    return false;
+  }
+
+  if (!isPhoneNumberDuplicate) {
+    alert("전화번호 중복체크를 완료해주세요");
+    return false;
+  }
+
+  if (!isEmailDuplicate) {
+    alert("이메일 중복체크를 완료해주세요");
+    return false;
+  }
+
+  return true;
+}
+
+const clickIdDuplicate = () => {
+  if (idInputValidate()) {
+    fetchIdDuplicate();
+  }
+};
+
+const clickPhoneNumberDuplicate = () => {
+  if (phoneNumberInputValidate()) {
+    fetchPhoneNumberDuplicate();
   }
 }
 
-const fetchData = async () => {
-  const loginId = document.getElementById("id-text-field").value;
-  const pw = document.getElementById("pw-text-field").value;
-  const name = document.getElementById("name-text-field").value;
-  const phoneNumber = document.getElementById("phonenumber-text-field").value;
-  const email = document.getElementById("email-text-field").value;
+const clickEmailDuplicate = () => {
+  if (emailInputValidate()) {
+    fetchEmailDuplicate();
+  }
+}
+
+const clickSignup = () => {
+  if (validate()) {
+    fetchSignupData();
+  }
+};
+
+const onchangeIdInput = () => {
+  isIdDuplicate = false;
+}
+
+const onchangePhoneNumberInput = () => {
+  isPhoneNumberDuplicate = false;
+}
+
+const onchangeEmailInput = () => {
+  isEmailDuplicate = false;
+}
+
+const fetchIdDuplicate = async () => {
+  const result = await fetch("/api/account/id/duplicate/" + idField.value);
+  const json = await result.json();
+  if (result.status === 200) {
+    // 중복된 아이디가 존재하는 경우
+    if (json.data) {
+      alert("중복된 아이디가 존재합니다");
+      // 중복된 아이디가 존재하지 않는 경우
+    } else {
+      isIdDuplicate = true;
+      alert("사용 가능한 아이디입니다");
+    }
+  }
+}
+
+const fetchPhoneNumberDuplicate = async () => {
+  const result = await fetch("/api/account/phoneNumber/duplicate/" + phoneNumberField.value);
+  const json = await result.json();
+  if (result.status === 200) {
+    // 중복된 전화번호가 존재하는 경우
+    if (json.data) {
+      alert("중복된 전화번호가 존재합니다");
+      // 중복된 전화번호가 존재하지 않는 경우
+    } else {
+      isPhoneNumberDuplicate = true;
+      alert("사용 가능한 전화번호입니다");
+    }
+  }
+}
+
+const fetchEmailDuplicate = async () => {
+  const result = await fetch("/api/account/email/duplicate/" + emailField.value);
+  const json = await result.json();
+  if (result.status === 200) {
+    // 중복된 이메일이 존재하는 경우
+    if (json.data) {
+      alert("중복된 이메일이 존재합니다");
+      // 중복된 이메일이 존재하지 않는 경우
+    } else {
+      isEmailDuplicate = true;
+      alert("사용 가능한 이메일입니다");
+    }
+  }
+}
+
+const fetchSignupData = async () => {
+  const loginId = idField.value;
+  const pw = pwField.value;
+  const name = nicknameField.value;
+  const phoneNumber = phoneNumberField.value;
+  const email = emailField.value;
 
   try {
     const res = await fetch("/api/account/signup", {
