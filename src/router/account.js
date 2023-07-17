@@ -430,11 +430,10 @@ router.put("/", async (req, res) => {
 // 회원 탈퇴 api
 // userId
 // DELETE
-router.delete("/", async (req, res) => {
+router.delete("/", async (req, res, next) => {
   const { userId } = req.body;
   const result = {
     isSuccess: false,
-    data: "",
     message: ""
   }
   let client = null;
@@ -456,6 +455,11 @@ router.delete("/", async (req, res) => {
   } catch (error) {
     console.error(error);
     result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {
