@@ -12,37 +12,72 @@ function Exception(input, name) {
   }
 
   this.checkLength = (min, max) => {
-    if (input.length < min || input.length > max) throw new Error(`(${name}): 길이가 비정상적입니다`);
+    if (input.length < min || input.length > max) {
+      const error = Error(`(${name}): 길이가 비정상적입니다`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.checkIdRegex = () => {
-    if (!loginIdRegex.test(input)) throw new Error(`(${name}): 정규표현식 실패`);
+    if (!loginIdRegex.test(input)) {
+      const error = Error(`(${name}): 정규표현식 실패`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.checkPwRegex = () => {
-    if (!pwRegex.test(input)) throw new Error(`(${name}): 정규표현식 실패`);
+    if (!pwRegex.test(input)) {
+      const error = Error(`(${name}): 정규표현식 실패`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.checkNameRegex = () => {
-    if (!nameRegex.test(input)) throw new Error(`(${name}): 정규표현식 실패`);
+    if (!nameRegex.test(input)) {
+      const error = Error(`(${name}): 정규표현식 실패`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.checkPhoneNumberRegex = () => {
-    if (!phoneNumberRegex.test(input)) throw new Error(`(${name}): 정규식표현식 실패`);
+    if (!phoneNumberRegex.test(input)) { 
+      const error = Error(`(${name}): 정규식표현식 실패`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.checkEmailRegex = () => {
-    if (!emailRegex.test(input)) throw new Error(`(${name}): 정규표현식 실패`);
+    if (!emailRegex.test(input)) {
+      const error = Error(`(${name}): 정규표현식 실패`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 
   this.isNumber = () => {
-    if (isNaN(Number(input))) throw new Error(`(${name}): 정수가 아닙니다`);
+    if (isNaN(Number(input))) {
+      const error = Error(`(${name}): 정수가 아닙니다`);
+      error.status = 400;
+
+      throw error;
+    }
     return this;
   }
 }
