@@ -1,0 +1,43 @@
+.log-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.log {
+  display: flex;
+  border: 1px solid #ccc;
+  padding: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.log .time {
+  width: 150px;
+}
+
+.log .ip {
+  width: 200px;
+}
+
+.log .status {
+  width: 100px;
+}
+
+.log .method {
+  width: 100px;
+}
+
+.log .api {
+  flex: 1;
+  /* Flex the remaining space */
+}
+
+.request,
+.response {
+  flex: 1;
+}
+
+#column {
+  display: flex;
+  justify-content: space-around;
+}
