@@ -220,6 +220,14 @@ const fetchEmailDuplicate = async () => {
       isEmailDuplicate = true;
       alert("사용 가능한 이메일입니다");
     }
+    // 클라이언트에서 유효하지 않은 요청을 보냈을 경우
+  } else if (response.status === 400) {
+    alert(json.message);
+    location.href = "/";
+  // 서버에서 에러가 발생한 경우
+  } else if (response.status === 500) {
+    alert("서버 오류: " + json.message);
+    location.href = "/";
   }
 }
 

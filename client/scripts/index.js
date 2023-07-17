@@ -14,6 +14,11 @@ const findPwBtn = document.getElementById("find-pw-button");
 const a = location.href;
 console.log(a);
 
+// 세션적용 전까지 임시방편.....
+window.onload = () => {
+  sessionStorage.removeItem("resetPwUserPkSession");
+}
+
 // 요소의 높이 계산
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
@@ -131,7 +136,6 @@ const loginFetch = async () => {
   try {
     const id = idInput.value;
     const pw = pwInput.value;
-
     const res = await fetch("/api/account/login", {
       method: "POST",
       headers: {
@@ -142,20 +146,23 @@ const loginFetch = async () => {
         password: pw
       })
     });
-
+    
     const json = await res.json();
-    if (json.isSuccess) {
-      const userPk = json.data;
-      sessionStorage.setItem("loginUserSession", userPk);
+    if (res.status === 200) {
+      sessionStorage.setItem("loginUserSession", json.data);
       location.reload();
-
-    } else {
-      alert("로그인 실패: " + json.message);
+    } else if (res.status === 400) {
+      alert("잘못된 요청: " + json.message);
+      location.href = "/";
+    } else if (res.status === 401) {
+      alert(`로그인 실패: ${json.message}`);
       clearInputFields();
+    } else if (res.status === 500) {
+      alert("서버 오류: " + json.message);
     }
 
   } catch (error) {
-    alert("error: " + error + "(서버 꺼져있는듯)");
+    alert("error: " + error.message);
   }
 }
 

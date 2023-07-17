@@ -1,6 +1,14 @@
 document.getElementById("home-button").addEventListener("click", () => {
+  sessionStorage.removeItem("resetPwUserPkSession");
   location.href = "/";
 })
+
+window.onload = () => {
+  const resetPwUserPk = sessionStorage.getItem("resetPwUserPkSession");
+  if (!resetPwUserPk) {
+    location.href = "/";
+  }
+}
 
 function validate() {
   const newPassword = document.querySelector("#new-pw-text-field").value;
@@ -38,7 +46,7 @@ const clickResetPw = () => {
 }
 
 const fetchData = async () => {
-  const userId = sessionStorage.getItem("resetPwSession");
+  const userId = sessionStorage.getItem("resetPwUserPkSession");
   const newPw = document.getElementById("new-pw-text-field").value;
 
   try {
@@ -54,12 +62,17 @@ const fetchData = async () => {
     });
 
     const json = await res.json();
-    if (json.isSuccess) {
-      sessionStorage.clear();
-      location.href = "/";
-
-    } else {
-      alert("잘못된 데이터를 입력하셨습니다");
+    if (res.status === 200) {
+      if (json.isSuccess) {
+        location.href = "/";
+      } else {
+        alert("해당하는 사용자가 존재하지 않습니다. 처음부터 시도해주세요");
+        location.href = "/";
+      }
+    } else if (res.status === 400) {
+      alert("잘못된 요청: " + json.message);
+    } else if (res.status === 500) {
+      alert("서버 에러: " + json.message);
     }
 
   } catch (err) {

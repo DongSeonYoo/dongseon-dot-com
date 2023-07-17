@@ -74,17 +74,27 @@ const fetchData = async () => {
   try {
     const response = await fetch("/api/account/pw?" + queryString);
     const json = await response.json();
-
-    if (json.isSuccess) {
-      const userPk = json.data;
-      sessionStorage.setItem("resetPwSession", userPk);
-      location.href = "/reset-pw";
-
-    } else {
-      alert(json.message);
+    // 요청이 성공할경우
+    if (response.status === 200) {
+      // 사용자를 찾았을 경우
+      if (json.data) {
+        const userPk = json.data;
+        sessionStorage.setItem("resetPwUserPkSession", userPk);
+        location.href = "/reset-pw";
+      // 사용자를 찾지 못했을 경우
+      } else {
+        alert(json.message);
+      }
+    // 클라이언트에서 유효하지 않은 요청을 보냈을 경우
+    } else if (response.status === 400) {
+      alert("잘못된 요청: " + json.message);
+      location.href = "/";
+    // 서버에서 에러가 발생한 경우
+    } else if (response.status === 500) {
+      alert("서버 오류: " + json.message);
+      location.href = "/";
     }
-
   } catch (error) {
-    alert(error);
+    alert(error.message);
   }
 }

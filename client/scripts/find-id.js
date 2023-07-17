@@ -73,12 +73,24 @@ const fetchData = async () => {
     const res = await fetch("/api/account/loginId?" + queryString);
     const json = await res.json();
 
-    if (json.isSuccess) {
-      alert(json.data);
-      location.href = "/";
-    } else {
-      alert("해당하는 사용자가 존재하지 않습니다");
-      location.reload();
+    // 200 status code: 요청이 성공적으로 전달된 경우
+    if (res.status === 200) {
+      // 만약 사용자를 찾았다면?
+      if (json.data) {
+        alert("아이디: " + json.data);
+        location.href = "/";
+      // 만약 사용자를 찾지 못했다면?
+      } else {
+        alert(json.message);
+      }
+    
+    // 클라이언트에서 잘못된 응답을 보내주었을 경우
+    } else if (res.status === 400) {
+      alert(json.message);
+
+    // 서버에서 예상치 못한 오류가 생겼을 경우
+    } else if (res.status === 500) {
+      alert("서버 에러가 발생하였습니다");
     }
   } catch (err) {
     alert(err);
