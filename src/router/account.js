@@ -269,19 +269,19 @@ router.get("/loginId", async (req, res) => {
 // 1.(사용자 인증 단계)
 // GET
 // loginId, name, phoneNumber, email
-router.get("/pw", async (req, res) => {
-  const { loginId, name, phoneNumber, email } = req.query;
+router.post("/pw", async (req, res, next) => {
+  const { loginId, name, phoneNumber, email } = req.body;
   const result = {
-    isSuccess: false,
     data: "",
-    message: ""
-  }
+    message: "",
+  };
   let client = null;
 
   try {
-    exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
-    exception(name, "name").checkInput().checkLength(1, maxNameLength)
-    exception(phoneNumber, "phoneNumber").checkInput().checkLength(maxPhoneNumberLength, maxPhoneNumberLength);
+    exception(loginId, "loginId").checkInput().checkIdRegex();
+    exception(name, "name").checkInput().checkNameRegex();
+    exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
+    exception(email, "email").checkInput().checkEmailRegex();
 
     client = createClient();
     await client.connect();
@@ -292,12 +292,18 @@ router.get("/pw", async (req, res) => {
       result.isSuccess = true;
       result.data = data.rows[0].id;
     } else {
+      result.data = null;
       result.message = "해당하는 사용자가 없습니다";
     }
 
   } catch (error) {
     console.error(error);
     result.message = error.message;
+    if (error.status === 400) {
+      res.status(400);
+    } else {
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {

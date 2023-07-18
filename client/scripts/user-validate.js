@@ -69,10 +69,21 @@ const fetchData = async () => {
   const name = document.getElementById("name-text-field").value;
   const phoneNumber = document.getElementById("phone-number-text-field").value;
   const email = document.getElementById("email-text-field").value;
-  const queryString = `loginId=${loginId}&name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
+  // const queryString = `loginId=${loginId}&name=${name}&phoneNumber=${phoneNumber}&email=${email}`;
 
   try {
-    const response = await fetch("/api/account/pw?" + queryString);
+    const response = await fetch(`/api/account/pw`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        loginId: loginId,
+        name: name,
+        phoneNumber: phoneNumber,
+        email: email
+      })
+    });
     const json = await response.json();
     // 요청이 성공할경우
     if (response.status === 200) {
