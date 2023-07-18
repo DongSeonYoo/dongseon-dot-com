@@ -1,5 +1,7 @@
 const express = require("express");
 const app = express();
+const path = require("path");
+const CLIENT_PATH = path.join(__dirname,'./client/pages');
 const logging = require("./src/module/logging");
 
 const pagesRoute = require("./src/router/pages");
@@ -31,9 +33,15 @@ app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
 app.use("/api/log", logApi);
 
+// 404 error handling
+app.use((req, res) => {
+  res.sendFile(path.join(CLIENT_PATH, '404.html'))
+});
+
+// 500 error catch middleware
 app.use((err, req, res, next) => {
   console.log(err);
   res.status(500);
-})
+});
 
 module.exports = app;
