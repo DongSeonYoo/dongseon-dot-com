@@ -22,12 +22,13 @@ router.post("/login", async (req, res, next) => {
 
     client = createClient();
     await client.connect();
+    
     const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
     const params = [loginId, password];
     const data = await client.query(sql, params);
+
     if (data.rows.length !== 0) {
       result.data = data.rows[0].id;
-      res.status(200);
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
       res.status(401);
@@ -35,10 +36,11 @@ router.post("/login", async (req, res, next) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
 
@@ -62,26 +64,25 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
 
   try {
     exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
-    
+
     client = createClient();
     await client.connect();
     const sql = "SELECT id FROM user_TB WHERE login_id = $1";
     const params = [loginId];
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      res.status(200);
       result.data = true;
     } else {
-      res.status(200);
       result.data = false;
     }
-    
+
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
   } finally {
@@ -101,29 +102,29 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
     data: false,
     message: "",
   };
+  let client = null;
 
   try {
-    exception(phoneNumber, "phoneNumber").checkInput().checkLength(1, maxPhoneNumberLength);
-    
+    exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
+
     client = createClient();
     await client.connect();
     const sql = "SELECT phone_number FROM user_TB WHERE phone_number = $1";
     const params = [phoneNumber];
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      res.status(200);
       result.data = true;
     } else {
-      res.status(200);
       result.data = false;
     }
-    
+
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
   } finally {
@@ -143,29 +144,28 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
     data: false,
     message: "",
   };
+  let client = null;
 
   try {
-    exception(email, "email").checkInput().checkLength(1, maxEmailLength);
-    
+    exception(email, "email").checkInput().checkEmailRegex();
     client = createClient();
     await client.connect();
     const sql = "SELECT email FROM user_TB WHERE email = $1";
     const params = [email];
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      res.status(200);
       result.data = true;
     } else {
-      res.status(200);
       result.data = false;
     }
-    
+
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
   } finally {
@@ -182,7 +182,6 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
 router.post("/signup", async (req, res, next) => {
   const { loginId, password, name, phoneNumber, email } = req.body;
   const result = {
-    isSuccess: false,
     data: "",
     message: "",
   };
@@ -197,22 +196,21 @@ router.post("/signup", async (req, res, next) => {
 
     client = createClient();
     await client.connect();
-    const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
+    const sql = `INSERT INTO user_TB (login_id, password, nme, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
     const params = [loginId, password, name, phoneNumber, email];
 
     const data = await client.query(sql, params);
     if (data.rowCount !== 0) {
-      result.isSuccess = true;
       result.message = "회원가입 성공";
-      res.status(200);
     }
 
   } catch (error) {
     console.error(error)
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
 
@@ -227,10 +225,9 @@ router.post("/signup", async (req, res, next) => {
 // 아이디 찾기 api
 // name, phoneNumber, email
 // GET
-router.get("/loginId", async (req, res) => {
+router.get("/loginId", async (req, res, next) => {
   const { name, phoneNumber, email } = req.query;
   const result = {
-    isSuccess: false,
     data: "",
     message: ""
   }
@@ -247,15 +244,21 @@ router.get("/loginId", async (req, res) => {
     const params = [name, phoneNumber, email];
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      result.isSuccess = true;
       result.data = data.rows[0].login_id;
     } else {
+      result.data = null;
       result.message = "해당하는 아이디가 존재하지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {
@@ -298,10 +301,11 @@ router.post("/pw", async (req, res, next) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
+      result.message = error.message;
       res.status(400);
     } else {
+      result.message = "데이터베이스 오류";
       next(new Error("500 error"));
     }
 
@@ -317,13 +321,13 @@ router.post("/pw", async (req, res, next) => {
 // 2.(비밀번호 재설정 단계)
 // PUT
 // userId, newPw
-router.put("/pw", async (req, res) => {
+router.put("/pw", async (req, res, next) => {
   const { userId, newPw } = req.body;
   const result = {
     isSuccess: false,
     data: "",
-    message: ""
-  }
+    message: "",
+  };
   let client = null;
 
   try {
@@ -337,7 +341,7 @@ router.put("/pw", async (req, res) => {
     const data = await client.query(sql, param);
     if (data.rowCount !== 0) {
       result.isSuccess = true;
-
+      result.message = "비밀번호 수정 성공";
     } else {
       result.message = "해당하는 사용자가 없습니다";
     }
@@ -345,6 +349,13 @@ router.put("/pw", async (req, res) => {
   } catch (error) {
     console.error(error);
     result.message = error.message;
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 error"));
+    }
 
   } finally {
     if (client) {
@@ -357,18 +368,16 @@ router.put("/pw", async (req, res) => {
 // 프로필 보기 api
 // userId
 // GET
-router.get("/:userId", async (req, res) => {
+router.get("/:userId", async (req, res, next) => {
   const { userId } = req.params;
   const result = {
-    isSuccess: false,
     data: "",
-    message: ""
-  }
+    message: "",
+  };
   let client = null;
 
   try {
     exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
-
     client = createClient();
     await client.connect();
     const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
@@ -376,15 +385,23 @@ router.get("/:userId", async (req, res) => {
     const params = [userId];
     const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
-      result.isSuccess = true;
       result.data = data.rows[0];
     } else {
+      result.data = null;
       result.message = "해당하는 사용자가 존재하지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    if (error.status === 400) {
+      result.data = null;
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 error"));
+    }
+    
   } finally {
     if (client) {
       await client.end();
@@ -396,13 +413,12 @@ router.get("/:userId", async (req, res) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-router.put("/", async (req, res) => {
+router.put("/", async (req, res, next) => {
   const { userId, name, phoneNumber, email } = req.body;
   const result = {
     isSuccess: false,
-    data: "",
-    message: ""
-  }
+    message: "",
+  };
   let client = null;
 
   try {
@@ -418,13 +434,20 @@ router.put("/", async (req, res) => {
     const data = await client.query(sql, params)
     if (data.rowCount !== 0) {
       result.isSuccess = true;
+      result.message = "프로필 수정 성공";
     } else {
-      result.message = "해당하는 사용자가 없습니다";
+      result.message = "해당하는 사용자가 존재하지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(error.status);
+    } else {
+      result.message = "데이터베이스 오류"
+      next(new Error("500 error"));
+    }
   } finally {
     if (client) {
       await client.end();
@@ -449,7 +472,7 @@ router.delete("/", async (req, res, next) => {
 
     client = createClient();
     await client.connect();
-    const sql = "DELETE FROM user_TB WHERE id = $1";
+    const sql = "DELETE FROM user_TB HERE id = $1";
     const params = [userId];
     const data = await client.query(sql, params);
     if (data.rowCount !== 0) {
@@ -460,11 +483,11 @@ router.delete("/", async (req, res, next) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
     if (error.status === 400) {
-      res.status(400);
+      res.status(error.status);
     } else {
-      next(new Error("500 error"));
+      result.message = "데이터베이스 오류";
+      next(new Error("500 error!"));
     }
 
   } finally {
