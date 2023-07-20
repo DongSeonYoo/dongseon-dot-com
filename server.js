@@ -34,13 +34,12 @@ app.use("/api/comment", commentApi);
 app.use("/api/log", logApi);
 
 // 404 error handling
-app.use((req, res) => {
-  res.sendFile(path.join(CLIENT_PATH, '404.html'))
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(CLIENT_PATH, '404.html'))
 });
 
 // 500 error catch middleware
 app.use((err, req, res, next) => {
-  console.log(err);
   res.status(500);
 });
 
