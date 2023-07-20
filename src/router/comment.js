@@ -9,11 +9,10 @@ const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentL
 // 댓글 생성 api
 // postId, userId, content
 // POST
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   const { postId, userId, content } = req.body;
   const result = {
     isSuccess: false,
-    data: "",
     message: ""
   };
   let client = null;
@@ -35,8 +34,22 @@ router.post("/", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
-    
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+
+    } else if (error.code === '23503') {
+      if (error.constraint === 'comment_tb_user_id_fkey') {
+        result.message = "해당하는 유저가 존재하지 않습니다";
+      } else if (error.constraint === 'comment_tb_post_id_fkey') {
+        result.message = "해당하는 게시글이 존재하지 않습니다";
+      }
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 Error!"));
+    }
+
   } finally {
     if (client) {
       await client.end();
@@ -48,11 +61,10 @@ router.post("/", async (req, res) => {
 // 댓글 조회 api
 // :postId
 // GET
-router.get("/post/:postId", async (req, res) => {
+router.get("/post/:postId", async (req, res, next) => {
   const { postId } = req.params;
   const result = {
-    isSuccess: false,
-    data: "",
+    data: null,
     message: ""
   };
   let client = null;
@@ -62,23 +74,42 @@ router.get("/post/:postId", async (req, res) => {
 
     client = createClient();
     await client.connect();
-    const sql = `SELECT comment_TB.id, comment_TB.user_id, comment_TB.content, comment_TB.created_date, comment_TB.updated_date, 
-               user_TB.name AS author_name 
-               FROM comment_TB JOIN user_TB ON comment_TB.user_id = user_TB.id 
-               WHERE post_id = $1`
+    const sql = `SELECT 
+                      comment_TB.id, 
+                      comment_TB.user_id, 
+                      comment_TB.content, 
+                      comment_TB.created_date, 
+                      comment_TB.updated_date, 
+                      user_TB.name AS "authorName" 
+                    FROM 
+                      comment_TB 
+                    JOIN 
+                      user_TB 
+                    ON 
+                      comment_TB.user_id = user_TB.id 
+                    WHERE 
+                      post_id = $1`;
     const params = [postId];
 
     const data = await client.query(sql, params);
+    // 만약 해당 게시글에 댓글이 존재하면?
     if (data.rows.length !== 0) {
-      result.isSuccess = true;
       result.data = data.rows;
-    } else {
-      result.message = "댓글이 존재하지 않습니다";
-    }
     
+    // 댓글이 존재하지 않으면? data = null
+    } else {
+      result.message = "해당 게시글에 댓글이 존재하지 않습니다";
+    }
+
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 error!"));
+    }
 
   } finally {
     if (client) {
@@ -91,11 +122,10 @@ router.get("/post/:postId", async (req, res) => {
 // 댓글 수정 api
 // postId, commentId, userId, content
 // PUT
-router.put("/", async (req, res) => {
+router.put("/", async (req, res, next) => {
   const { userId, content, postId, commentId } = req.body;
   const result = {
     isSuccess: false,
-    data: "",
     message: ""
   };
   let client = null;
@@ -105,7 +135,7 @@ router.put("/", async (req, res) => {
     exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
     exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
     exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
-    
+
     client = createClient();
     await client.connect();
     const sql = "UPDATE comment_TB SET content = $1 WHERE post_id = $2 AND user_id = $3 AND id = $4";
@@ -113,13 +143,20 @@ router.put("/", async (req, res) => {
     const data = await client.query(sql, params)
     if (data.rowCount !== 0) {
       result.isSuccess = true;
+      result.message = "댓글 수정 성공";
     } else {
       result.message = "해당하는 댓글이 존재하지 않습니다";
     }
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 Error!"));
+    }
 
   } finally {
     if (client) {
@@ -132,11 +169,10 @@ router.put("/", async (req, res) => {
 // 댓글 삭제 api
 // postId, commentId, userId
 // DELETE
-router.delete("/", async (req, res) => {
+router.delete("/", async (req, res, next) => {
   const { postId, commentId, userId } = req.body;
   const result = {
     isSuccess: false,
-    data: "",
     message: ""
   };
   let client = null;
@@ -159,7 +195,16 @@ router.delete("/", async (req, res) => {
 
   } catch (error) {
     console.error(error);
-    result.message = error.message;
+    
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "데이터베이스 오류";
+      next(new Error("500 Error!"));
+      res.status(500);
+    }
+    
   } finally {
     if (client) {
       await client.end();
