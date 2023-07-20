@@ -149,6 +149,10 @@ const loginFetch = async () => {
     
     const json = await res.json();
     if (res.status === 200) {
+      if (json.data === "admin") {
+        location.href = "/";
+        return;
+      }
       sessionStorage.setItem("loginUserSession", json.data);
       location.reload();
     } else if (res.status === 400) {

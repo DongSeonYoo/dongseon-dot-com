@@ -46,6 +46,9 @@ const makeTag = (data) => {
   const reqSpan = document.createElement("span");
   reqSpan.classList.add("request");
   reqSpan.textContent = truncateData(JSON.stringify(data.req));
+  if (reqSpan.textContent === "{}") {
+    reqSpan.textContent = "none";
+  }
 
   const resSpan = document.createElement("span");
   resSpan.classList.add("response");
