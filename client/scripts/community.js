@@ -4,11 +4,67 @@ const posts = document.getElementById("posts");
 const homeBtn = document.getElementById("home-button");
 const createPostBtn = document.getElementById("create-post-button");
 
-getAllPostsFetch();
+const pageSelectContainer = document.getElementById("page-select-container");
+let currentPage = 1; // 현재 페이지 번호
 
-async function getAllPostsFetch() {
+init();
+
+async function init() {
   try {
-    const result = await fetch("/api/post/all");
+    // 게시글의 개수 먼저 불러오고
+    const postCounts = await getPostCountFetch();
+    console.log(postCounts);
+
+    // 한 페이지에 보여주는 게시글의 기본값이 7 이니 postCounts / 8 한 값
+    const maxPageSelectCount = Math.floor(postCounts / 8);
+    makePageSelectButton(maxPageSelectCount);
+    await getPostFetch(currentPage);
+
+  } catch (error) {
+    alert("요청에 실패하였습니다");
+    console.error(error);
+    location.href = "/";
+  }
+}
+
+// 페이지 이동 버튼을 만들어주는 함수
+function makePageSelectButton(count) {
+  if (count === 0) {
+    count = 1;
+  }
+  for (let i = 1; i <= count + 1; i++) {
+    const pageSelectBtn = document.createElement("button");
+    pageSelectBtn.classList.add("page-select-btn");
+    pageSelectBtn.innerHTML = String(i);
+
+    pageSelectBtn.onclick = () => {
+      currentPage = i;
+      clearPost();
+      getPostFetch(i);
+    }
+    pageSelectContainer.appendChild(pageSelectBtn);
+  }
+}
+
+function clearPost() {
+  while (posts.firstChild) {
+    posts.removeChild(posts.firstChild);
+  }
+}
+
+// async function movePageFetch(count) {
+//   try {
+//     const result = fetch(`/api/post?pageNumber=${count}`);
+
+//   } catch (error) {
+    
+//   }
+// }
+
+// 게시글을 가져오는 요청을 하는 함수
+async function getPostFetch(count = 1) {
+  try {
+    const result = await fetch(`/api/post?pageNumber=${count - 1}`);
     const json = await result.json();
 
     // 응답이 성공적으로 이루어졌을 경우
@@ -21,19 +77,20 @@ async function getAllPostsFetch() {
       }
       // 만약 게시글이 null이라면 아무 게시글도 존재하지 않음
       else {
-        const noPostTitle = document.getElementById("no-post-title");
-        noPostTitle.innerHTML = "게시글이 존재하지 않습니다";
+        
       }
-    // 해당 api는 요청이 없기때문에 400 처리는 해줄 필요가 없ㄷ음
 
     // 500 error코드가 반환되었을 시 백엔드에서 온 메세지를 그대로 출력
+    } else if (result.status === 400) {
+      alert(json.message);
+      location.href = "/";
     } else if (result.status === 500) {
       alert(json.message);
       location.href = "/";
     }
 
   } catch (error) {
-    alert("네트워크 오류");
+    alert("네트워크 오류: " + error.message);
     console.error(error);
     location.href = "/";
   }
@@ -46,6 +103,22 @@ async function getAllPostsFetch() {
       location.href = `/post/${postId}`;
     })
   });
+}
+
+async function getPostCountFetch() {
+  const result = await fetch("/api/post/all/count");
+  const json = await result.json();
+  if (result.status === 200) {
+    if (json.data !== null) {
+      return await json.data;
+    } else {
+
+    }
+
+  } else {
+    alert("서버 오류: " + json.message);
+    location.href = "/";
+  }
 }
 
 function makePostList(post) {

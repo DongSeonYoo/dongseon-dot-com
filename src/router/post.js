@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const createClient = require("../database/connect/postgresql");
 const exception = require("../module/exception");
-const path = require("path");
-const CLIENT_PATH = path.join(__dirname,'../../client/pages');
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 
 // 게시글 작성 api
@@ -55,7 +53,9 @@ router.post("/", async (req, res, next) => {
 // 모든 게시글 조회 api
 // GET
 // 명사이자 단수형으로
-router.get("/all", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
+  const counterPage = 8;
+  let { pageNumber } = req.query;
   const result = {
     data: "",
     message: ""
@@ -63,13 +63,18 @@ router.get("/all", async (req, res, next) => {
   let client = null;
 
   try {
+    exception(pageNumber, "pageNumber").isNumber();
+
+    const offset = Number(pageNumber * counterPage);
     client = createClient();
     await client.connect();
     const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
-               FROM post_TB 
-               JOIN user_TB ON post_TB.user_id = user_TB.id 
-               ORDER BY created_date DESC LIMIT 8`;
-    const data = await client.query(sql);
+              FROM post_TB 
+              JOIN user_TB ON post_TB.user_id = user_TB.id 
+              ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
+    const params = [offset, counterPage];
+
+    const data = await client.query(sql, params);
     if (data.rows.length !== 0) {
       result.data = data.rows;
     } else {
@@ -78,11 +83,15 @@ router.get("/all", async (req, res, next) => {
     }
 
   } catch (error) {
-    // 받는 req 값이 없으니 무조건 500 에러만 해당 catch에 걸림.
     console.error(error);
-    result.message = "데이터베이스 오류";
-    next(new Error("500 Error!"));
-    
+    if (error.status === 400) {
+      result.message = error.message;
+      res.status(400);
+    } else {
+      result.message = "서버 오류";
+      next(new Error("500 Error!"));
+    }
+
   } finally {
     if (client) {
       await client.end();
@@ -94,7 +103,7 @@ router.get("/all", async (req, res, next) => {
 // 특정 게시글 조회 api
 // postId
 // GET
-router.get("/:postId",async (req, res, next) => {
+router.get("/:postId", async (req, res, next) => {
   const { postId } = req.params;
   const result = {
     data: "",
@@ -129,7 +138,7 @@ router.get("/:postId",async (req, res, next) => {
       result.message = "해당하는 게시글이 존재하지 않습니다";
       next(new Error());
     }*/
-    
+
   } catch (error) {
     console.error(error);
     if (error.status === 400) {
@@ -187,7 +196,7 @@ router.put("/", async (req, res, next) => {
       result.message = "데이터베이스 오류";
       next(new Error("500 Error!"));
     }
-    
+
   } finally {
     if (client) {
       await client.end();
@@ -215,7 +224,7 @@ router.delete("/", async (req, res, next) => {
     await client.connect();
 
     const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2";
-    const params = [postId, userId];  
+    const params = [postId, userId];
     const data = await client.query(sql, params);
 
     if (data.rowCount !== 0) {
@@ -233,6 +242,39 @@ router.delete("/", async (req, res, next) => {
       result.message = "데이터베이스 오류";
       next(new Error("500 Error!"));
     }
+
+  } finally {
+    if (client) {
+      await client.end();
+    }
+    res.send(result);
+  }
+});
+
+// 모든 게시글의 수를 가져오는 api
+// GET
+router.get("/all/count", async (req, res, next) => {
+  const result = {
+    data: null,
+    message: ""
+  };
+  let client = null;
+
+  try {
+    client = createClient();
+    await client.connect();
+    const sql = `SELECT COUNT(*) FROM post_TB`;
+
+    const data = await client.query(sql);
+    if (data.rows.length !== 0) {
+      result.data = data.rows[0].count;
+    } else {
+      result.message = "게시글이 존재하지 않습니다"
+    }
+
+  } catch (error) {
+      result.message = "서버 오류";
+      next(new Error("500 Error!"));
 
   } finally {
     if (client) {
