@@ -10,6 +10,19 @@
 </head>
 
 <body>
+  <select id="order-option-list" onchange="onchangeOrderOption()">
+    <option value="recent">최신 순</option>
+    <option value="old">오래된 순</option>
+  </select>
+
+  <select id="method-option-list" onchange="onchangeMethodOption()">
+    <option value="ALL">ALL</option>
+    <option value="GET">GET</option>
+    <option value="POST">POST</option>
+    <option value="PUT">PUT</option>
+    <option value="DELETE">DELETE</option>
+  </select>
+
 
   <section id="log-section" class="log-container">
 

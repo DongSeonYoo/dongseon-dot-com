@@ -1,14 +1,28 @@
 const logSection = document.getElementById("log-section");
+const recentOption = document.getElementById("recent-option");
+const oldOption = document.getElementById("old-option");
 
-const a = async () => {
+let selectedOrderValue = "recent";
+let selectedMethodValue = "all";
+
+window.onload = () => {
+  loadApiFetch(selectedOrderValue, selectedMethodValue);
+}
+
+const loadApiFetch = async (order, method) => {
   try {
-    const result = await fetch("/api/log");
+    const result = await fetch(`/api/log?order=${order}&method=${method}`);
     const json = await result.json();
 
-    if (json.isSuccess) {
-      json.data.forEach(data => {
-        makeTag(data);
-      });
+    if (result.status === 200) {
+      if (json.data) {
+        const responsedData = json.data;
+        responsedData.forEach(data => makeTag(data));
+      }
+    } else if (result.status === 400) {
+      alert(json.message);
+    } else if (result.status === 500) {
+      alert(json.message);
     }
 
   } catch (error) {
@@ -16,8 +30,6 @@ const a = async () => {
     alert(error.message);
   }
 }
-
-a();
 
 const makeTag = (data) => {
   const logDiv = document.createElement("div");
@@ -41,7 +53,7 @@ const makeTag = (data) => {
 
   const apiSpan = document.createElement("span");
   apiSpan.classList.add("api");
-  apiSpan.textContent = data.api;
+  apiSpan.textContent = truncateData(JSON.stringify(data.api));
 
   const reqSpan = document.createElement("span");
   reqSpan.classList.add("request");
@@ -65,11 +77,27 @@ const makeTag = (data) => {
   logSection.appendChild(logDiv);
 }
 
-// truncateData 함수를 사용하여 요청과 응답 데이터를 너무 길 경우 줄여서 표시합니다.
+// 요청과 응답 데이터가 너무 길 경우 줄여서 표시
 const truncateData = (data) => {
-  const maxLength = 15;
+  const maxLength = 40;
   if (data.length > maxLength) {
     return data.slice(0, maxLength) + "...";
   }
   return data;
+}
+
+const onchangeOrderOption = () => {
+ const orderOptionList = document.getElementById("order-option-list");
+ selectedOrderValue = orderOptionList[orderOptionList.selectedIndex].value;
+
+ logSection.innerHTML = "";
+ loadApiFetch(selectedOrderValue, selectedMethodValue);
+}
+
+const onchangeMethodOption = () => {
+  const methodOptionList = document.getElementById("method-option-list");
+  
+  selectedMethodValue = methodOptionList[methodOptionList.selectedIndex].value;
+  logSection.innerHTML = "";
+  loadApiFetch(selectedOrderValue, selectedMethodValue);
 }
