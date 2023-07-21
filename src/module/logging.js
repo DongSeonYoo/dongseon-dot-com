@@ -4,7 +4,7 @@ const momentTimeZone = require("moment-timezone");
 
 require("dotenv").config();
 // 한국시간 설정
-momentTimeZone.tz("Asia/Seoul");
+momentTimeZone.tz.setDefault("Asia/Seoul");
 
 const logging = async (req, res, resBody) => {
   const document = {
@@ -23,7 +23,7 @@ const logging = async (req, res, resBody) => {
     await connect.db().collection("api_logs").insertOne(document);
 
   } catch (error) {
-    console.log("api logger ERROR: " + error.message);
+    console.log("api logger ERROR: " + error);
 
   } finally {
     if (connect) connect.close();
