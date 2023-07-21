@@ -11,13 +11,16 @@ const logApi = require("./src/router/log");
 const loggingSetting = require('./src/middleware/logginSetting');
 
 require("dotenv").config();
-// 구간별로 나누자
 
+// 전역 미들웨어
 app.use(express.json());
 app.use(express.static("client/"));
 app.use(loggingSetting());
 
+// 페이지 미들웨어
 app.use("/", pagesRoute);
+
+// api 호출 미들웨어
 app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
