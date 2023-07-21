@@ -23,7 +23,7 @@ router.post("/login", async (req, res, next) => {
     client = createClient();
     await client.connect();
     
-    const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
+    const sql = "SELECT id AS id FROM user_TB WHERE login_id = $1 AND password = $2";
     const params = [loginId, password];
     const data = await client.query(sql, params);
 
@@ -196,7 +196,7 @@ router.post("/signup", async (req, res, next) => {
 
     client = createClient();
     await client.connect();
-    const sql = `INSERT INTO user_TB (login_id, password, nme, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
+    const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
     const params = [loginId, password, name, phoneNumber, email];
 
     const data = await client.query(sql, params);
@@ -208,6 +208,9 @@ router.post("/signup", async (req, res, next) => {
     console.error(error)
     if (error.status === 400) {
       result.message = error.message;
+      res.status(400);
+    } else if (error.code === '23505') {
+      result.message = "제약조건 위반: " + error.constraint;
       res.status(400);
     } else {
       result.message = "데이터베이스 오류";
