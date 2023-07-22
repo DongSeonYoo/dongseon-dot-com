@@ -2,16 +2,37 @@ const logSection = document.getElementById("log-section");
 const recentOption = document.getElementById("recent-option");
 const oldOption = document.getElementById("old-option");
 
+const prevPageBtn = document.getElementById("prev-page-button");
+const nextPageBtn = document.getElementById("next-page-button");
+
+let maxPageCount;
 let selectedOrderValue = "recent";
 let selectedMethodValue = "all";
+let currentPage = 1;
 
-window.onload = () => {
-  loadApiFetch(selectedOrderValue, selectedMethodValue);
+window.onload = async () => {
+  const logsCount = await getDocumentCountFetch();
+  maxPageCount = (logsCount / 15);
+
+  await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
 }
 
-const loadApiFetch = async (order, method) => {
+const getDocumentCountFetch = async () => {
+  const result = await fetch("/api/log/count");
+  const json = await result.json();
+
+  if (result.status === 200) {
+    return json.data;
+
+  } else if (result.status === 500) {
+    alert(json.message);
+    location.href = "/";
+  }
+}
+
+const loadApiFetch = async (order, method, page) => {
   try {
-    const result = await fetch(`/api/log?order=${order}&method=${method}`);
+    const result = await fetch(`/api/log?order=${order}&method=${method}&page=${page}`);
     const json = await result.json();
 
     if (result.status === 200) {
@@ -21,8 +42,10 @@ const loadApiFetch = async (order, method) => {
       }
     } else if (result.status === 400) {
       alert(json.message);
+      location.href = "/";
     } else if (result.status === 500) {
       alert(json.message);
+      location.href = "/";
     }
 
   } catch (error) {
@@ -91,7 +114,7 @@ const onchangeOrderOption = () => {
  selectedOrderValue = orderOptionList[orderOptionList.selectedIndex].value;
 
  logSection.innerHTML = "";
- loadApiFetch(selectedOrderValue, selectedMethodValue);
+ loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
 }
 
 const onchangeMethodOption = () => {
@@ -99,5 +122,21 @@ const onchangeMethodOption = () => {
   
   selectedMethodValue = methodOptionList[methodOptionList.selectedIndex].value;
   logSection.innerHTML = "";
-  loadApiFetch(selectedOrderValue, selectedMethodValue);
+  loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+}
+
+const onclickPrevButton = () => {
+  if (currentPage > 1) {
+    currentPage--;
+    logSection.innerHTML = "";
+    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  }
+}
+
+const onclickNextButton = () => {
+  if (currentPage < maxPageCount) {
+    currentPage++;
+    logSection.innerHTML = "";
+    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  }
 }
