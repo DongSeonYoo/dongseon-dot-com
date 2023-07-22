@@ -56,4 +56,27 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/count", async (req, res, next) => {
+  const result = {
+    data: "",
+    message: ""
+  }
+  let connect = null;
+
+  try {
+    connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
+    const data = await connect.db().collection("api_logs").countDocuments();
+
+    result.data = data;
+
+  } catch (error) {
+    result.message = error.message;
+    next(new Error("500 Error!"));
+    
+  } finally {
+    if (connect) connect.close();
+    res.send(result);
+  }
+})
+
 module.exports = router;
