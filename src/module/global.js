@@ -9,10 +9,13 @@ module.exports = {
 
   //post
   maxPostIdLength: 10,
-  maxPostTitleLength: 30,
+  maxPostTitleLength: 20,
   maxPostContentLength: 500,
 
   //comment
   maxCommentIdLength: 8,
-  maxCommentContentLength: 300
+  maxCommentContentLength: 300,
+
+  // log
+  maxItemPerPage: 14
 }
