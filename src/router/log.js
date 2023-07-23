@@ -1,12 +1,11 @@
 const router = require("express").Router();
 const mongoClient = require("mongodb").MongoClient;
 const exception = require("../module/exception");
-
+const { maxItemPerPage } = require("../module/global");
 require("dotenv").config();
 
 router.get("/", async (req, res, next) => {
   let { order, method, page } = req.query;
-  const ITEMS_PER_PAGE = 15;
   const result = {
     data: "",
     message: ""
@@ -35,8 +34,8 @@ router.get("/", async (req, res, next) => {
 
     // 쿼리 실행
     const cursor = await connect.db().collection("api_logs").find(method).sort({"_id": order})
-      .skip((page - 1) * ITEMS_PER_PAGE)
-      .limit(ITEMS_PER_PAGE);
+      .skip((page - 1) * maxItemPerPage)
+      .limit(maxItemPerPage);
     const data = await cursor.toArray();
     result.data = data;
 
