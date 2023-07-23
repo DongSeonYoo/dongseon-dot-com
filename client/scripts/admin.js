@@ -12,9 +12,33 @@ let currentPage = 1;
 
 window.onload = async () => {
   const logsCount = await getDocumentCountFetch();
-  maxPageCount = (logsCount / 15);
+  console.log(logsCount)
+  maxPageCount = Math.ceil(logsCount / 15);
+  console.log(maxPageCount);
+  updatePageMoveButton();
 
   await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+}
+
+const onchangePage = (page) => {
+  currentPage = page;
+  logSection.innerHTML = "";
+  loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  updatePageMoveButton();
+}
+
+const updatePageMoveButton = () => {
+  if (currentPage === 1) {
+    prevPageBtn.disabled = true;
+  } else {
+    prevPageBtn.disabled = false;
+  }
+
+  if (currentPage === maxPageCount) {
+    nextPageBtn.disabled = true;
+  } else {
+    nextPageBtn.disabled = false;
+  }
 }
 
 const getDocumentCountFetch = async () => {
@@ -102,7 +126,7 @@ const makeTag = (data) => {
 
 // 요청과 응답 데이터가 너무 길 경우 줄여서 표시
 const truncateData = (data) => {
-  const maxLength = 40;
+  const maxLength = 30;
   if (data.length > maxLength) {
     return data.slice(0, maxLength) + "...";
   }
@@ -127,16 +151,12 @@ const onchangeMethodOption = () => {
 
 const onclickPrevButton = () => {
   if (currentPage > 1) {
-    currentPage--;
-    logSection.innerHTML = "";
-    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    onchangePage(currentPage - 1);
   }
 }
 
 const onclickNextButton = () => {
   if (currentPage < maxPageCount) {
-    currentPage++;
-    logSection.innerHTML = "";
-    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    onchangePage(currentPage + 1);
   }
 }
