@@ -6,7 +6,7 @@ const loggingSetting = () => {
  
     res.send = function (result) {
       // if(typeof result !== 'string'){} ?
-      if (typeof result !== 'string' && (req.originalUrl.indexOf('/log?') === -1 || req.originalUrl.indexOf('/log') === -1)) {
+      if (typeof result !== 'string' && !req.originalUrl.startsWith('/api/log')) {
         logging(req, res, result);
       }
   
