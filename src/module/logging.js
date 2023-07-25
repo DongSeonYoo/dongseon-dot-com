@@ -7,6 +7,7 @@ require("dotenv").config();
 momentTimeZone.tz.setDefault("Asia/Seoul");
 
 const logging = async (req, res, resBody) => {
+  // document 준비
   const document = {
     time: moment().format("YYYY-MM-DD HH:mm:ss"),
     ip: req.ip,
@@ -20,10 +21,14 @@ const logging = async (req, res, resBody) => {
   let connect = null;
   try {
     connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
-    await connect.db().collection("api_logs").insertOne(document);
+    await connect
+      .db()
+      .collection("api_logs")
+      .insertOne(document);
 
   } catch (error) {
     console.log("api logger ERROR: " + error);
+    
 
   } finally {
     if (connect) connect.close();

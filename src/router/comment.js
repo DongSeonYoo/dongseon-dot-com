@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
-const createClient = require("../database/connect/postgresql");
+const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
 
@@ -31,30 +30,16 @@ router.post("/", async (req, res, next) => {
     if (data.rowCount !== 0) {
       result.isSuccess = true;
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-
-    } else if (error.code === '23503') {
-      if (error.constraint === 'comment_tb_user_id_fkey') {
-        result.message = "해당하는 유저가 존재하지 않습니다";
-      } else if (error.constraint === 'comment_tb_post_id_fkey') {
-        result.message = "해당하는 게시글이 존재하지 않습니다";
-      }
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -100,22 +85,16 @@ router.get("/post/:postId", async (req, res, next) => {
     } else {
       result.message = "해당 게시글에 댓글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -147,22 +126,16 @@ router.put("/", async (req, res, next) => {
     } else {
       result.message = "해당하는 댓글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -192,24 +165,16 @@ router.delete("/", async (req, res, next) => {
     } else {
       result.message = "해당하는 댓글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-      res.status(500);
-    }
-    
+    next(error);
+
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 

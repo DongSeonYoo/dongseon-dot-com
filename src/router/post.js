@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const createClient = require("../database/connect/postgresql");
+const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 
@@ -27,26 +27,27 @@ router.post("/", async (req, res, next) => {
     if (data.rowCount !== 0) {
       result.isSuccess = true;
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
     // input값이 유효하지 않을때, 해당하는 사용자(fk)가 없을때 400반환
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else if (error.code === '23503') {
-      result.message = "해당하는 사용자가 존재하지 않습니다";
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 error"));
-    }
+    // if (error.status === 400) {
+    //   result.message = error.message;
+    //   res.status(400);
+    // } else if (error.code === '23503') {
+    //   result.message = "해당하는 사용자가 존재하지 않습니다";
+    //   res.status(400);
+    // } else {
+    //   result.message = "데이터베이스 오류";
+    //   next(new Error("500 error"));
+    // }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -57,7 +58,7 @@ router.get("/", async (req, res, next) => {
   const counterPage = 8;
   let { pageNumber } = req.query;
   const result = {
-    data: "",
+    data: null,
     message: ""
   };
   let client = null;
@@ -68,7 +69,8 @@ router.get("/", async (req, res, next) => {
     const offset = Number(pageNumber * counterPage);
     client = createClient();
     await client.connect();
-    const sql = `SELECT post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
+    const sql = `SELECT 
+              post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
               FROM post_TB 
               JOIN user_TB ON post_TB.user_id = user_TB.id 
               ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
@@ -81,22 +83,23 @@ router.get("/", async (req, res, next) => {
       result.data = null;
       result.message = "게시글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
-    console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "서버 오류";
-      next(new Error("500 Error!"));
-    }
+    // console.error(error);
+    // if (error.status === 400) {
+    //   result.message = error.message;
+    //   res.status(400);
+    // } else {
+    //   result.message = "서버 오류";
+    //   next(new Error("500 Error!"));
+    // }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -106,7 +109,7 @@ router.get("/", async (req, res, next) => {
 router.get("/:postId", async (req, res, next) => {
   const { postId } = req.params;
   const result = {
-    data: "",
+    data: null,
     message: ""
   };
   let client = null;
@@ -128,32 +131,18 @@ router.get("/:postId", async (req, res, next) => {
     if (data.rows.length !== 0) {
       result.data = data.rows[0];
     } else {
-      // 여기서 해당하는 게시글이 없다면 server.js의 404 error handling으로 바로 갈수있는 방법 없나?
-      // 방법이 없으면 여기서 res.sendFile 해서 404.html파일 내려줘야하나?
-      result.data = null;
       result.message = "존재하지 않는 게시글입니다";
     }
-    /* else {
-      result.data = null;
-      result.message = "해당하는 게시글이 존재하지 않습니다";
-      next(new Error());
-    }*/
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -186,22 +175,16 @@ router.put("/", async (req, res, next) => {
       result.isSuccess = false;
       result.message = "수정 실패, 해당하는 게시글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      res.status(400);
-      result.message = error.message;
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -232,22 +215,16 @@ router.delete("/", async (req, res, next) => {
     } else {
       result.message = "해당하는 게시글이 존재하지 않습니다";
     }
+    res.send(result);
 
   } catch (error) {
     console.error(error);
-    if (error.status === 400) {
-      result.message = error.message;
-      res.status(400);
-    } else {
-      result.message = "데이터베이스 오류";
-      next(new Error("500 Error!"));
-    }
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 
@@ -271,16 +248,15 @@ router.get("/all/count", async (req, res, next) => {
     } else {
       result.message = "게시글이 존재하지 않습니다"
     }
+    res.send(result);
 
   } catch (error) {
-      result.message = "서버 오류";
-      next(new Error("500 Error!"));
+    next(error);
 
   } finally {
     if (client) {
       await client.end();
     }
-    res.send(result);
   }
 });
 

@@ -1,14 +1,17 @@
 const express = require("express");
 const app = express();
 const path = require("path");
-const CLIENT_PATH = path.join(__dirname,'./client/pages');
+const CLIENT_PATH = path.join(__dirname, './client/pages');
+const session = require("express-session");
+
+const loggingSetting = require('./src/middleware/loggingSetting');
+const errorHandling = require("./src/middleware/errorHandling");
 
 const pagesRoute = require("./src/router/pages");
 const accountApi = require("./src/router/account");
 const postApi = require("./src/router/post");
 const commentApi = require("./src/router/comment");
 const logApi = require("./src/router/log");
-const loggingSetting = require('./src/middleware/logginSetting');
 
 require("dotenv").config();
 
@@ -32,10 +35,6 @@ app.use((req, res, next) => {
 });
 
 // error catch middleware
-app.use((err, req, res, next) => {
-  req.err = err;
-
-  res.status(500);
-});
+app.use(errorHandling());
 
 module.exports = app;
