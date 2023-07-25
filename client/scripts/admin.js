@@ -12,11 +12,9 @@ let currentPage = 1;
 
 window.onload = async () => {
   const logsCount = await getDocumentCountFetch();
-  console.log(logsCount)
-  maxPageCount = Math.ceil(logsCount / 15);
-  console.log(maxPageCount);
+  maxPageCount = Math.ceil(logsCount / 13);
   updatePageMoveButton();
-
+  
   await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
 }
 
@@ -126,7 +124,7 @@ const makeTag = (data) => {
 
 // 요청과 응답 데이터가 너무 길 경우 줄여서 표시
 const truncateData = (data) => {
-  const maxLength = 30;
+  const maxLength = 28;
   if (data.length > maxLength) {
     return data.slice(0, maxLength) + "...";
   }
