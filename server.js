@@ -2,7 +2,6 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const CLIENT_PATH = path.join(__dirname, './client/pages');
-const session = require("express-session");
 
 const loggingSetting = require('./src/middleware/loggingSetting');
 const errorHandling = require("./src/middleware/errorHandling");
@@ -11,6 +10,7 @@ const pagesRoute = require("./src/router/pages");
 const accountApi = require("./src/router/account");
 const postApi = require("./src/router/post");
 const commentApi = require("./src/router/comment");
+const authApi = require("./src/router/auth");
 const logApi = require("./src/router/log");
 
 require("dotenv").config();
@@ -24,6 +24,7 @@ app.use(loggingSetting());
 app.use("/", pagesRoute);
 
 // api 호출 미들웨어
+app.use("/api/auth", authApi);
 app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
