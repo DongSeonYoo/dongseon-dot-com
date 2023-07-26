@@ -13,12 +13,8 @@ window.onload = async () => {
     // 수정, 삭제 버튼 생성
     makeManagePostUI();
   }
-  displayComment();
+  await displayComment();
 }
-
-backBtn.addEventListener("click", () => {
-  location.href = "/community"
-})
 
 function parseUrl() {
   const url = window.location.href.split("/");
@@ -171,7 +167,7 @@ async function clickCommentSubmitBtn() {
         commentsSection.innerHTML = "";
         commentContent.value = "";
         commentCount += 1;
-        displayComment();
+        await displayComment();
       } else {
         alert(json.message);
         location.href = "/community";
@@ -346,3 +342,7 @@ async function deleteCommentFetch(postId, commentId, userId) {
     console.error(error);
   }
 }
+
+backBtn.addEventListener("click", () => {
+  location.href = "/community"
+})
