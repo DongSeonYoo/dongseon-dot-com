@@ -31,17 +31,6 @@ router.post("/", async (req, res, next) => {
 
   } catch (error) {
     console.error(error);
-    // input값이 유효하지 않을때, 해당하는 사용자(fk)가 없을때 400반환
-    // if (error.status === 400) {
-    //   result.message = error.message;
-    //   res.status(400);
-    // } else if (error.code === '23503') {
-    //   result.message = "해당하는 사용자가 존재하지 않습니다";
-    //   res.status(400);
-    // } else {
-    //   result.message = "데이터베이스 오류";
-    //   next(new Error("500 error"));
-    // }
     next(error);
 
   } finally {
@@ -86,14 +75,6 @@ router.get("/", async (req, res, next) => {
     res.send(result);
 
   } catch (error) {
-    // console.error(error);
-    // if (error.status === 400) {
-    //   result.message = error.message;
-    //   res.status(400);
-    // } else {
-    //   result.message = "서버 오류";
-    //   next(new Error("500 Error!"));
-    // }
     next(error);
 
   } finally {

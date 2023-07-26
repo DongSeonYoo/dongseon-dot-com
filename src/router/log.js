@@ -40,20 +40,12 @@ router.get("/", async (req, res, next) => {
       .sort({"_id": order})
       .skip((page - 1) * maxItemPerPage)
       .limit(maxItemPerPage);
-      
+
     const data = await cursor.toArray();
     result.data = data;
     res.send(result);
 
   } catch (error) {
-    // console.error(error);
-    // if (error.status === 400) {
-    //   result.message = error.message;
-    //   res.status(400);
-    // } else {
-    //   result.message = error.message;
-    //   next(new Error("500 Error!"));
-    // }
     next(error);
 
   } finally {

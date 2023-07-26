@@ -3,8 +3,6 @@ const router = express.Router();
 const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
-const jwt = require("../module/jwt");
-const loginAuth = require("../middleware/loginAuth");
 
 router.post("/login", async (req, res, next) => {
   const { loginId, password } = req.body;
@@ -28,8 +26,6 @@ router.post("/login", async (req, res, next) => {
     const data = await client.query(sql, params);
 
     if (data.rows.length !== 0) {
-      // Save user data in the session after successful login
-      // req.session.userId = data.rows[0].id;
       result.data = data.rows[0].id;
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
@@ -111,13 +107,6 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
 
   } catch (error) {
     console.error(error);
-    // if (error.status === 400) {
-    //   result.message = error.message;
-    //   res.status(400);
-    // } else {
-    //   result.message = "데이터베이스 오류";
-    //   next(new Error("500 error"));
-    // }
     next(error);
   } finally {
     if (client) {
@@ -192,16 +181,6 @@ router.post("/signup", async (req, res, next) => {
 
   } catch (error) {
     console.error(error)
-    // if (error.status === 400) {
-    //   result.message = error.message;
-    //   res.status(400);
-    // } else if (error.code === '23505') {
-    //   result.message = "제약조건 위반: " + error.constraint;
-    //   res.status(400);
-    // } else {
-    //   result.message = "데이터베이스 오류";
-    //   next(new Error("500 error"));
-    // }
     next(error);
 
   } finally {
