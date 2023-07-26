@@ -4,11 +4,14 @@ const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
+const loginAuth = require("../middleware/loginAuth");
+const jwt = require("jsonwebtoken");
+
 router.post("/login", async (req, res, next) => {
   const { loginId, password } = req.body;
   const result = {
-    data: null,
-    message: ""
+    message: "",
+    token: null
   };
   let client = null;
 
@@ -20,13 +23,21 @@ router.post("/login", async (req, res, next) => {
     // db연결
     client = createClient();
     await client.connect();
-    
-    const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
+    const sql = "SELECT id, name FROM user_TB WHERE login_id = $1 AND password = $2";
     const params = [loginId, password];
     const data = await client.query(sql, params);
 
     if (data.rows.length !== 0) {
-      result.data = data.rows[0].id;
+      const token = jwt.sign({
+        "userPk": data.rows[0].id,
+        "loginId": loginId,
+        "name": data.rows[0].name, 
+      }, process.env.JWT_SECRET_KEY, {
+        "expiresIn": '1h', //10분
+        "issuer": 'ehdtjs.com'
+      });
+      result.token = token;
+
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
     }
