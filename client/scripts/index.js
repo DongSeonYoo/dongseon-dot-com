@@ -10,6 +10,7 @@ const pwInput = document.getElementById("pw-form");
 const signupBtn = document.querySelector("#sign-up-button");
 const findIdBtn = document.querySelector("#find-id-button");
 const findPwBtn = document.getElementById("find-pw-button");
+const token = sessionStorage.getItem("accessToken");
 
 const a = location.href;
 console.log(a);
@@ -17,44 +18,65 @@ console.log(a);
 // 세션적용 전까지 임시방편.....
 window.onload = () => {
   sessionStorage.removeItem("resetPwUserPkSession");
+
+  checkLoggedIn();
+}
+
+async function checkLoggedIn() {
+  if (token) {
+    try {
+      const authResult = await fetch("/api/auth", {
+        headers: {
+          'Authorization': token,
+        }
+      });
+  
+      // 토큰이 유효한지 검사
+      if (authResult.status === 200) {
+        const loginModalBtn = document.getElementById("login-modal-open-button");
+  
+        const navbarDiv = document.getElementById("nav-bar");
+        const tempDiv = document.createElement("div");
+  
+        const viewProfileAtag = document.createElement("a");
+        const viewProfileButton = document.createElement("button");
+        const logoutBtn = document.createElement("button");
+  
+        // 로그인 버튼 제거
+        loginModalBtn.style.display = "none";
+  
+        // 내 프로필 보기 버튼
+        viewProfileAtag.href = `/view-profile`;
+        viewProfileButton.classList.add("login-only-button");
+        viewProfileButton.innerHTML = "내 프로필";
+        viewProfileAtag.appendChild(viewProfileButton);
+        tempDiv.appendChild(viewProfileAtag);
+        navbarDiv.appendChild(tempDiv);
+  
+        // 로그아웃 버튼
+        logoutBtn.classList.add("login-only-button");
+        logoutBtn.innerHTML = "로그아웃";
+        logoutBtn.addEventListener("click", () => {
+          sessionStorage.clear();
+          location.reload();
+        });
+  
+        tempDiv.appendChild(logoutBtn);
+        navbarDiv.appendChild(tempDiv);
+      }
+
+    // 만료되거나 유효하지 않은 토큰일 경우 해당 catch에서 걸림
+    } catch (error) {
+      alert(error.message);
+      location.href = "/";
+    }
+  }
+  // 로그인되지 않은상태라면 그대로 html 출력
 }
 
 // 요소의 높이 계산
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
-
-if (sessionStorage.getItem("loginUserSession")) {
-  const loginModalBtn = document.getElementById("login-modal-open-button");
-  
-  const navbarDiv = document.getElementById("nav-bar");
-  const tempDiv = document.createElement("div");
-  
-  const viewProfileAtag = document.createElement("a");
-  const viewProfileButton = document.createElement("button");
-  const logoutBtn = document.createElement("button");
-
-  // 로그인 버튼 제거
-  loginModalBtn.style.display = "none";
-
-  // 내 프로필 보기 버튼
-  viewProfileAtag.href = `/view-profile`;
-  viewProfileButton.classList.add("login-only-button");
-  viewProfileButton.innerHTML = "내 프로필";
-  viewProfileAtag.appendChild(viewProfileButton);
-  tempDiv.appendChild(viewProfileAtag);
-  navbarDiv.appendChild(tempDiv);
-
-  // 로그아웃 버튼
-  logoutBtn.classList.add("login-only-button");
-  logoutBtn.innerHTML = "로그아웃";
-  logoutBtn.addEventListener("click", () => {
-    sessionStorage.clear();
-    location.reload();
-  });
-
-  tempDiv.appendChild(logoutBtn);
-  navbarDiv.appendChild(tempDiv);
-}
 
 // 스크롤 이벤트 처리
 document.addEventListener('scroll', () => {
@@ -146,21 +168,19 @@ const loginFetch = async () => {
         password: pw
       })
     });
-    
+
     const json = await res.json();
     if (res.status === 200) {
-      if (json.data === "admin") {
-        location.href = "/";
-        return;
+      if (json.token) {
+        sessionStorage.setItem("accessToken", json.token);
+        location.reload();
+      } else {
+        alert(`로그인 실패: ${json.message}`);
+        clearInputFields();
       }
-      sessionStorage.setItem("loginUserSession", json.data);
-      location.reload();
     } else if (res.status === 400) {
       alert("잘못된 요청: " + json.message);
       location.href = "/";
-    } else if (res.status === 401) {
-      alert(`로그인 실패: ${json.message}`);
-      clearInputFields();
     } else if (res.status === 500) {
       alert("서버 오류: " + json.message);
     }
