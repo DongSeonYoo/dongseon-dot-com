@@ -28,9 +28,11 @@ const errorHandling = () => {
         result.message = "해당하는 게시글이 존재하지 않습니다";
         res.status(400).send(result);
       }
-      // res.status(400).send({
-      //   message: "해당하는 사용자가 존재하지 않습니다"
-      // });
+
+      else if (err.constraint === "post_tb_user_id_fkey") {
+        result.message = "해당하는 유저가 존재하지 않습니다";
+        res.status(400).send(result);
+      }
 
     } else {
       result.message = "서버에서 오류가 발생하였습니다";
