@@ -8,12 +8,17 @@ const errorHandling = () => {
       result.message = err.message;
       res.status(400).send(result);
   
-    // 토큰
+    // 토큰 inavlid
     } else if (err.status === 401) {
-      result.message = err.message;
+      result.message = "토큰이 유효하지 않습니다";
       res.status(401).send(result);
       
-    // unique 제약조건 위반
+    // 토큰 expired
+    } else if (err.status === 419) {
+      result.message = "토큰이 만료되었습니다";
+      res.status(419).send(result);
+
+      // unique 제약조건 위반
     } else if (err.code === '23505') {
       result.message = err.message;
       res.status(400).send(result);
