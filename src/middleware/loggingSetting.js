@@ -4,13 +4,13 @@ const loggingSetting = () => {
   return (req, res, next) => {
     const originResultSend = res.send;
  
-    res.send = function (result) {
+    res.send = function (resBody) {
       // if(typeof result !== 'string'){} ?
       if (typeof result !== 'string' && !req.originalUrl.startsWith('/api/log')) {
-        logging(req, res, result);
+        logging(req, res, resBody);
       }
   
-      return originResultSend.call(this, result);
+      return originResultSend.call(this, resBody);
     }
     next();
   }
