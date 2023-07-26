@@ -17,5 +17,5 @@ module.exports = {
   maxCommentContentLength: 300,
 
   // log
-  maxItemPerPage: 14
+  maxItemPerPage: 13
 }
