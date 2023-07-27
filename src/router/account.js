@@ -408,27 +408,35 @@ router.put("/", loginAuth, async (req, res, next) => {
 // 회원 탈퇴 api
 // userId
 // DELETE
-router.delete("/", async (req, res, next) => {
-  const { userId } = req.body;
+router.delete("/", loginAuth, async (req, res, next) => {
+  const { userPk } = req.decoded;
   const result = {
-    isSuccess: false,
-    message: ""
+    isSuccess: false
   }
   let client = null;
 
   try {
-    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
+    exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
     client = createClient();
     await client.connect();
-    const sql = "DELETE FROM user_TB WHERE id = $1";
-    const params = [userId];
-    const data = await client.query(sql, params);
+    const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
+    const deleteUser = [userPk];
+    const data = await client.query(deleteUserSql, deleteUser);
+    // 삭제 성공 시 해당 토큰을 블랙리스트에 등록
     if (data.rowCount !== 0) {
-      result.isSuccess = true;
-    } else {
-      result.message = "해당하는 사용자가 존재하지 않습니다";
+      const token = req.cookies.accessToken;
+      const expiredDate = new Date(req.decoded.exp * 1000);
+      const reason = "leave";
+
+      const registerBlackListSql = `INSERT INTO token_blacklist (token, expired_date, reason) VALUES ($1, $2, $3)`;
+      const params = [token, expiredDate, reason];
+      const data = await client.query(registerBlackListSql, params);
+      if (data.rowCount !== 0) {
+        result.isSuccess = true;
+      }
     }
+    res.clearCookie("accessToken");
     res.send(result);
 
   } catch (error) {

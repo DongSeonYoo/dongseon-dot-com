@@ -1,22 +1,39 @@
 const jwt = require("jsonwebtoken");
+const createClient = require("../../config/database/postgresql");
+
 require("dotenv").config();
 
-const loginAuth = () => {
-  return (req, res, next) => {
-    try {
-      req.decoded = jwt.verify(req.headers.authorization, process.env.JWT_SECRET_KEY);
-      next();
+module.exports = async (req, res, next) => {
+  let client = null;
+  const accessToken = req.cookies.accessToken;
+  try {
 
-    } catch (error) {
-      if (error.message === "jwt expired") {
-        error.status = 419;
-        next(error);
-      } else {
-        error.status = 401;
-        next(error);
-      }
+    // 토큰의 블랙리스트를 체크하는 쿼리
+    client = createClient();
+    await client.connect();
+
+    const sql = "SELECT id FROM token_blacklist WHERE token = $1";
+    const params = [accessToken];
+    const data = await client.query(sql, params);
+    // 블랙리스트에 해당하는 토큰이 존재하는 경우
+    if (data.rows.length !== 0) {
+      const error = new Error();
+      error.status = 401;
+      throw error;
+
+    // 블랙리스트에 토큰이 존재하지 않는 경우 (request에 디코딩한 값 담아줌)
+    } else {
+      req.decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+      next();
+    }
+
+  } catch (error) {
+    if (error.message === "jwt expired") {
+      error.status = 419;
+      next(error);
+    } else {
+      error.status = 401;
+      next(error);
     }
   }
-}
-
-module.exports = loginAuth;
+};
