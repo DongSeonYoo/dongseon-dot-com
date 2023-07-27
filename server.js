@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const path = require("path");
+const cookieParser = require("cookie-parser");
 const CLIENT_PATH = path.join(__dirname, './client/pages');
 
 const loggingSetting = require('./src/middleware/loggingSetting');
@@ -17,6 +18,7 @@ require("dotenv").config();
 
 // 전역 미들웨어
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static("client/"));
 app.use(loggingSetting());
 
