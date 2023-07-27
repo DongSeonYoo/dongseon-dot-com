@@ -258,7 +258,7 @@ const fetchSignupData = async () => {
       location.href = "/";
 
     } else {
-      alert(json.message)
+      location.href = "/";
     }
 
   } catch (err) {

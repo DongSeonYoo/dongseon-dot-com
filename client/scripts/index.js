@@ -10,7 +10,9 @@ const pwInput = document.getElementById("pw-form");
 const signupBtn = document.querySelector("#sign-up-button");
 const findIdBtn = document.querySelector("#find-id-button");
 const findPwBtn = document.getElementById("find-pw-button");
-const token = sessionStorage.getItem("accessToken");
+// const token = sessionStorage.getItem("accessToken");
+
+const token = getCookie("accessToken");
 
 const a = location.href;
 console.log(a);
@@ -18,19 +20,14 @@ console.log(a);
 // 세션적용 전까지 임시방편.....
 window.onload = () => {
   sessionStorage.removeItem("resetPwUserPkSession");
-
   checkLoggedIn();
 }
 
 async function checkLoggedIn() {
   if (token) {
     try {
-      const authResult = await fetch("/api/auth", {
-        headers: {
-          'Authorization': token,
-        }
-      });
-  
+      const authResult = await fetch("/api/auth");
+      // 이거 안댐 바꿔야댐
       // 토큰이 유효한지 검사
       if (authResult.status === 200) {
         const loginModalBtn = document.getElementById("login-modal-open-button");
@@ -57,18 +54,18 @@ async function checkLoggedIn() {
         logoutBtn.classList.add("login-only-button");
         logoutBtn.innerHTML = "로그아웃";
         logoutBtn.addEventListener("click", () => {
-          sessionStorage.clear();
+          deleteCookie("accessToken");
           location.reload();
         });
   
         tempDiv.appendChild(logoutBtn);
         navbarDiv.appendChild(tempDiv);
+      } else {
+        deleteCookie("accessToken");
       }
 
-    // 만료되거나 유효하지 않은 토큰일 경우 해당 catch에서 걸림
     } catch (error) {
       alert(error.message);
-      location.href = "/";
     }
   }
   // 로그인되지 않은상태라면 그대로 html 출력
@@ -172,7 +169,7 @@ const loginFetch = async () => {
     const json = await res.json();
     if (res.status === 200) {
       if (json.token) {
-        sessionStorage.setItem("accessToken", json.token);
+        setCookie("accessToken", json.token);
         location.reload();
       } else {
         alert(`로그인 실패: ${json.message}`);
