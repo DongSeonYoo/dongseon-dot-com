@@ -326,8 +326,8 @@ router.put("/pw", async (req, res, next) => {
 // 프로필 보기 api
 // userId
 // GET
-router.get("/:userId", async (req, res, next) => {
-  const { userId } = req.params;
+router.get("/:userId", loginAuth, async (req, res, next) => {
+  const { userPk } = req.decoded;
   const result = {
     data: "",
     message: "",
@@ -335,13 +335,13 @@ router.get("/:userId", async (req, res, next) => {
   let client = null;
 
   try {
-    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
+    exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
     client = createClient();
 
     await client.connect();
     const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
                     FROM user_TB WHERE id = $1`;
-    const params = [userId];
+    const params = [userPk];
     const data = await client.query(sql, params);
 
     if (data.rows.length !== 0) {
@@ -366,8 +366,9 @@ router.get("/:userId", async (req, res, next) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-router.put("/", async (req, res, next) => {
-  const { userId, name, phoneNumber, email } = req.body;
+router.put("/", loginAuth, async (req, res, next) => {
+  const { userPk } = req.decoded;
+  const { name, phoneNumber, email } = req.body;
   const result = {
     isSuccess: false,
     message: "",
@@ -375,7 +376,7 @@ router.put("/", async (req, res, next) => {
   let client = null;
 
   try {
-    exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
+    exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
     exception(name, "name").checkInput().checkNameRegex();
     exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
     exception(email, "email").checkInput().checkEmailRegex();
@@ -383,7 +384,7 @@ router.put("/", async (req, res, next) => {
     client = createClient();
     await client.connect();
     const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
-    const params = [name, phoneNumber, email, userId];
+    const params = [name, phoneNumber, email, userPk];
     const data = await client.query(sql, params)
     if (data.rowCount !== 0) {
       result.isSuccess = true;
