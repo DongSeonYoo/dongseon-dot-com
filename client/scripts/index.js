@@ -10,94 +10,55 @@ const pwInput = document.getElementById("pw-form");
 const signupBtn = document.querySelector("#sign-up-button");
 const findIdBtn = document.querySelector("#find-id-button");
 const findPwBtn = document.getElementById("find-pw-button");
-// const token = sessionStorage.getItem("accessToken");
-
+const communityBtn = document.getElementById("community-button");
+// 현재 브라우저의 쿠키(토큰)를 가져옴
 const token = getCookie("accessToken");
-
-const a = location.href;
-console.log(a);
-
-// 세션적용 전까지 임시방편.....
-window.onload = () => {
-  sessionStorage.removeItem("resetPwUserPkSession");
-  checkLoggedIn();
-}
-
-async function checkLoggedIn() {
-  if (token) {
-    try {
-      const authResult = await fetch("/api/auth");
-      // 이거 안댐 바꿔야댐
-      // 토큰이 유효한지 검사
-      if (authResult.status === 200) {
-        const loginModalBtn = document.getElementById("login-modal-open-button");
-  
-        const navbarDiv = document.getElementById("nav-bar");
-        const tempDiv = document.createElement("div");
-  
-        const viewProfileAtag = document.createElement("a");
-        const viewProfileButton = document.createElement("button");
-        const logoutBtn = document.createElement("button");
-  
-        // 로그인 버튼 제거
-        loginModalBtn.style.display = "none";
-  
-        // 내 프로필 보기 버튼
-        viewProfileAtag.href = `/view-profile`;
-        viewProfileButton.classList.add("login-only-button");
-        viewProfileButton.innerHTML = "내 프로필";
-        viewProfileAtag.appendChild(viewProfileButton);
-        tempDiv.appendChild(viewProfileAtag);
-        navbarDiv.appendChild(tempDiv);
-  
-        // 로그아웃 버튼
-        logoutBtn.classList.add("login-only-button");
-        logoutBtn.innerHTML = "로그아웃";
-        logoutBtn.addEventListener("click", () => {
-          deleteCookie("accessToken");
-          location.reload();
-        });
-  
-        tempDiv.appendChild(logoutBtn);
-        navbarDiv.appendChild(tempDiv);
-      } else {
-        deleteCookie("accessToken");
-      }
-
-    } catch (error) {
-      alert(error.message);
-    }
-  }
-  // 로그인되지 않은상태라면 그대로 html 출력
-}
-
 // 요소의 높이 계산
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
+// 로그인이 되어있으면 true, 되어있지 않으면 false(기본값)
+let isLoggedIn = false;
 
-// 스크롤 이벤트 처리
-document.addEventListener('scroll', () => {
-  if (window.scrollY > navBarHeight) {
-    navBar.classList.add("navbar-draw-color");
-
-  } else {
-    navBar.classList.remove("navbar-draw-color");
+// 세션적용 전까지 임시방편..... (일단건들 ㄴㄴ)
+window.onload = async () => {
+  sessionStorage.removeItem("resetPwUserPkSession");
+  if (token) {
+    isLoggedIn = await checkAuth();
+    if (isLoggedIn) {
+      makeOnlyLoginUI();
+    } else {
+      // 로그인되지 않은 상태라면 그대로 HTML 출력
+    }
   }
+}
 
-  home.style.opacity = 1 - window.scrollY / homeHeight;
-});
+const makeOnlyLoginUI = () => {
+  const loginModalBtn = document.getElementById("login-modal-open-button");
+  const navbarDiv = document.getElementById("nav-bar");
+  const tempDiv = document.createElement("div");
+  const viewProfileAtag = document.createElement("a");
+  const viewProfileButton = document.createElement("button");
+  const logoutBtn = document.createElement("button");
 
-// 스크롤 맨 위로 이동 이벤트 처리
-scrollTopButton.addEventListener("click", () => {
-  document.body.scrollIntoView({
-    behavior: "smooth"
+  // 로그인 버튼 제거
+  loginModalBtn.style.display = "none";
+  // 내 프로필 보기 버튼
+  viewProfileAtag.href = `/view-profile`;
+  viewProfileButton.classList.add("login-only-button");
+  viewProfileButton.innerHTML = "내 프로필";
+  viewProfileAtag.appendChild(viewProfileButton);
+  tempDiv.appendChild(viewProfileAtag);
+  navbarDiv.appendChild(tempDiv);
+  // 로그아웃 버튼
+  logoutBtn.classList.add("login-only-button");
+  logoutBtn.innerHTML = "로그아웃";
+  logoutBtn.addEventListener("click", () => {
+    deleteCookie("accessToken");
+    location.reload();
   });
-});
-
-// 메뉴 토글 이벤트 처리
-navbarButton.addEventListener('click', () => {
-  navMenu.classList.toggle("open");
-});
+  tempDiv.appendChild(logoutBtn);
+  navbarDiv.appendChild(tempDiv);
+}
 
 // 모달창 열기/닫기 이벤트
 const modalOpen = () => {
@@ -107,23 +68,6 @@ const modalOpen = () => {
 const modalClose = () => {
   modal.classList.add("hidden");
 }
-
-document.querySelector("#login-modal-open-button").addEventListener("click", modalOpen);
-document.querySelector("#modal-close-button").addEventListener("click", modalClose);
-document.querySelector(".background").addEventListener("click", modalClose);
-
-// 회원가입, 아이디 찾기, 비밀번호 찾기 버튼 이벤트
-findIdBtn.addEventListener("click", () => {
-  location.href = "/find-id";
-});
-
-findPwBtn.addEventListener("click", () => {
-  location.href = "/user-validate";
-});
-
-signupBtn.addEventListener("click", () => {
-  location.href = "/signup";
-});
 
 // 로그인 유효성 검사
 const validate = () => {
@@ -191,3 +135,53 @@ const clearInputFields = () => {
   idInput.value = "";
   pwInput.value = "";
 };
+
+// 스크롤 이벤트 처리
+document.addEventListener('scroll', () => {
+  if (window.scrollY > navBarHeight) {
+    navBar.classList.add("navbar-draw-color");
+
+  } else {
+    navBar.classList.remove("navbar-draw-color");
+  }
+
+  home.style.opacity = 1 - window.scrollY / homeHeight;
+});
+
+// 스크롤 맨 위로 이동 이벤트 처리
+scrollTopButton.addEventListener("click", () => {
+  document.body.scrollIntoView({
+    behavior: "smooth"
+  });
+});
+
+// 메뉴 토글 이벤트 처리
+navbarButton.addEventListener('click', () => {
+  navMenu.classList.toggle("open");
+});
+
+// 커뮤니티로 가는 버튼을 눌렀을시
+communityBtn.addEventListener("click", async () => {
+  if (isLoggedIn) {
+    location.href = "/community"
+  } else {
+    alert("로그인 후 이용가능합니다")
+  }
+})
+
+// 회원가입, 아이디 찾기, 비밀번호 찾기 버튼 이벤트
+findIdBtn.addEventListener("click", () => {
+  location.href = "/find-id";
+});
+
+findPwBtn.addEventListener("click", () => {
+  location.href = "/user-validate";
+});
+
+signupBtn.addEventListener("click", () => {
+  location.href = "/signup";
+});
+
+document.querySelector("#login-modal-open-button").addEventListener("click", modalOpen);
+document.querySelector("#modal-close-button").addEventListener("click", modalClose);
+document.querySelector(".background").addEventListener("click", modalClose);
