@@ -1,7 +1,6 @@
-document.getElementById("home-button").addEventListener("click", () => {
-  location.href = "/";
-});
-
+window.onload = () => {
+  if (checkCookie()) location.href = "/";
+}
 function validate() {
   const loginIdRegex = /^[A-Za-z0-9]{8,15}$/;
   const nameRegex = /^[가-힣a-zA-Z]{2,8}$/;

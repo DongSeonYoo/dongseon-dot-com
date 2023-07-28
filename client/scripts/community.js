@@ -1,19 +1,18 @@
 const container = document.getElementById("container");
 const posts = document.getElementById("posts");
-
-const homeBtn = document.getElementById("home-button");
 const createPostBtn = document.getElementById("create-post-button");
-
+const postCountSpan = document.getElementById("post-counts");
 const pageSelectContainer = document.getElementById("page-select-container");
+
+let allPostCounts;
 let currentPage = 1; // 현재 페이지 번호
 
-init();
-
-async function init() {
+window.onload = async () => {
   try {
     // 게시글의 개수 먼저 불러오고
     const postCounts = await getPostCountFetch();
-    console.log(postCounts);
+    allPostCounts = postCounts;
+    postCountSpan.innerHTML = allPostCounts;
 
     // 한 페이지에 보여주는 게시글의 기본값이 7 이니 postCounts / 8 한 값
     const maxPageSelectCount = Math.floor(postCounts / 8);
@@ -77,11 +76,16 @@ async function getPostFetch(count = 1) {
       }
       // 만약 게시글이 null이라면 아무 게시글도 존재하지 않음
       else {
-        
+
       }
 
-    // 500 error코드가 반환되었을 시 백엔드에서 온 메세지를 그대로 출력
     } else if (result.status === 400) {
+      alert(json.message);
+      location.href = "/";
+    } else if (result.status === 401) {
+      alert(json.message);
+      location.href = "/";
+    } else if (result.status === 419) {
       alert(json.message);
       location.href = "/";
     } else if (result.status === 500) {

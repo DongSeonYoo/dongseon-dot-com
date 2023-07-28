@@ -1,6 +1,6 @@
-document.querySelector("#home-button").addEventListener('click', () => {
-  location.href = "/";
-});
+window.onload = () => {
+  if (checkCookie()) location.href = "/";
+}
 
 function validate() {
   const name = document.getElementById("name-text-field").value;
@@ -54,7 +54,7 @@ function validate() {
   return true;
 }
 
-function clickFindId() {
+const clickFindId = () => {
   const isValidValues = validate();
 
   if (isValidValues) {
