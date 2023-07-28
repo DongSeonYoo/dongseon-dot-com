@@ -4,7 +4,6 @@ const phoneNumberForm = document.getElementById("phoneNumber-form");
 const emailForm = document.getElementById("email-form");
 const signUpDateForm = document.getElementById("signup-date-form");
 const updateDateForm = document.getElementById("update-date-form");
-const homeBtn = document.querySelector(".home-button");
 const editProfileBtn = document.getElementById("edit-profile-button");
 const dropUserBtn = document.getElementById("drop-user-button");
 const token = getCookie("accessToken");
@@ -19,12 +18,10 @@ window.onload = async () => {
     location.href = "/";
     return;
   }
-  const authResponse = await fetch("/api/auth");
-  if (authResponse.status === 200) {
-    const json = await authResponse.json();
-    const userData = json.data.userPk;
-    viewProfileFetch(userData);
-  }
+
+  const json = await checkAuth();
+  const userData = json.data.userPk;
+  viewProfileFetch(userData);
 }
 
 const inputValidate = (existingName, existingPhoneNumber, existingEmail) => {
@@ -179,7 +176,3 @@ dropUserBtn.addEventListener("click", () => {
     dropUserFetch();
   }
 })
-
-homeBtn.addEventListener("click", () => {
-  location.href = "/";
-});
