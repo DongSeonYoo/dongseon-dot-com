@@ -5,20 +5,21 @@ require("dotenv").config();
 
 module.exports = async (req, res, next) => {
   let client = null;
+  // 쿠키에 담긴 토큰을 가져온다음
   const accessToken = req.cookies.accessToken;
   try {
-
-    // 토큰의 블랙리스트를 체크하는 쿼리
+    // 토큰이 블랙리스트에 등록되어있는지 체크
     client = createClient();
     await client.connect();
 
     const sql = "SELECT id FROM token_blacklist WHERE token = $1";
     const params = [accessToken];
     const data = await client.query(sql, params);
-    // 블랙리스트에 해당하는 토큰이 존재하는 경우
+    // 블랙리스트에 해당하는 토큰이 존재한다면?
     if (data.rows.length !== 0) {
       const error = new Error();
       error.status = 401;
+      res.clearCookie("accessToken");
       throw error;
 
     // 블랙리스트에 토큰이 존재하지 않는 경우 (request에 디코딩한 값 담아줌)
@@ -35,5 +36,7 @@ module.exports = async (req, res, next) => {
       error.status = 401;
       next(error);
     }
+  } finally {
+    if (client) await client.end();
   }
 };
