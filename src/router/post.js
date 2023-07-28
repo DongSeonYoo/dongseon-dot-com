@@ -3,10 +3,11 @@ const router = express.Router();
 const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
+const loginAuth = require("../middleware/loginAuth");
 
 // 게시글 작성 api
 // userId, title, content
-router.post("/", async (req, res, next) => {
+router.post("/", loginAuth, async (req, res, next) => {
   const { userId, title, content } = req.body;
   const result = {
     isSuccess: false,
@@ -43,7 +44,7 @@ router.post("/", async (req, res, next) => {
 // 모든 게시글 조회 api
 // GET
 // 명사이자 단수형으로
-router.get("/", async (req, res, next) => {
+router.get("/", loginAuth, async (req, res, next) => {
   const counterPage = 8;
   let { pageNumber } = req.query;
   const result = {
@@ -87,7 +88,7 @@ router.get("/", async (req, res, next) => {
 // 특정 게시글 조회 api
 // postId
 // GET
-router.get("/:postId", async (req, res, next) => {
+router.get("/:postId", loginAuth, async (req, res, next) => {
   const { postId } = req.params;
   const result = {
     data: null,
