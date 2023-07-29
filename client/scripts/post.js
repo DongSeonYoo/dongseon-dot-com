@@ -7,7 +7,10 @@ const userId = sessionStorage.getItem("loginUserSession");
 const postId = parseUrl();
 let commentCount = commentsSection.childElementCount;
 window.onload = async () => {
+  const json = await checkAuth();
+  userId = json.data.userPk;
   const postAuthor = await displayPost();
+
   // 해당 포스트의 주인일 경우
   if (userId === String(postAuthor)) {
     // 수정, 삭제 버튼 생성

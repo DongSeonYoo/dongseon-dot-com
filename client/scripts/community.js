@@ -8,6 +8,7 @@ let allPostCounts;
 let currentPage = 1; // 현재 페이지 번호
 
 window.onload = async () => {
+  await checkAuth();
   try {
     // 게시글의 개수 먼저 불러오고
     const postCounts = await getPostCountFetch();

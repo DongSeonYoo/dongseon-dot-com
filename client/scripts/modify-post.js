@@ -12,11 +12,10 @@ let existingValue = {
   content: "",
 };
 
-if (!userId) {
-  location.href = "/";
+window.onload = async () => {
+  await checkAuth();
+  loadPostData(postId);
 }
-
-loadPostData(postId);
 
 const validateInput = () => {
   const titleValue = document.getElementById("input-title").value;

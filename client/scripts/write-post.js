@@ -1,10 +1,8 @@
 const submitBtn = document.getElementById("submit-button");
 const cancelBtn = document.getElementById("cancel-button");
 
-window.onload = () => {
-  if (!sessionStorage.getItem("loginUserSession")) {
-    location.href = "/";
-  }
+window.onload = async () => {
+  await checkAuth();
 }
 
 submitBtn.addEventListener("click", () => {
