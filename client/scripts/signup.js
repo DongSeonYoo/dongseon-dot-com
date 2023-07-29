@@ -15,6 +15,10 @@ let isIdDuplicate = false;
 let isPhoneNumberDuplicate = false;
 let isEmailDuplicate = false;
 
+window.onload = () => {
+  if (checkCookie()) location.href = "/";
+}
+
 const validate = () => {
   if (!idInputValidate()) {
     return false;
