@@ -83,8 +83,7 @@ async function modifyPostFetch(titleValue, contentValue) {
       "body": JSON.stringify({
         "postId": postId,
         "title": titleValue,
-        "content": contentValue,
-        "userId": userId
+        "content": contentValue
       })
     });
 
@@ -104,8 +103,8 @@ async function modifyPostFetch(titleValue, contentValue) {
 
 submitBtn.addEventListener("click", () => {
   if (validateInput()) {
-    const titleValue = document.getElementById("input-title").value;
-    const contentValue = document.getElementById("input-content").value;
+    const titleValue = postTitle.value;
+    const contentValue = postContent.value;
 
     modifyPostFetch(titleValue, contentValue);
   }

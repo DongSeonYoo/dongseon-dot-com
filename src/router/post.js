@@ -8,7 +8,8 @@ const loginAuth = require("../middleware/loginAuth");
 // 게시글 작성 api
 // userId, title, content
 router.post("/", loginAuth, async (req, res, next) => {
-  const { userId, title, content } = req.body;
+  const userId = req.decoded.userPk;
+  const { title, content } = req.body;
   const result = {
     isSuccess: false,
     message: ""
@@ -95,7 +96,6 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     message: ""
   };
   let client = null;
-  let trueOrFalse = false;
 
   try {
     exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
@@ -113,7 +113,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     if (data.rows.length !== 0) {
       result.data = data.rows[0];
     } else {
-      result.message = "존재하지 않는 게시글입니다";
+      next();
     }
     res.send(result);
 
@@ -131,8 +131,9 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
 // 게시글 수정 api
 // userId, postId, title, content
 // PUT
-router.put("/", async (req, res, next) => {
-  const { postId, userId, title, content } = req.body;
+router.put("/", loginAuth, async (req, res, next) => {
+  const userId = req.decoded.userPk;
+  const { postId, title, content } = req.body;
   const result = {
     isSuccess: false,
     message: ""
@@ -173,8 +174,9 @@ router.put("/", async (req, res, next) => {
 // 게시글 삭제 api
 // userId, postId
 // DELETE
-router.delete("/", async (req, res, next) => {
-  const { postId, userId } = req.body;
+router.delete("/", loginAuth, async (req, res, next) => {
+  const userId = req.decoded.userPk;
+  const { postId } = req.body;
   const result = {
     isSuccess: false,
     message: ""
@@ -212,7 +214,7 @@ router.delete("/", async (req, res, next) => {
 
 // 모든 게시글의 수를 가져오는 api
 // GET
-router.get("/all/count", async (req, res, next) => {
+router.get("/all/count", loginAuth, async (req, res, next) => {
   const result = {
     data: null,
     message: ""

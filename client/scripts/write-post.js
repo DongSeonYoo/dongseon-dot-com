@@ -47,16 +47,14 @@ const createPostFetch = async () => {
   const contentValue = document.getElementById("input-content").value;
 
   try {
-    const userId = sessionStorage.getItem("loginUserSession")
     const result = await fetch("/api/post", {
       "method": "POST",
       "headers": {
         "Content-Type": "application/json"
       },
       "body": JSON.stringify({
-        "userId": userId,
         "title": titleValue,
-        "content": contentValue
+        "content": contentValue,
       })
     });
 

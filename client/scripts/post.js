@@ -116,10 +116,10 @@ async function clickPostDeleteButton() {
         "Content-Type": "application/json"
       },
       "body": JSON.stringify({
-        "userId": `${userId}`,
         "postId": `${postId}`,
       })
     });
+
     const data = await result.json();
     if (data.isSuccess) {
       location.href = "/community";
