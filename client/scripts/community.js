@@ -52,15 +52,6 @@ function clearPost() {
   }
 }
 
-// async function movePageFetch(count) {
-//   try {
-//     const result = fetch(`/api/post?pageNumber=${count}`);
-
-//   } catch (error) {
-    
-//   }
-// }
-
 // 게시글을 가져오는 요청을 하는 함수
 async function getPostFetch(count = 1) {
   try {
@@ -75,22 +66,11 @@ async function getPostFetch(count = 1) {
           makePostList(post);
         });
       }
-      // 만약 게시글이 null이라면 아무 게시글도 존재하지 않음
       else {
-
+        // 만약 게시글이 null이라면 아무 게시글도 존재하지 않음
       }
 
-    } else if (result.status === 400) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 401) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 419) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 500) {
-      alert(json.message);
+    } else {
       location.href = "/";
     }
 
@@ -165,11 +145,11 @@ homeBtn.addEventListener("click", () => {
   location.href = "/";
 });
 
-createPostBtn.addEventListener("click", () => {
-  if (sessionStorage.getItem("loginUserSession")) {
+createPostBtn.addEventListener("click", async () => {
+  const data = await checkAuth();
+  if (data) {
     location.href = "/write-post";
-
   } else {
-    alert("로그인 후 이용해주세요");
+    alert("로그인 후 이용가능합니다");
   }
 });
