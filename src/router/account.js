@@ -52,6 +52,22 @@ router.post("/login", async (req, res, next) => {
   }
 });
 
+router.get("/logout", loginAuth, async (req, res, next) => {
+  const result = {
+    message: "",
+  };
+
+  try {
+    result.message = "로그아웃 성공";
+    res.clearCookie("accessToken");
+    res.send(result);
+
+  } catch (error) {
+    result.message = error.message;
+    next(error);
+  }
+});
+
 // 아이디 중복체크 api
 // GET
 // pathVariable: loginId

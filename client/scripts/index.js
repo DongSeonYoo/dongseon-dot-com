@@ -21,7 +21,6 @@ let isLoggedIn = false;
 
 // 세션적용 전까지 임시방편..... (일단건들 ㄴㄴ)
 window.onload = async () => {
-  sessionStorage.removeItem("resetPwUserPkSession");
   if (token) {
     isLoggedIn = await checkAuth();
     if (isLoggedIn) {
@@ -52,10 +51,7 @@ const makeOnlyLoginUI = () => {
   // 로그아웃 버튼
   logoutBtn.classList.add("login-only-button");
   logoutBtn.innerHTML = "로그아웃";
-  logoutBtn.addEventListener("click", () => {
-    deleteCookie("accessToken");
-    location.reload();
-  });
+  logoutBtn.addEventListener("click", logoutFetch);
   tempDiv.appendChild(logoutBtn);
   navbarDiv.appendChild(tempDiv);
 }
@@ -129,6 +125,16 @@ const loginFetch = async () => {
   } catch (error) {
     alert("error: " + error.message);
   }
+}
+
+const logoutFetch = async () => {
+  try {
+    await fetch("/api/account/logout");
+  } catch (error) {
+    alert(error);
+  }
+
+  location.reload();
 }
 
 const clearInputFields = () => {
