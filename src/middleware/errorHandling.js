@@ -10,13 +10,18 @@ const errorHandling = () => {
   
     // 토큰 inavlid
     } else if (err.status === 401) {
-      result.message = "토큰이 유효하지 않습니다";
+      result.message = "로그인 후 이용가능합니다";
       res.status(401).send(result);
       
     // 토큰 expired
     } else if (err.status === 419) {
-      result.message = "토큰이 만료되었습니다";
-      res.status(419).send(result);
+      result.message = "토큰이 만료되었습니다, 다시 로그인해주세요";
+      res.status(401).send(result);
+
+    // 권한 거부
+    } else if (err.status === 403) {
+      result.message = "권한이 거부되었습니다";
+      res.status(403).send(result);
 
       // unique 제약조건 위반
     } else if (err.code === '23505') {
@@ -40,6 +45,7 @@ const errorHandling = () => {
       }
 
     } else {
+      console.error(err);
       result.message = "서버에서 오류가 발생하였습니다";
       res.status(500).send(result);
     }
