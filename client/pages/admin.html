@@ -13,7 +13,6 @@
   <select id="order-option-list" onchange="onchangeOrderOption()">
     <option value="recent">최신 순</option>
     <option value="old">오래된 순</option>
-    <div id="log-count"></div>
   </select>
 
   <select id="method-option-list" onchange="onchangeMethodOption()">
@@ -23,6 +22,7 @@
     <option value="PUT">PUT</option>
     <option value="DELETE">DELETE</option>
   </select>
+  <span id="log-count"></span>
 
 
   <section id="log-section" class="log-container">
@@ -34,6 +34,7 @@
     <button id="next-page-button" onclick="onclickNextButton()">></button>
   </section>
 
+  <script src="../scripts/common.js"></script>
   <script src="../scripts/admin.js"></script>
 </body>
 

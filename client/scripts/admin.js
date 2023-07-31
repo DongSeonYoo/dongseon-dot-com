@@ -1,21 +1,30 @@
 const logSection = document.getElementById("log-section");
 const recentOption = document.getElementById("recent-option");
 const oldOption = document.getElementById("old-option");
-
 const prevPageBtn = document.getElementById("prev-page-button");
 const nextPageBtn = document.getElementById("next-page-button");
+const logCountDiv = document.getElementById("log-count");
 
+let apiCounts;
 let maxPageCount;
 let selectedOrderValue = "recent";
 let selectedMethodValue = "all";
 let currentPage = 1;
 
 window.onload = async () => {
-  const logsCount = await getDocumentCountFetch();
-  maxPageCount = Math.ceil(logsCount / 13);
-  updatePageMoveButton();
-  
-  await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  // 관리자 권한 체크
+  try {
+    await adminAuthCheck();
+    const logsCount = await getDocumentCountFetch();
+    apiCounts = logsCount;
+    maxPageCount = Math.ceil(logsCount / 16);
+    updatePageMoveButton();
+    logCountDiv.innerHTML = logsCount + "개의 로그";
+
+    await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 const onchangePage = (page) => {
@@ -40,34 +49,24 @@ const updatePageMoveButton = () => {
 }
 
 const getDocumentCountFetch = async () => {
-  const result = await fetch("/api/log/count");
-  const json = await result.json();
+  const response = await fetch("/api/log/count");
+  const json = await response.json();
 
-  if (result.status === 200) {
+  if (response.status === 200) {
     return json.data;
-
-  } else if (result.status === 500) {
-    alert(json.message);
-    location.href = "/";
   }
 }
 
 const loadApiFetch = async (order, method, page) => {
   try {
-    const result = await fetch(`/api/log?order=${order}&method=${method}&page=${page}`);
-    const json = await result.json();
+    const response = await fetch(`/api/log?order=${order}&method=${method}&page=${page}`);
+    const json = await response.json();
 
-    if (result.status === 200) {
+    if (response.status === 200) {
       if (json.data) {
         const responsedData = json.data;
         responsedData.forEach(data => makeTag(data));
       }
-    } else if (result.status === 400) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 500) {
-      alert(json.message);
-      location.href = "/";
     }
 
   } catch (error) {
@@ -132,17 +131,23 @@ const truncateData = (data) => {
 }
 
 const onchangeOrderOption = () => {
- const orderOptionList = document.getElementById("order-option-list");
- selectedOrderValue = orderOptionList[orderOptionList.selectedIndex].value;
+  const orderOptionList = document.getElementById("order-option-list");
+  selectedOrderValue = orderOptionList[orderOptionList.selectedIndex].value;
 
- logSection.innerHTML = "";
- loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+  currentPage = 1;
+  updatePageMoveButton();
+
+  logSection.innerHTML = "";
+  loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
 }
 
 const onchangeMethodOption = () => {
   const methodOptionList = document.getElementById("method-option-list");
-  
   selectedMethodValue = methodOptionList[methodOptionList.selectedIndex].value;
+
+  currentPage = 1;
+  updatePageMoveButton();
+
   logSection.innerHTML = "";
   loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
 }
