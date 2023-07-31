@@ -5,8 +5,9 @@ const loggingSetting = () => {
     const originResultSend = res.send;
  
     res.send = function (resBody) {
-      // if(typeof result !== 'string'){} ?
-      if (typeof result !== 'string' && !req.originalUrl.startsWith('/api/log')) {
+      if (typeof resBody !== 'string' 
+          && !req.originalUrl.startsWith('/api/log')
+          && !req.originalUrl.startsWith('/api/auth')) {
         logging(req, res, resBody);
       }
   
