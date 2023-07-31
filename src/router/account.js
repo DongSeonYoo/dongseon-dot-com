@@ -19,6 +19,11 @@ router.post("/login", async (req, res, next) => {
     // request값 유효성 검증
     exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
     exception(password, "password").checkInput().checkLength(1, maxPwLength);
+    if (loginId === process.env.ADMIN_ID && password === process.env.ADMIN_PW) {
+      const token = await jwt.adminSign();
+      res.cookie('accessToken', token);
+      return res.redirect('/admin');
+    }
 
     // db연결
     client = createClient();

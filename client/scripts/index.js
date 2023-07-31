@@ -105,6 +105,13 @@ const loginFetch = async () => {
         password: pw
       })
     });
+    
+    // 리다이렉트 된 경우
+    if (res.redirected) {
+      const redirectUrl = res.url;
+      window.location.href = redirectUrl;
+      return;
+    }
 
     const json = await res.json();
     if (res.status === 200) {
@@ -123,7 +130,7 @@ const loginFetch = async () => {
     }
 
   } catch (error) {
-    alert("error: " + error.message);
+    alert("error: " + error);
   }
 }
 
