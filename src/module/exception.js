@@ -1,83 +1,56 @@
 const { loginIdRegex, pwRegex, nameRegex, phoneNumberRegex, emailRegex } = require("../module/regex");
+const badRequestErrorCode = 400;
+const errorMessage = {
+  invalidInput: "요청값이 잘못되었습니다",
+  length: "길이가 비정상적입니다",
+  regex: "정규표현식 실패",
+  isNumber: "정수가 아닙니다",
+}
 
 function Exception(input, name) {
+  this.setError = (message) => {
+    const error = new Error(`${name}: ${message}`);
+    error.status = badRequestErrorCode;
+    throw error;
+  }
+  
   this.checkInput = () => {
-    if (input === undefined) {
-      const error = new Error(`(${name}): 요청값이 잘못되었습니다`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (input === undefined) this.setError(errorMessage.invalidInput); 
     return this;
   }
 
   this.checkLength = (min, max) => {
-    if (input.length < min || input.length > max) {
-      const error = new Error(`(${name}): 길이가 비정상적입니다`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (input.length < min || input.length > max) this.setError(errorMessage.length);
     return this;
   }
 
   this.checkIdRegex = () => {
-    if (!loginIdRegex.test(input)) {
-      const error = new Error(`(${name}): 정규표현식 실패`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (!loginIdRegex.test(input)) this.setError(errorMessage.regex);
     return this;
   }
 
   this.checkPwRegex = () => {
-    if (!pwRegex.test(input)) {
-      const error = new Error(`(${name}): 정규표현식 실패`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (!pwRegex.test(input)) this.setError(errorMessage.regex);
     return this;
   }
 
   this.checkNameRegex = () => {
-    if (!nameRegex.test(input)) {
-      const error = new Error(`(${name}): 정규표현식 실패`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (!nameRegex.test(input))  this.setError(errorMessage.regex);
     return this;
   }
 
   this.checkPhoneNumberRegex = () => {
-    if (!phoneNumberRegex.test(input)) { 
-      const error = new Error(`(${name}): 정규식표현식 실패`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (!phoneNumberRegex.test(input)) this.setError(errorMessage.regex);
     return this;
   }
 
   this.checkEmailRegex = () => {
-    if (!emailRegex.test(input)) {
-      const error = new Error(`(${name}): 정규표현식 실패`);
-      error.status = 400;
-      throw error;
-    }
-
+    if (!emailRegex.test(input)) this.setError(errorMessage.regex);
     return this;
   }
 
   this.isNumber = () => {
-    if (isNaN(Number(input))) {
-      const error = new Error(`(${name}): 정수가 아닙니다`);
-      error.status = 400;
-      throw error;
-    }
-    
+    if (isNaN(Number(input))) this.setError(errorMessage.isNumber);
     return this;
   }
 }
