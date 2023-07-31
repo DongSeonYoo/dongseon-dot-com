@@ -2,13 +2,13 @@ const router = require("express").Router();
 const mongoClient = require("mongodb").MongoClient;
 const exception = require("../module/exception");
 const { maxItemPerPage } = require("../module/global");
+const adminAuth = require("../middleware/adminAuth");
 require("dotenv").config();
 
-router.get("/", async (req, res, next) => {
+router.get("/", adminAuth, async (req, res, next) => {
   let { order, method, page } = req.query;
   const result = {
     data: "",
-    message: ""
   }
 
   let connect = null;
@@ -53,10 +53,9 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/count", async (req, res, next) => {
+router.get("/count", adminAuth, async (req, res, next) => {
   const result = {
     data: "",
-    message: ""
   }
   let connect = null;
 
