@@ -5,7 +5,8 @@ const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
 const loginAuth = require("../middleware/loginAuth");
-const jwt = require("jsonwebtoken");
+const jwt = require("../module/jwt");
+require("dotenv").config();
 
 router.post("/login", async (req, res, next) => {
   const { loginId, password } = req.body;
@@ -33,14 +34,9 @@ router.post("/login", async (req, res, next) => {
     const data = await client.query(sql, params);
 
     if (data.rows.length !== 0) {
-      const token = jwt.sign({
-        "userPk": data.rows[0].id,
-      }, process.env.JWT_SECRET_KEY, {
-        "expiresIn": '1h', //10분
-        "issuer": 'ehdtjs.com'
-      });
+      const userPk = data.rows[0].id;
+      const token = await jwt.userSign(userPk);
       result.token = token;
-
     } else {
       result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
     }
@@ -83,7 +79,7 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
     message: "",
   };
   let client = null;;
-  
+
   try {
     exception(loginId, "loginId").checkInput().checkIdRegex();
 
@@ -376,7 +372,7 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
   } catch (error) {
     console.error(error);
     next(error);
-    
+
   } finally {
     if (client) {
       await client.end();
@@ -463,7 +459,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
   } catch (error) {
     console.error(error);
     next(error);
-    
+
   } finally {
     if (client) {
       await client.end();
