@@ -3,13 +3,15 @@ const router = express.Router();
 const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
+const loginAuth = require("../middleware/loginAuth");
 
 
 // 댓글 생성 api
 // postId, userId, content
 // POST
-router.post("/", async (req, res, next) => {
-  const { postId, userId, content } = req.body;
+router.post("/", loginAuth, async (req, res, next) => {
+  const userId = req.decoded.userPk;
+  const { postId, content } = req.body;
   const result = {
     isSuccess: false,
     message: ""
@@ -46,7 +48,7 @@ router.post("/", async (req, res, next) => {
 // 댓글 조회 api
 // :postId
 // GET
-router.get("/post/:postId", async (req, res, next) => {
+router.get("/post/:postId", loginAuth, async (req, res, next) => {
   const { postId } = req.params;
   const result = {
     data: null,
@@ -101,8 +103,9 @@ router.get("/post/:postId", async (req, res, next) => {
 // 댓글 수정 api
 // postId, commentId, userId, content
 // PUT
-router.put("/", async (req, res, next) => {
-  const { userId, content, postId, commentId } = req.body;
+router.put("/", loginAuth, async (req, res, next) => {
+  const userId = req.decoded.userPk;
+  const { content, postId, commentId } = req.body;
   const result = {
     isSuccess: false,
     message: ""
@@ -142,8 +145,9 @@ router.put("/", async (req, res, next) => {
 // 댓글 삭제 api
 // postId, commentId, userId
 // DELETE
-router.delete("/", async (req, res, next) => {
-  const { postId, commentId, userId } = req.body;
+router.delete("/", loginAuth, async (req, res, next) => {
+  const userId = req.decoded.userPk;
+  const { postId, commentId } = req.body;
   const result = {
     isSuccess: false,
     message: ""
