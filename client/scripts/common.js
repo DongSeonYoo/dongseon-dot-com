@@ -29,29 +29,37 @@ const checkCookie = () => {
   if (getCookie("accessToken")) {
     return true;
   }
-
   return false;
 }
 
 // 토큰이 유효한지 검사하고 디코딩한 유저 식별값을 넘겨줌
 async function checkAuth() {
   try {
-    const response = await fetch("/api/auth");
+    const response = await fetch("/api/auth/login");
     const user = await response.json();
     if (response.status === 200) {
       return user;
-    } else if (response.status === 401) {
+      
+    } else if (response.status === 401 || response.status === 419) {
       deleteCookie("accessToken");
-    } else if (response.status === 419) {
-      alert(user.message);
-      deleteCookie("accessToken");
+      location.href = "/";
     }
-    location.href = "/";
     return false;
 
   } catch (error) {
-    alert(error.message);
-    location.href = "/";
+    alert(error);
+  }
+}
+
+// 관리자 권한 체크
+async function adminAuthCheck() {
+  try {
+    const response = await fetch("/api/auth/admin");
+    if (response.status !== 200) {
+      location.href = "/";
+    }
+  } catch (error) {
+    console.log(error);
   }
 }
 
