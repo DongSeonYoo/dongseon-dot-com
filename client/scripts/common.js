@@ -39,11 +39,10 @@ async function checkAuth() {
     const user = await response.json();
     if (response.status === 200) {
       return user;
-      
-    } else if (response.status === 401 || response.status === 419) {
-      deleteCookie("accessToken");
-      location.href = "/";
     }
+
+    deleteCookie("accessToken");
+    location.href = "/";
     return false;
 
   } catch (error) {
