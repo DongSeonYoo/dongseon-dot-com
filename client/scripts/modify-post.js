@@ -86,18 +86,18 @@ async function modifyPostFetch(titleValue, contentValue) {
         "content": contentValue
       })
     });
-
-    const json = await result.json();
-    if (json.isSuccess) {
-      location.href = `/post/${postId}`;
-
-    } else {
-      alert(json.message);
+    if (result.status === 200) {
+      const json = await result.json();
+      if (json.isSuccess) {
+        location.href = `/post/${postId}`;
+      }
+    } else if (result.status === 401 || result.status === 403) {
+      alert("다시 로그인 해주세요");
+      location.href = "/";
     }
 
   } catch (error) {
-    alert("데이터베이스 오류" + error);
-    console.error(error);
+    alert(error.message);
   }
 }
 
