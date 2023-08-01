@@ -1,4 +1,5 @@
 .log-container {
+  margin-top: 15px;
   display: flex;
   flex-direction: column;
 }
@@ -9,10 +10,11 @@
   padding: 8px;
   margin-bottom: 8px;
   align-items: center;
+  cursor: pointer;
 }
 
 .log .time {
-  width: 150px;
+  width: 200px;
 }
 
 .log .ip {
@@ -23,18 +25,30 @@
   width: 100px;
 }
 
+.log .loginId {
+  width: 100px;
+}
+
 .log .method {
   width: 100px;
 }
 
 .log .api {
   flex: 1;
-  /* Flex the remaining space */
 }
 
 .request,
 .response {
   flex: 1;
+}
+
+#menu-area-section {
+  display: flex;
+  gap: 10px;
+}
+
+#page-move-button-section {
+  text-align: center;
 }
 
 #column {
