@@ -1,8 +1,10 @@
+require("dotenv").config();
+
 module.exports = {
-  secretKey: "YoOdOnGsEoN",
+  secretKey: process.env.JWT_SECRET_KEY,
   option: {
     "algorithm": "HS256",
-    "expiresIn": "10m",
+    "expiresIn": "1h",
     "issuer": "ehdtjs.com"
   }
 }
