@@ -8,335 +8,334 @@ const postId = parseUrl();
 let commentCount = commentsSection.childElementCount;
 
 window.onload = async () => {
-  const json = await checkAuth();
-  userId = json.data.userPk;
-  const postAuthor = await displayPost();
+    const json = await checkAuth();
+    userId = json.data.userPk;
+    const postAuthor = await displayPost();
 
-  // 해당 포스트의 주인일 경우
-  if (userId === postAuthor) {
-    // 수정, 삭제 버튼 생성
-    makeManagePostUI();
-  }
-  await displayComment();
+    // 해당 포스트의 주인일 경우
+    if (userId === postAuthor) {
+        // 수정, 삭제 버튼 생성
+        makeManagePostUI();
+    }
+    await displayComment();
 }
 
 async function displayPost() {
-  try {
-    const res = await fetch("/api/post/" + postId);
-    const json = await res.json();
+    try {
+        const res = await fetch("/api/post/" + postId);
+        const json = await res.json();
 
-    if (res.status === 200) {
-      if (json.data !== null) {
-        const post = json.data;
+        if (res.status === 200) {
+            if (json.data !== null) {
+                const post = json.data;
 
-        const postTitle = document.getElementById("post-title");
-        const postAuthor = document.getElementById("post-author");
-        const postContent = document.getElementById("post-content");
-        const postCreateDate = document.getElementById("post-create-date");
-        const postUpdateDate = document.getElementById("post-update-date");
+                const postTitle = document.getElementById("post-title");
+                const postAuthor = document.getElementById("post-author");
+                const postContent = document.getElementById("post-content");
+                const postCreateDate = document.getElementById("post-create-date");
+                const postUpdateDate = document.getElementById("post-update-date");
 
-        const parsingUpdatedDate = new Date(post.updated_date).toLocaleDateString();
-        const parsingCreateDate = new Date(post.created_date).toLocaleString();
+                const parsingUpdatedDate = new Date(post.updated_date).toLocaleDateString();
+                const parsingCreateDate = new Date(post.created_date).toLocaleString();
 
-        postTitle.innerHTML = post.title;
-        postAuthor.innerHTML = "작성자: " + post.author_name;
-        postContent.innerHTML = post.content;
-        postCreateDate.innerHTML = "작성일: " + parsingUpdatedDate;
-        postUpdateDate.innerHTML = "최근 수정일: " + parsingCreateDate;
-        return post.user_id;
-      } 
-    } else if (res.status === 404) {
-      location.href = "../pages/404.html";
-    } else if (res.status === 401 || res.status === 419) {
-      alert(json.message);
-      location.href = "/";
-    } else if (res.status === 500) {
-      alert("데이터베이스 오류");
-      location.href = "/";
+                postTitle.innerHTML = post.title;
+                postAuthor.innerHTML = "작성자: " + post.author_name;
+                postContent.innerHTML = post.content;
+                postCreateDate.innerHTML = "작성일: " + parsingUpdatedDate;
+                postUpdateDate.innerHTML = "최근 수정일: " + parsingCreateDate;
+                return post.user_id;
+            }
+        } else if (res.status === 404) {
+            location.href = "../pages/404.html";
+        } else if (res.status === 401 || res.status === 419) {
+            alert(json.message);
+            location.href = "/";
+        } else if (res.status === 500) {
+            alert("데이터베이스 오류");
+            location.href = "/";
+        }
+
+    } catch (error) {
+        console.error(error);
+        location.href = "/";
     }
-
-  } catch (error) {
-    console.error(error);
-    alert("네트워크 오류: " + error);
-    location.href = "/";
-  }
 }
 
 async function displayComment() {
     try {
-      const json = await loadCommentFetch(postId);
-      if (json.data !== null) {
-        commentCount = json.data.length; // 댓글 숫자 업데이트
+        const json = await loadCommentFetch(postId);
+        if (json.data !== null) {
+            commentCount = json.data.length; // 댓글 숫자 업데이트
 
-      if (commentCount === 0){
-        commentsCount.innerHTML = "댓글이 존재하지 않습니다";
-      } else {
-        commentsCount.innerHTML = commentCount + "개의 댓글";
-      }
-      // if (json.data.length !== 0) {
-      json.data.forEach(comment => {
-        makeCommentList(comment);
-      });
+            if (commentCount === 0) {
+                commentsCount.innerHTML = "댓글이 존재하지 않습니다";
+            } else {
+                commentsCount.innerHTML = commentCount + "개의 댓글";
+            }
+            // if (json.data.length !== 0) {
+            json.data.forEach(comment => {
+                makeCommentList(comment);
+            });
+        }
+
+    } catch (error) {
+        console.log(error);
     }
-
-  } catch (error) {
-    console.log(error);
-  }
 }
 
 async function loadCommentFetch(postId) {
-  try {
-    const result = await fetch("/api/comment/post/" + postId);
-    const json = await result.json();
+    try {
+        const result = await fetch("/api/comment/post/" + postId);
+        const json = await result.json();
 
-    if (result.status === 200) {
-      return json;
+        if (result.status === 200) {
+            return json;
 
-    } else if (result.status === 400) {
-      alert("잘못된 요청: " + json.message)
-      location.href = "/community";
-    } else if (result.status === 401 || result.status === 419) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 500) {
-      alert(json.message);
+        } else if (result.status === 400) {
+            alert("잘못된 요청: " + json.message)
+            location.href = "/community";
+        } else if (result.status === 401 || result.status === 419) {
+            alert(json.message);
+            location.href = "/";
+        } else if (result.status === 500) {
+            alert(json.message);
+        }
+    } catch (error) {
+        console.error(error.message);
     }
-   } catch (error) {
-    console.error(error.message);
-  }
 }
 
 function parseUrl() {
-  const url = window.location.href.split("/");
-  const postId = url[url.length - 1];
+    const url = window.location.href.split("/");
+    const postId = url[url.length - 1];
 
-  return postId;
+    return postId;
 }
 
 function makeCommentList(comment) {
-  const commentDiv = document.createElement("div");
-  const commentInfoArea = document.createElement("div");
-  const commentAuthor = document.createElement("p");
-  const commentCreatedDate = document.createElement("p");
-  const commentUpdatedDate = document.createElement("p");
-  const commentContent = document.createElement("p");
+    const commentDiv = document.createElement("div");
+    const commentInfoArea = document.createElement("div");
+    const commentAuthor = document.createElement("p");
+    const commentCreatedDate = document.createElement("p");
+    const commentUpdatedDate = document.createElement("p");
+    const commentContent = document.createElement("p");
 
-  const parsedCreatedDate = new Date(comment.created_date).toLocaleString();
-  const parsedUpdatedDate = new Date(comment.updated_date).toDateString();
+    const parsedCreatedDate = new Date(comment.created_date).toLocaleString();
+    const parsedUpdatedDate = new Date(comment.updated_date).toDateString();
 
-  commentAuthor.innerHTML = "작성자: " + comment.authorName;
-  commentCreatedDate.innerHTML = "작성일: " + parsedCreatedDate;
-  commentUpdatedDate.innerHTML = "최근 수정일: " + parsedUpdatedDate;
-  commentContent.innerHTML = comment.content;
+    commentAuthor.innerHTML = "작성자: " + comment.authorName;
+    commentCreatedDate.innerHTML = "작성일: " + parsedCreatedDate;
+    commentUpdatedDate.innerHTML = "최근 수정일: " + parsedUpdatedDate;
+    commentContent.innerHTML = comment.content;
 
-  commentInfoArea.appendChild(commentAuthor);
-  commentInfoArea.appendChild(commentCreatedDate);
-  commentInfoArea.appendChild(commentUpdatedDate);
-  commentDiv.appendChild(commentInfoArea);
-  commentDiv.appendChild(commentContent);
+    commentInfoArea.appendChild(commentAuthor);
+    commentInfoArea.appendChild(commentCreatedDate);
+    commentInfoArea.appendChild(commentUpdatedDate);
+    commentDiv.appendChild(commentInfoArea);
+    commentDiv.appendChild(commentContent);
 
-  // 만약 현재 보고있는 유저와 댓글의 아이디가 일치하면 (댓글주인일경우)
-  if (userId == comment.user_id) {
-    makeMamnageCommentUI(commentDiv, comment.id);
-  }
+    // 만약 현재 보고있는 유저와 댓글의 아이디가 일치하면 (댓글주인일경우)
+    if (userId == comment.user_id) {
+        makeMamnageCommentUI(commentDiv, comment.id);
+    }
 
-  commentsSection.appendChild(commentDiv);
+    commentsSection.appendChild(commentDiv);
 
-  commentDiv.classList.add("comment");
-  commentInfoArea.classList.add("comment-info-area");
-  commentAuthor.classList.add("comment-author");
-  commentCreatedDate.classList.add("comment-date");
-  commentUpdatedDate.classList.add("comment-date");
-  commentContent.classList.add("comment-content");
+    commentDiv.classList.add("comment");
+    commentInfoArea.classList.add("comment-info-area");
+    commentAuthor.classList.add("comment-author");
+    commentCreatedDate.classList.add("comment-date");
+    commentUpdatedDate.classList.add("comment-date");
+    commentContent.classList.add("comment-content");
 }
 
 function makeManagePostUI() {
-  const buttonZone = document.createElement("div");
-  const postModifyButton = document.createElement("button");
-  const postDeleteButton = document.createElement("button");
+    const buttonZone = document.createElement("div");
+    const postModifyButton = document.createElement("button");
+    const postDeleteButton = document.createElement("button");
 
-  postModifyButton.innerHTML = "수정";
-  postDeleteButton.innerHTML = "삭제";
+    postModifyButton.innerHTML = "수정";
+    postDeleteButton.innerHTML = "삭제";
 
-  buttonZone.id = "button-zone";
-  postModifyButton.id = "postModifyButton";
-  postDeleteButton.id = "postDeleteButton";
+    buttonZone.id = "button-zone";
+    postModifyButton.id = "postModifyButton";
+    postDeleteButton.id = "postDeleteButton";
 
-  postModifyButton.onclick = clickPostModifyButton;
-  postDeleteButton.onclick = clickPostDeleteButton;
+    postModifyButton.onclick = clickPostModifyButton;
+    postDeleteButton.onclick = clickPostDeleteButton;
 
-  buttonZone.appendChild(postModifyButton);
-  buttonZone.appendChild(postDeleteButton);
+    buttonZone.appendChild(postModifyButton);
+    buttonZone.appendChild(postDeleteButton);
 
-  postInfoArea.appendChild(buttonZone);
+    postInfoArea.appendChild(buttonZone);
 }
 
 function makeMamnageCommentUI(commentDiv, commentId) {
-  const commentModifyBtn = document.createElement("button");
-  const commentDeleteBtn = document.createElement("button");
+    const commentModifyBtn = document.createElement("button");
+    const commentDeleteBtn = document.createElement("button");
 
-  commentModifyBtn.innerHTML = "수정";
-  commentDeleteBtn.innerHTML = "삭제";
+    commentModifyBtn.innerHTML = "수정";
+    commentDeleteBtn.innerHTML = "삭제";
 
-  commentDiv.appendChild(commentModifyBtn);
-  commentDiv.appendChild(commentDeleteBtn);
+    commentDiv.appendChild(commentModifyBtn);
+    commentDiv.appendChild(commentDeleteBtn);
 
-  // commentModifyBtn.onclick = clickCommentModifyButton;
-  commentDeleteBtn.onclick = () => clickCommentDeleteButton(commentId);
+    // commentModifyBtn.onclick = clickCommentModifyButton;
+    commentDeleteBtn.onclick = () => clickCommentDeleteButton(commentId);
 }
 
 function clickPostModifyButton() {
-  location.href = `/modify-post/${postId}`;
+    location.href = `/modify-post/${postId}`;
 }
 
 async function clickPostDeleteButton() {
-  const askDelete = confirm("게시글을 삭제하시겠습니까?");
-  if (!askDelete) {
-    return;
-  }
-
-  try {
-    const result = await fetch("/api/post", {
-      "method": "DELETE",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": JSON.stringify({
-        "postId": `${postId}`,
-      })
-    });
-
-    const data = await result.json();
-    if (result.status === 200) {
-      if (data.isSuccess) {
-        location.href = "/community";
-      } else {
-        alert(data.message);
-      }
-    } else if (result.status === 400) {
-      alert(json.message);
-      location.href = "/community";
-    } else if (result.status === 401 || result.status === 419) {
-      alert(json.message);
-      location.href = "/";
-    } else if (result.status === 500) {
-      alert(json.message);
+    const askDelete = confirm("게시글을 삭제하시겠습니까?");
+    if (!askDelete) {
+        return;
     }
-  } catch (error) {
-    alert("데이터베이스 오류: " + error);
-    console.error(error);
-  }
+
+    try {
+        const result = await fetch("/api/post", {
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify({
+                "postId": `${postId}`,
+            })
+        });
+
+        const data = await result.json();
+        if (result.status === 200) {
+            if (data.isSuccess) {
+                location.href = "/community";
+            } else {
+                alert(data.message);
+            }
+        } else if (result.status === 400) {
+            alert(json.message);
+            location.href = "/community";
+        } else if (result.status === 401 || result.status === 419) {
+            alert(json.message);
+            location.href = "/";
+        } else if (result.status === 500) {
+            alert(json.message);
+        }
+    } catch (error) {
+        alert("데이터베이스 오류: " + error);
+        console.error(error);
+    }
 }
 
 async function clickCommentSubmitBtn() {
-  const commentContent = document.getElementById("comment-input");
+    const commentContent = document.getElementById("comment-input");
 
-  if (!userId) {
-    alert("로그인 후 이용해주세요");
-    return;
-  }
-
-  if (commentContent.value === "") {
-    alert("댓글이 입력되지 않았습니다");
-    return;
-  }
-
-  if (commentContent.value.length > 300) {
-    alert("댓글은 300자 내로 입력해주세요");
-    return;
-  }
-
-  try {
-    const res = await fetch("/api/comment", {
-      "method": "POST",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-
-      "body": JSON.stringify({
-        "postId": postId,
-        "content": commentContent.value
-      })
-    });
-    const json = await res.json();
-
-    if (res.status === 200) {
-      if (json.isSuccess) {
-        commentsSection.innerHTML = "";
-        commentContent.value = "";
-        commentCount += 1;
-        await displayComment();
-      } else {
-        alert(json.message);
-        location.href = "/community";
-      }
-    } else if (res.status === 400) {
-      alert(json.message);
-      location.href = "/community";
-    } else if (res.status === 401 || res.status === 419) {
-      alert(json.message);
-      location.href = "/";
-    } else {
-      alert(json.message);
+    if (!userId) {
+        alert("로그인 후 이용해주세요");
+        return;
     }
-  } catch (error) {
-    console.error(error);
-    alert(error);
-  }
+
+    if (commentContent.value === "") {
+        alert("댓글이 입력되지 않았습니다");
+        return;
+    }
+
+    if (commentContent.value.length > 300) {
+        alert("댓글은 300자 내로 입력해주세요");
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/comment", {
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+
+            "body": JSON.stringify({
+                "postId": postId,
+                "content": commentContent.value
+            })
+        });
+        const json = await res.json();
+
+        if (res.status === 200) {
+            if (json.isSuccess) {
+                commentsSection.innerHTML = "";
+                commentContent.value = "";
+                commentCount += 1;
+                await displayComment();
+            } else {
+                alert(json.message);
+                location.href = "/community";
+            }
+        } else if (res.status === 400) {
+            alert(json.message);
+            location.href = "/community";
+        } else if (res.status === 401 || res.status === 419) {
+            alert(json.message);
+            location.href = "/";
+        } else {
+            alert(json.message);
+        }
+    } catch (error) {
+        console.error(error);
+        alert(error);
+    }
 }
 
 async function clickCommentModifyButton() {
-  const commentInfoArea = document.querySelector(".comment-info-area");
-  const modifyCommentInput = document.createElement("input");
+    const commentInfoArea = document.querySelector(".comment-info-area");
+    const modifyCommentInput = document.createElement("input");
 
-  commentInfoArea.appendChild(modifyCommentInput);
+    commentInfoArea.appendChild(modifyCommentInput);
 }
 
 async function clickCommentDeleteButton(commentId) {
-  const askDelete = confirm("댓글을 삭제하시겠습니까?");
-  if (!askDelete) {
-    return;
-  }
+    const askDelete = confirm("댓글을 삭제하시겠습니까?");
+    if (!askDelete) {
+        return;
+    }
 
-  await deleteCommentFetch(postId, commentId);
-  commentsSection.innerHTML = "";
-  if (commentCount !== 0) {
-    commentCount -= 1; // 댓글 숫자 감소
-  }
-  
-  await displayComment();
+    await deleteCommentFetch(postId, commentId);
+    commentsSection.innerHTML = "";
+    if (commentCount !== 0) {
+        commentCount -= 1; // 댓글 숫자 감소
+    }
+
+    await displayComment();
 }
 
 async function deleteCommentFetch(postId, commentId) {
-  try {
-    const result = await fetch("/api/comment", {
-      "method": "DELETE",
-      "headers": {
-        "Content-Type": "application/json"
-      },
-      "body": JSON.stringify({
-        "postId": postId,
-        "commentId": commentId,
-      })
-    });
+    try {
+        const result = await fetch("/api/comment", {
+            "method": "DELETE",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify({
+                "postId": postId,
+                "commentId": commentId,
+            })
+        });
 
-    const json = await result.json();
-    if (result.status === 200) {
-      if (!json.isSuccess) {
-        alert("해당하는 댓글이 존재하지 않습니다");
-      }
+        const json = await result.json();
+        if (result.status === 200) {
+            if (!json.isSuccess) {
+                alert("해당하는 댓글이 존재하지 않습니다");
+            }
 
-    } else if (result.status === 400) {
-        alert("잘못된 요청: " + json.message);
-    } else if (result.status === 500) {
-        alert("서버 에러,");
+        } else if (result.status === 400) {
+            alert("잘못된 요청: " + json.message);
+        } else if (result.status === 500) {
+            alert("서버 에러,");
+        }
+
+    } catch (error) {
+        console.error(error);
     }
-
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 backBtn.addEventListener("click", () => {
-  location.href = "/community"
+    location.href = "/community"
 })

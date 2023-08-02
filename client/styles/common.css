@@ -3,3 +3,7 @@ body {
   background-position: center;
   margin: 0;
 }
+
+button {
+  cursor: pointer;
+}

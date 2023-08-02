@@ -34,7 +34,7 @@ app.use("/api/log", logApi);
 
 // 404 error handling
 app.use((req, res, next) => {
-  res.status(404).sendFile(path.join(CLIENT_PATH, '404.html'))
+    res.status(404).sendFile(path.join(CLIENT_PATH, '404.html'))
 });
 
 // error catch middleware

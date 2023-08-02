@@ -63,6 +63,6 @@ body {
   cursor: pointer;
 }
 
-.home-button {
+#home-button {
   background-color: #dc3545;
 }
