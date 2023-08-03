@@ -21,11 +21,10 @@ const data = {
 window.onload = async () => {
     // 관리자 권한 체크
     try {
-        // await adminAuthCheck();
+        await adminAuthCheck();
         const logsCount = await getDocumentCountFetch();
         apiCounts = logsCount;
         maxPageCount = Math.ceil(logsCount / 16);
-
 
         await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
     } catch (error) {
@@ -41,15 +40,15 @@ const onchangePage = (page) => {
 const updatePageMoveButton = () => {
     if (currentPage === 1) {
         prevPageBtn.disabled = true;
-    } else {
-        prevPageBtn.disabled = false;
+        return;
     }
+    prevPageBtn.disabled = false;
 
     if (currentPage === maxPageCount) {
         nextPageBtn.disabled = true;
-    } else {
-        nextPageBtn.disabled = false;
+        return;
     }
+    nextPageBtn.disabled = false;
 }
 
 const getDocumentCountFetch = async () => {
