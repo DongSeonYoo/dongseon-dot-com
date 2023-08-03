@@ -1,10 +1,12 @@
 const { secretKey, option } = require("../../config/secretKey");
 const jwt = require("jsonwebtoken");
 
-const userSign = async (userPk, loginId) => {
+const userSign = async (user) => {
     const payload = {
-        userPk,
-        loginId,
+        userPk: user.id,
+        name: user.name,
+        phoneNumber: user.phone_number,
+        email: user.email,
         role: "user",
     }
     return jwt.sign(payload, secretKey, option);
