@@ -14,6 +14,7 @@ const commentApi = require("./src/router/comment");
 const authApi = require("./src/router/auth");
 const logApi = require("./src/router/log");
 
+require("./src/module/schedule");
 require("dotenv").config();
 
 // 전역 미들웨어
