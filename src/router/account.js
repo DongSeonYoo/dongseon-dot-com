@@ -6,6 +6,8 @@ const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneN
 
 const loginAuth = require("../middleware/loginAuth");
 const jwt = require("../module/jwt");
+const dailyLoginCount = require("../module/dailyLoginCount");
+
 require("dotenv").config();
 
 router.post("/login", async (req, res, next) => {
@@ -37,6 +39,7 @@ router.post("/login", async (req, res, next) => {
         if (data.rows.length !== 0) {
             const userData = data.rows[0];
             const token = await jwt.userSign(userData);
+            dailyLoginCount.writeUser(loginId);
 
             result.message = "로그인 성공";
             result.token = token;
