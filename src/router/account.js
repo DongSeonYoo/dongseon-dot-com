@@ -30,13 +30,15 @@ router.post("/login", async (req, res, next) => {
         client = createClient();
         await client.connect();
 
-        const sql = "SELECT id FROM user_TB WHERE login_id = $1 AND password = $2";
+        const sql = "SELECT id, name, email, phone_number FROM user_TB WHERE login_id = $1 AND password = $2";
         const params = [loginId, password];
         const data = await client.query(sql, params);
 
         if (data.rows.length !== 0) {
-            const userPk = data.rows[0].id;
-            const token = await jwt.userSign(userPk, loginId);
+            const userData = data.rows[0];
+            const token = await jwt.userSign(userData);
+
+            result.message = "로그인 성공";
             result.token = token;
         } else {
             result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
