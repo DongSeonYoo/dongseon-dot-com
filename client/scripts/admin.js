@@ -78,12 +78,15 @@ const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) =
                 logCountDiv.innerHTML = apiCounts + "개의 로그";
                 console.log(json.logCount);
             }
+        } else {
+            alert(json.message);
+            location.href = "/";
+            deleteCookie("accessToken");
         }
         updatePageMoveButton();
 
     } catch (error) {
         console.error(error);
-        alert(error.message);
     }
 }
 
