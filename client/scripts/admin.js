@@ -6,12 +6,17 @@ const nextPageBtn = document.getElementById("next-page-button");
 const logCountDiv = document.getElementById("log-count");
 const idSerchForm = document.getElementById("loginid-search-form");
 
+const recentSerchArea = document.getElementById("recent-search-area");
+
 let apiCounts;
 let maxPageCount;
+// 전역 검색 필터
 let selectedOrderValue = "recent";
 let selectedMethodValue = "all";
 let selectedSerchValue = "";
 let currentPage = 1;
+
+let recentSerch;
 
 const data = {
     req: "",
@@ -62,25 +67,23 @@ const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) =
         const response = await fetch(`/api/log?order=${order}&method=${method}&page=${page}&loginId=${loginId}`);
         const json = await response.json();
 
+        // 응답 성공시
         if (response.status === 200) {
             if (json.data) {
                 logSection.innerHTML = "";
-                const responsedData = json.data;
+                const responsedData = json.data.log;
                 responsedData.forEach(data => makeTag(data));
-            }
 
-            if (json.logCount) {
-                apiCounts = json.logCount;
+                apiCounts = json.data.logCount;
                 maxPageCount = Math.ceil(apiCounts / 16);
                 logCountDiv.innerHTML = apiCounts + "개의 로그";
-                return json.logCount;
+                updatePageMoveButton();
+                return apiCounts;
             }
-        } else {
+        } else if (response.status === 400) {
             alert(json.message);
-            location.href = "/";
-            deleteCookie("accessToken");
+            location.reload();
         }
-        updatePageMoveButton();
 
     } catch (error) {
         console.error(error);
@@ -202,7 +205,7 @@ const onclickSerchButton = () => {
     }
 
     if (selectedSerchValue) {
-        console.log(selectedSerchValue);
         loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage, selectedSerchValue);
+        idSerchForm.innerHTML = "";
     }
 }
