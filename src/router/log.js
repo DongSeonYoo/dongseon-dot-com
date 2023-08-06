@@ -12,7 +12,6 @@ router.get("/", adminAuth, async (req, res, next) => {
     const result = {
         data: "",
     }
-    console.log(`${method}, ${loginId === ""}`);
 
     let connect = null;
     try {
@@ -60,7 +59,6 @@ router.get("/", adminAuth, async (req, res, next) => {
             .countDocuments(queryOption);
 
         result.logCount = logCount;
-
         res.send(result);
 
     } catch (error) {
@@ -70,29 +68,5 @@ router.get("/", adminAuth, async (req, res, next) => {
         if (connect) connect.close();
     }
 });
-
-router.get("/count", adminAuth, async (req, res, next) => {
-    const result = {
-        data: "",
-    }
-    let connect = null;
-
-    try {
-        connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
-        const data = await connect
-            .db()
-            .collection("api_logs")
-            .countDocuments();
-
-        result.data = data;
-        res.send(result);
-
-    } catch (error) {
-        next(error);
-
-    } finally {
-        if (connect) connect.close();
-    }
-})
 
 module.exports = router;

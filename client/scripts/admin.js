@@ -22,11 +22,8 @@ window.onload = async () => {
     // 관리자 권한 체크
     try {
         await adminAuthCheck();
-        const logsCount = await getDocumentCountFetch();
-        apiCounts = logsCount;
-        maxPageCount = Math.ceil(logsCount / 16);
-
-        await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+        const logCount = await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+        apiCounts = logCount;
     } catch (error) {
         console.log(error);
     }
@@ -76,7 +73,7 @@ const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) =
                 apiCounts = json.logCount;
                 maxPageCount = Math.ceil(apiCounts / 16);
                 logCountDiv.innerHTML = apiCounts + "개의 로그";
-                console.log(json.logCount);
+                return json.logCount;
             }
         } else {
             alert(json.message);
@@ -199,6 +196,11 @@ const onclickNextButton = () => {
 
 const onclickSerchButton = () => {
     selectedSerchValue = idSerchForm.value;
+    if (selectedSerchValue === "") {
+        alert("아이디를 입력해주세요");
+        return;
+    }
+
     if (selectedSerchValue) {
         console.log(selectedSerchValue);
         loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage, selectedSerchValue);
