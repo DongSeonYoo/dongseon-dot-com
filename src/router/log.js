@@ -8,6 +8,8 @@ const adminAuth = require("../middleware/adminAuth");
 const { maxLoginIdLength } = require("../module/global");
 require("dotenv").config();
 
+// 과연 이 log 라우터에 로그불러오기, 최근검색어 둘다 넣는게 맞는건지? 파일을 역할별로 분리해야 할것같기도 하고
+
 // 한 페이지의 로그와 전체 로그의 개수를 보내주는 api
 router.get("/", adminAuth, async (req, res, next) => {
     let { order, method, page, loginId = "" } = req.query;
@@ -70,6 +72,63 @@ router.get("/", adminAuth, async (req, res, next) => {
 
     } finally {
         if (connect) connect.close();
+    }
+});
+
+// 입력된 로그인 아이디를 받아 redis sortedSet에 넣어주는 api
+router.post("/", adminAuth, async (req, res, next) => {
+    const { searchedId } = req.body;
+    console.log(searchedId);
+    const result = {
+        isSuccess: false,
+        message: "",
+    };
+
+    try {
+        exception(searchedId, "searchedId").checkInput().checkLength(0, maxLoginIdLength);
+        await redisClient.connect();
+
+        // redis 쿼리 실행
+        const redisRecentSearchKey = "recentSearch";
+        if (searchedId !== "") {
+            const timestamp = Math.floor(Date.now() / 1000);
+            await redisClient.zAdd(redisRecentSearchKey, {
+                score: timestamp,
+                value: searchedId
+            });
+            await redisClient.ZREMRANGEBYRANK(redisRecentSearchKey, 0, -6);
+        }
+        result.isSuccess = true;
+        res.send(result);
+
+        await redisClient.disconnect();
+
+    } catch (error) {
+        console.error(error);
+        result.message = error.message;
+        next(error);
+    }
+});
+
+// 최근 5개 검색 목록을 가져오는 api
+router.get("/recentSearch", adminAuth, async (req, res, next) => {
+    const result = {
+        data: null,
+    };
+
+    try {
+        await redisClient.connect();
+        const resultData = await redisClient.zRange("recentSearch", 0, -1);
+
+        result.data = resultData;
+        res.send(result);
+
+    } catch (error) {
+        console.error(error);
+        next(error);
+
+    } finally {
+        await redisClient.disconnect();
     }
 });
 

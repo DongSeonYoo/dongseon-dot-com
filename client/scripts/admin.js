@@ -1,4 +1,6 @@
 const logSection = document.getElementById("log-section");
+const menuAreaSection = document.getElementById("menu-area-section");
+
 const recentOption = document.getElementById("recent-option");
 const oldOption = document.getElementById("old-option");
 const prevPageBtn = document.getElementById("prev-page-button");
@@ -15,13 +17,6 @@ let selectedOrderValue = "recent";
 let selectedMethodValue = "all";
 let selectedSerchValue = "";
 let currentPage = 1;
-
-let recentSerch;
-
-const data = {
-    req: "",
-    res: "",
-};
 
 window.onload = async () => {
     // 관리자 권한 체크
@@ -51,43 +46,6 @@ const updatePageMoveButton = () => {
         return;
     }
     nextPageBtn.disabled = false;
-}
-
-const getDocumentCountFetch = async () => {
-    const response = await fetch("/api/log/count");
-    const json = await response.json();
-
-    if (response.status === 200) {
-        return json.data;
-    }
-}
-
-const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) => {
-    try {
-        const response = await fetch(`/api/log?order=${order}&method=${method}&page=${page}&loginId=${loginId}`);
-        const json = await response.json();
-
-        // 응답 성공시
-        if (response.status === 200) {
-            if (json.data) {
-                logSection.innerHTML = "";
-                const responsedData = json.data.log;
-                responsedData.forEach(data => makeTag(data));
-
-                apiCounts = json.data.logCount;
-                maxPageCount = Math.ceil(apiCounts / 16);
-                logCountDiv.innerHTML = apiCounts + "개의 로그";
-                updatePageMoveButton();
-                return apiCounts;
-            }
-        } else if (response.status === 400) {
-            alert(json.message);
-            location.reload();
-        }
-
-    } catch (error) {
-        console.error(error);
-    }
 }
 
 const makeTag = (data) => {
@@ -156,6 +114,14 @@ const makeTag = (data) => {
     logSection.appendChild(logDiv);
 }
 
+const makeRecentSearchTag = (data) => {
+    const recentSearchTag = document.createElement("div");
+    recentSearchTag.innerHTML = data;
+
+    recentSerchArea.appendChild(recentSearchTag);
+    menuAreaSection.appendChild(recentSerchArea);
+}
+
 const clickLog = (e) => {
     console.log(e.target)
 }
@@ -204,8 +170,103 @@ const onclickSerchButton = () => {
         return;
     }
 
+    if (selectedSerchValue.length > 20) {
+        alert("아이디는 20자 이하로 입력해주세요");
+        idSerchForm.value = "";
+        return;
+    }
+
     if (selectedSerchValue) {
+        registerSearchHistoryFetch();
         loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage, selectedSerchValue);
-        idSerchForm.innerHTML = "";
+    }
+
+}
+
+const onclickInitFilter = () => {
+    // selectedOrderValue = "recent";
+    // selectedMethodValue = "all";
+    // currentPage = 1;
+    // selectedSerchValue = "";
+
+    // loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    // 임..시....방.......편
+    location.reload();
+}
+
+const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) => {
+    try {
+        const response = await fetch(`/api/log?order=${order}&method=${method}&page=${page}&loginId=${loginId}`);
+        const json = await response.json();
+
+        // 응답 성공시
+        if (response.status === 200) {
+            if (json.data) {
+                logSection.innerHTML = "";
+                recentSerchArea.innerHTML = "";
+
+                const responsedData = json.data.log;
+                responsedData.forEach(data => makeTag(data));
+
+                apiCounts = json.data.logCount;
+                maxPageCount = Math.ceil(apiCounts / 16);
+                logCountDiv.innerHTML = apiCounts + "개의 로그";
+                updatePageMoveButton();
+                loadSearchHistoryFetch();
+                return apiCounts;
+            }
+        } else if (response.status === 400) {
+            alert(json.message);
+            return;
+        }
+
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const getDocumentCountFetch = async () => {
+    const response = await fetch("/api/log/count");
+    const json = await response.json();
+
+    if (response.status !== 200) {
+        alert(json.message);
+        return;
+    }
+
+    return json.data;
+}
+
+const registerSearchHistoryFetch = async () => {
+    const response = await fetch("/api/log", {
+        "method": "POST",
+        "headers": {
+            "Content-Type": "application/json"
+        },
+        "body": JSON.stringify({
+            "searchedId": selectedSerchValue
+        }),
+    });
+
+    const data = await response.json();
+    if (response.status !== 200) {
+        console.error(data.message);
+        alert(data.message);
+    }
+};
+
+const loadSearchHistoryFetch = async () => {
+    try {
+        const response = await fetch("/api/log/recentSearch");
+        const json = await response.json();
+
+        if (response.status !== 200) {
+            alert(json.message);
+            return;
+        }
+        const recentSearchData = json.data.reverse();
+        recentSearchData.forEach((data) => makeRecentSearchTag(data));
+    } catch (error) {
+        console.error(error);
     }
 }
