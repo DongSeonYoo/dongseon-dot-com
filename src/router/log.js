@@ -8,6 +8,7 @@ const adminAuth = require("../middleware/adminAuth");
 const { maxLoginIdLength } = require("../module/global");
 require("dotenv").config();
 
+const redisRecentSearchKey = process.env.REDIS_RECENT_SEARCH;
 // 과연 이 log 라우터에 로그불러오기, 최근검색어 둘다 넣는게 맞는건지? 파일을 역할별로 분리해야 할것같기도 하고
 
 // 한 페이지의 로그와 전체 로그의 개수를 보내주는 api
