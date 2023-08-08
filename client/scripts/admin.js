@@ -177,8 +177,7 @@ const onclickSerchButton = () => {
     }
 
     if (selectedSerchValue) {
-        registerSearchHistoryFetch();
-        loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage, selectedSerchValue);
+        loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
     }
 
 }
@@ -236,24 +235,6 @@ const getDocumentCountFetch = async () => {
 
     return json.data;
 }
-
-const registerSearchHistoryFetch = async () => {
-    const response = await fetch("/api/log", {
-        "method": "POST",
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": JSON.stringify({
-            "searchedId": selectedSerchValue
-        }),
-    });
-
-    const data = await response.json();
-    if (response.status !== 200) {
-        console.error(data.message);
-        alert(data.message);
-    }
-};
 
 const loadSearchHistoryFetch = async () => {
     try {

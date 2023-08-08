@@ -46,6 +46,7 @@ router.get("/", adminAuth, async (req, res, next) => {
 
         // db연결
         connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
+        await redisClient.connect();
 
         // mongodb 쿼리 실행
         const logData = await connect
@@ -61,52 +62,30 @@ router.get("/", adminAuth, async (req, res, next) => {
             .collection("api_logs")
             .countDocuments(queryOption);
 
+        // redis 쿼리 실행
+        if (loginId.length !== 0) {
+            const timestamp = Math.floor(Date.now() / 1000);
+            await redisClient.zAdd(redisRecentSearchKey, {
+                score: timestamp,
+                value: loginId
+            });
+            await redisClient.ZREMRANGEBYRANK(redisRecentSearchKey, 0, -6);
+        }
+
         // 결과 담아주자
+        result.isSuccess = true;
         result.data.log = logData;
         result.data.logCount = logCount;
         res.send(result);
 
+        await redisClient.disconnect();
+        
     } catch (error) {
         console.error(error);
         next(error);
 
     } finally {
         if (connect) connect.close();
-    }
-});
-
-// 입력된 로그인 아이디를 받아 redis sortedSet에 넣어주는 api
-router.post("/", adminAuth, async (req, res, next) => {
-    const { searchedId } = req.body;
-    console.log(searchedId);
-    const result = {
-        isSuccess: false,
-        message: "",
-    };
-
-    try {
-        exception(searchedId, "searchedId").checkInput().checkLength(0, maxLoginIdLength);
-        await redisClient.connect();
-
-        // redis 쿼리 실행
-        const redisRecentSearchKey = "recentSearch";
-        if (searchedId !== "") {
-            const timestamp = Math.floor(Date.now() / 1000);
-            await redisClient.zAdd(redisRecentSearchKey, {
-                score: timestamp,
-                value: searchedId
-            });
-            await redisClient.ZREMRANGEBYRANK(redisRecentSearchKey, 0, -6);
-        }
-        result.isSuccess = true;
-        res.send(result);
-
-        await redisClient.disconnect();
-
-    } catch (error) {
-        console.error(error);
-        result.message = error.message;
-        next(error);
     }
 });
 
@@ -118,17 +97,17 @@ router.get("/recentSearch", adminAuth, async (req, res, next) => {
 
     try {
         await redisClient.connect();
-        const resultData = await redisClient.zRange("recentSearch", 0, -1);
+        const resultData = await redisClient.zRange(redisRecentSearchKey, 0, -1);
 
         result.data = resultData;
         res.send(result);
+
+        await redisClient.disconnect();
 
     } catch (error) {
         console.error(error);
         next(error);
 
-    } finally {
-        await redisClient.disconnect();
     }
 });
 
