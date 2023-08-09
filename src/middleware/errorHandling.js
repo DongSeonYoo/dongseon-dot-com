@@ -5,26 +5,31 @@ const errorHandling = () => {
         }
         // 유효하지 않은 요청
         if (err.status === 400) {
+            console.error(err.message);
             result.message = err.message;
             res.status(400).send(result);
 
             // 토큰 inavlid
         } else if (err.status === 401) {
+            console.error(err);
             result.message = "로그인 후 이용가능합니다";
             res.status(401).send(result);
 
             // 토큰 expired
         } else if (err.status === 419) {
+            console.error(err.message);
             result.message = "토큰이 만료되었습니다, 다시 로그인해주세요";
             res.status(401).send(result);
 
             // 권한 거부
         } else if (err.status === 403) {
+            console.error(err.message);
             result.message = "권한이 거부되었습니다";
             res.status(403).send(result);
 
             // unique 제약조건 위반
         } else if (err.code === '23505') {
+            console.error(err.message);
             result.message = err.message;
             res.status(400).send(result);
 
