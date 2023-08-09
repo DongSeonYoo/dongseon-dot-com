@@ -3,9 +3,9 @@ const mongoClient = require("mongodb").MongoClient;
 const redisClient = require("redis").createClient();
 
 const exception = require("../module/exception");
-const { maxItemPerPage } = require("../module/global");
 const adminAuth = require("../middleware/adminAuth");
-const { maxLoginIdLength } = require("../module/global");
+
+const { maxItemPerPage, maxLoginIdLength } = require("../module/global");
 require("dotenv").config();
 
 const redisRecentSearchKey = process.env.REDIS_RECENT_SEARCH;
