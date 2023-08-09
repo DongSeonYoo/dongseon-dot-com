@@ -5,7 +5,7 @@ require("dotenv").config();
 module.exports = async (req, res, next) => {
     let client = null;
     // 쿠키에 담긴 토큰을 추출
-    const accessToken = req.cookies.accessToken;
+    const { accessToken } = req.cookies;
     try {
         // 쿠키 이름이 잘못되었을때?(쿠키 이름을 조작한경우)
         if (!accessToken) {
