@@ -3,46 +3,57 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
-  <link rel="stylesheet" href="../styles/admin.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="../styles/admin.css">
 </head>
 
 <body>
-  <section id="menu-area-section">
-    <select id="order-option-list" onchange="onchangeOrderOption()">
-      <option value="recent">최신 순</option>
-      <option value="old">오래된 순</option>
-    </select>
+    <section id="menu-area-section">
+        <select id="order-option-list" onchange="onchangeOrderOption()">
+            <option value="recent">최신 순</option>
+            <option value="old">오래된 순</option>
+        </select>
 
-    <select id="method-option-list" onchange="onchangeMethodOption()">
-      <option value="ALL">ALL</option>
-      <option value="GET">GET</option>
-      <option value="POST">POST</option>
-      <option value="PUT">PUT</option>
-      <option value="DELETE">DELETE</option>
-    </select>
+        <select id="method-option-list" onchange="onchangeMethodOption()">
+            <option value="ALL">ALL</option>
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="DELETE">DELETE</option>
+        </select>
 
-    <span id="log-count"></span>
-    <div>
-      <input id="loginid-search-form" type="text" placeholder="찾고싶은 아이디">
-      <button onclick="onclickSerchButton()">검 색</button>
-    </div>
-  </section>
+        <span id="log-count"></span>
+        <div>
+            <input id="loginid-search-form" type="text" placeholder="찾고싶은 아이디">
+            <button class="menu-button" onclick="onclickSerchButton()">검 색</button>
+            <button class="menu-button" onclick="onclickInitFilter()">검색조건 초기화</button>
+        </div>
+
+        <div>최근 검색어: </div>
+        <div id="recent-search-area">
+            <!-- <div class="recent-search">1</div>
+            <div class="recent-search">2</div>
+            <div class="recent-search">3</div>
+            <div class="recent-search">4</div>
+            <div class="recent-search">5</div> -->
+        </div>
+    </section>
 
 
-  <section id="log-section" class="log-container">
+    <section id="log-section" class="log-container">
 
-  </section>
+    </section>
 
-  <section id="page-move-button-section">
-    <button id="prev-page-button" onclick="onclickPrevButton()"> < </button>
-    <button id="next-page-button" onclick="onclickNextButton()"> > </button  ton>
-  </section>
+    <section id="page-move-button-section">
+        <button id="prev-page-button" onclick="onclickPrevButton()">
+            < </button>
+                <button id="next-page-button" onclick="onclickNextButton()"> > </button ton>
+    </section>
 
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/admin.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../scripts/admin.js"></script>
 </body>
 
 </html>

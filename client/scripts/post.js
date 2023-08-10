@@ -87,19 +87,13 @@ async function loadCommentFetch(postId) {
     try {
         const result = await fetch("/api/comment/post/" + postId);
         const json = await result.json();
-
-        if (result.status === 200) {
-            return json;
-
-        } else if (result.status === 400) {
-            alert("잘못된 요청: " + json.message)
-            location.href = "/community";
-        } else if (result.status === 401 || result.status === 419) {
+        if (result.status !== 200) {
             alert(json.message);
             location.href = "/";
-        } else if (result.status === 500) {
-            alert(json.message);
+            return;
         }
+        return json;
+
     } catch (error) {
         console.error(error.message);
     }
@@ -195,7 +189,7 @@ async function clickPostDeleteButton() {
     }
 
     try {
-        const result = await fetch("/api/post", {
+        const response = await fetch("/api/post", {
             "method": "DELETE",
             "headers": {
                 "Content-Type": "application/json"
@@ -205,25 +199,20 @@ async function clickPostDeleteButton() {
             })
         });
 
-        const data = await result.json();
-        if (result.status === 200) {
-            if (data.isSuccess) {
-                location.href = "/community";
-            } else {
-                alert(data.message);
-            }
-        } else if (result.status === 400) {
+        const data = await response.json();
+        if (response.status !== 200) {
             alert(json.message);
-            location.href = "/community";
-        } else if (result.status === 401 || result.status === 419) {
-            alert(json.message);
-            location.href = "/";
-        } else if (result.status === 500) {
-            alert(json.message);
+            return;
         }
+        if (!data.isSuccess) {
+            alert(data.message);
+            return;
+        }
+        location.href = "/community";
+
     } catch (error) {
-        alert("데이터베이스 오류: " + error);
         console.error(error);
+        alert("데이터베이스 오류: " + error);
     }
 }
 
@@ -246,7 +235,7 @@ async function clickCommentSubmitBtn() {
     }
 
     try {
-        const res = await fetch("/api/comment", {
+        const response = await fetch("/api/comment", {
             "method": "POST",
             "headers": {
                 "Content-Type": "application/json"
@@ -257,27 +246,17 @@ async function clickCommentSubmitBtn() {
                 "content": commentContent.value
             })
         });
-        const json = await res.json();
-
-        if (res.status === 200) {
-            if (json.isSuccess) {
-                commentsSection.innerHTML = "";
-                commentContent.value = "";
-                commentCount += 1;
-                await displayComment();
-            } else {
-                alert(json.message);
-                location.href = "/community";
-            }
-        } else if (res.status === 400) {
+        const json = await response.json();
+        if (response.status !== 200) {
             alert(json.message);
             location.href = "/community";
-        } else if (res.status === 401 || res.status === 419) {
-            alert(json.message);
-            location.href = "/";
-        } else {
-            alert(json.message);
+            return;
         }
+        commentsSection.innerHTML = "";
+        commentContent.value = "";
+        commentCount += 1;
+        await displayComment();
+
     } catch (error) {
         console.error(error);
         alert(error);
@@ -308,7 +287,7 @@ async function clickCommentDeleteButton(commentId) {
 
 async function deleteCommentFetch(postId, commentId) {
     try {
-        const result = await fetch("/api/comment", {
+        const response = await fetch("/api/comment", {
             "method": "DELETE",
             "headers": {
                 "Content-Type": "application/json"
@@ -319,16 +298,13 @@ async function deleteCommentFetch(postId, commentId) {
             })
         });
 
-        const json = await result.json();
-        if (result.status === 200) {
-            if (!json.isSuccess) {
-                alert("해당하는 댓글이 존재하지 않습니다");
-            }
-
-        } else if (result.status === 400) {
-            alert("잘못된 요청: " + json.message);
-        } else if (result.status === 500) {
-            alert("서버 에러,");
+        const json = await response.json();
+        if (response.status !== 200) {
+            alert(json.message);
+            return;
+        }
+        if (!json.isSuccess) {
+            alert("해당하는 댓글이 존재하지 않습니다");
         }
 
     } catch (error) {
@@ -338,4 +314,4 @@ async function deleteCommentFetch(postId, commentId) {
 
 backBtn.addEventListener("click", () => {
     location.href = "/community"
-})
+});

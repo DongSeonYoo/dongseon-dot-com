@@ -13,7 +13,6 @@ let existingValue = {
 };
 
 window.onload = async () => {
-    await checkAuth();
     loadPostData(postId);
 }
 
@@ -61,6 +60,11 @@ async function loadPostData(postId) {
         const result = await fetch("/api/post/" + postId);
         const json = await result.json();
 
+        if (result.status !== 200) {
+            alert(json.message);
+            location.href = "/";
+            return;
+        }
         postTitle.value = json.data.title;
         postContent.value = json.data.content;
 

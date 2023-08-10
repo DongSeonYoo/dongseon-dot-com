@@ -37,16 +37,16 @@ async function checkAuth() {
     try {
         const response = await fetch("/api/auth/login");
         const user = await response.json();
-        if (response.status === 200) {
-            return user;
+        if (response.status !== 200) {
+            deleteCookie("accessToken");
+            location.href = "/";
+            return false;
         }
-
-        deleteCookie("accessToken");
-        location.href = "/";
-        return false;
+        return user;
 
     } catch (error) {
         alert(error);
+        location.href = "/";
     }
 }
 

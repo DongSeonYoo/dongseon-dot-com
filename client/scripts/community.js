@@ -8,8 +8,8 @@ let allPostCounts;
 let currentPage = 1; // 현재 페이지 번호
 
 window.onload = async () => {
-    await checkAuth();
     try {
+        await checkAuth();
         // 게시글의 개수 먼저 불러오고
         const postCounts = await getPostCountFetch();
         allPostCounts = postCounts;
@@ -55,23 +55,19 @@ function clearPost() {
 // 게시글을 가져오는 요청을 하는 함수
 async function getPostFetch(count = 1) {
     try {
-        const result = await fetch(`/api/post?pageNumber=${count - 1}`);
-        const json = await result.json();
+        const response = await fetch(`/api/post?pageNumber=${count - 1}`);
+        const json = await response.json();
 
-        // 응답이 성공적으로 이루어졌을 경우
-        if (result.status === 200) {
-            // data가 null이 아니라면 성공적으로 게시글들을 불러온것
-            if (json.data !== null) {
-                json.data.forEach(post => {
-                    makePostList(post);
-                });
-            }
-            else {
-                // 만약 게시글이 null이라면 아무 게시글도 존재하지 않음
-            }
-
-        } else {
+        // 응답이 성공적으로 이루어지지 않았을 경우
+        if (response.status !== 200) {
+            alert(json.message);
             location.href = "/";
+            return;
+        }
+        if (json.data !== null) {
+            json.data.forEach(post => {
+                makePostList(post);
+            });
         }
 
     } catch (error) {
@@ -90,18 +86,37 @@ async function getPostFetch(count = 1) {
     });
 }
 
+// async function getPostCountFetch() {
+//     const result = await fetch("/api/post/all/count");
+//     const json = await result.json();
+//     if (result.status === 200) {
+//         if (json.data !== null) {
+//             return await json.data;
+//         } else {
+
+//         }
+
+//     } else {
+//         alert("서버 오류: " + json.message);
+//         location.href = "/";
+//     }
+// }
+
 async function getPostCountFetch() {
-    const result = await fetch("/api/post/all/count");
-    const json = await result.json();
-    if (result.status === 200) {
+    try {
+        const response = await fetch("/api/post/all/count");
+        const json = await response.json();
+        if (response.status !== 200) {
+            alert("서버 오류: " + json.message);
+            location.href = "/";
+            return;
+        }
         if (json.data !== null) {
             return await json.data;
-        } else {
-
         }
 
-    } else {
-        alert("서버 오류: " + json.message);
+    } catch (error) {
+        alert(error);
         location.href = "/";
     }
 }
@@ -146,10 +161,16 @@ homeBtn.addEventListener("click", () => {
 });
 
 createPostBtn.addEventListener("click", async () => {
-    const data = await checkAuth();
-    if (data) {
-        location.href = "/write-post";
-    } else {
+    try {
+        const data = await checkAuth();
+        if (data) {
+            location.href = "/write-post";
+            return;
+        }
         alert("로그인 후 이용가능합니다");
+
+    } catch (error) {
+        alert(error);
+        location.href = "/";
     }
 });

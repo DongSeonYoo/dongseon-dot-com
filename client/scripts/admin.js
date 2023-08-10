@@ -22,7 +22,7 @@ window.onload = async () => {
     // 관리자 권한 체크
     try {
         await adminAuthCheck();
-        const logCount = await loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+        const logCount = await loadApiFetch(selectedOrderValue, selectedMethodValue);
         apiCounts = logCount;
     } catch (error) {
         console.log(error);
@@ -31,7 +31,7 @@ window.onload = async () => {
 
 const onchangePage = (page) => {
     currentPage = page;
-    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    loadApiFetch(selectedOrderValue, selectedMethodValue);
 }
 
 const updatePageMoveButton = () => {
@@ -115,8 +115,15 @@ const makeTag = (data) => {
 }
 
 const makeRecentSearchTag = (data) => {
-    const recentSearchTag = document.createElement("div");
+    const recentSearchTag = document.createElement("button");
+    recentSearchTag.classList.add("recent-search");
     recentSearchTag.innerHTML = data;
+    recentSearchTag.onclick = function () {
+        selectedSerchValue = this.innerHTML;
+        idSerchForm.value = this.innerHTML;
+        currentPage = 1;
+        loadApiFetch(selectedOrderValue, selectedMethodValue);
+    }
 
     recentSerchArea.appendChild(recentSearchTag);
     menuAreaSection.appendChild(recentSerchArea);
@@ -139,16 +146,14 @@ const onchangeOrderOption = () => {
     const orderOptionList = document.getElementById("order-option-list");
 
     selectedOrderValue = orderOptionList[orderOptionList.selectedIndex].value;
-    currentPage = 1;
-    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    loadApiFetch(selectedOrderValue, selectedMethodValue);
 }
 
 const onchangeMethodOption = () => {
     const methodOptionList = document.getElementById("method-option-list");
 
     selectedMethodValue = methodOptionList[methodOptionList.selectedIndex].value;
-    currentPage = 1;
-    loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+    loadApiFetch(selectedOrderValue, selectedMethodValue);
 }
 
 const onclickPrevButton = () => {
@@ -177,7 +182,8 @@ const onclickSerchButton = () => {
     }
 
     if (selectedSerchValue) {
-        loadApiFetch(selectedOrderValue, selectedMethodValue, currentPage);
+        currentPage = 1;
+        loadApiFetch(selectedOrderValue, selectedMethodValue);
     }
 
 }
@@ -193,47 +199,34 @@ const onclickInitFilter = () => {
     location.reload();
 }
 
-const loadApiFetch = async (order, method, page, loginId = selectedSerchValue) => {
+const loadApiFetch = async (order, method, page = currentPage, loginId = selectedSerchValue) => {
     try {
         const response = await fetch(`/api/log?order=${order}&method=${method}&page=${page}&loginId=${loginId}`);
         const json = await response.json();
 
-        // 응답 성공시
-        if (response.status === 200) {
-            if (json.data) {
-                logSection.innerHTML = "";
-                recentSerchArea.innerHTML = "";
-
-                const responsedData = json.data.log;
-                responsedData.forEach(data => makeTag(data));
-
-                apiCounts = json.data.logCount;
-                maxPageCount = Math.ceil(apiCounts / 16);
-                logCountDiv.innerHTML = apiCounts + "개의 로그";
-                updatePageMoveButton();
-                loadSearchHistoryFetch();
-                return apiCounts;
-            }
-        } else if (response.status === 400) {
+        // 응답 실패시
+        if (response.status !== 200) {
             alert(json.message);
             return;
+        }
+        if (json.data) {
+            recentSerchArea.innerHTML = "";
+            loadSearchHistoryFetch();
+
+            logSection.innerHTML = "";
+            const responsedData = json.data.log;
+            responsedData.forEach(data => makeTag(data));
+            updatePageMoveButton();
+
+            apiCounts = json.data.logCount;
+            maxPageCount = Math.ceil(apiCounts / 16);
+            logCountDiv.innerHTML = apiCounts + "개의 로그";
+            return apiCounts;
         }
 
     } catch (error) {
         console.error(error);
     }
-}
-
-const getDocumentCountFetch = async () => {
-    const response = await fetch("/api/log/count");
-    const json = await response.json();
-
-    if (response.status !== 200) {
-        alert(json.message);
-        return;
-    }
-
-    return json.data;
 }
 
 const loadSearchHistoryFetch = async () => {

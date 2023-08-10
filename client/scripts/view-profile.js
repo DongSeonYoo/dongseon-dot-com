@@ -107,20 +107,13 @@ const editProfileFetch = async () => {
                 "email": email
             }),
         });
-
         const json = await result.json();
-
-        if (result.status === 200) {
-            if (json.isSuccess) {
-                location.href = "/";
-            } else {
-                alert("수정 실패: " + json.message);
-                location.href = "/";
-            }
-        } else if (result.status === 400) {
-            alert("잘못된 요청: " + json.message);
-        } else if (result.status === 500) {
-            alert("서버 에러, 관리자께 문의하삼");
+        if (result.status !== 200) {
+            alert(json.message);
+            location.href = "/";
+            return;
+        }
+        if (json.isSuccess) {
             location.href = "/";
         }
 
@@ -143,18 +136,15 @@ const dropUserFetch = async () => {
                 "userId": deleteUserPk,
             }),
         });
-
         const json = await res.json();
-        if (res.status === 200) {
-            if (json.isSuccess) {
-            } else {
-                alert("회원 탈퇴 실패: " + json.message);
-            }
-        } else if (res.status === 400) {
-            alert("잘못된 요청: " + json.message);
-        } else if (res.status === 500) {
-            alert("서버 오류, 관리자에게 문의해주세요");
+        if (res.status !== 200) {
+            alert(json.message);
+            return;
         }
+        if (!json.isSuccess) {
+            alert("회원 탈퇴 실패: " + json.message);
+        }
+        
     } catch (error) {
         alert("요청 오류: " + error.message);
         console.error(error);

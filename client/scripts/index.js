@@ -11,6 +11,8 @@ const signupBtn = document.querySelector("#sign-up-button");
 const findIdBtn = document.querySelector("#find-id-button");
 const findPwBtn = document.getElementById("find-pw-button");
 const communityBtn = document.getElementById("community-button");
+const recentLoginCount = document.getElementById("recent-login-user-count");
+const totalLoginCount = document.getElementById("total-login-user-count");
 // 현재 브라우저의 쿠키(토큰)를 가져옴
 const token = getCookie("accessToken");
 // 요소의 높이 계산
@@ -19,15 +21,51 @@ const homeHeight = home.getBoundingClientRect().height;
 // 로그인이 되어있으면 true, 되어있지 않으면 false(기본값)
 let isLoggedIn = false;
 
-// 세션적용 전까지 임시방편..... (일단건들 ㄴㄴ)
 window.onload = async () => {
-    if (token) {
-        isLoggedIn = await checkAuth();
-        if (isLoggedIn) {
-            makeOnlyLoginUI();
-        } else {
+    try {
+        if (token) {
+            isLoggedIn = await checkAuth();
             // 로그인되지 않은 상태라면 그대로 HTML 출력
+            if (!isLoggedIn) {
+                return;
+            }
+            makeOnlyLoginUI();
         }
+
+        recentLoginCountFetch();
+        totalLoginCountFetch();
+    } catch (error) {
+        alert(error);
+    }
+}
+
+const recentLoginCountFetch = async () => {
+    try {
+        const response = await fetch("/api/loginCount/hour");
+        const json = await response.json();
+        if (response.status !== 200) {
+            alert(json.message);
+            return;
+        }
+        recentLoginCount.innerHTML = `최근 1시간동안 로그인 한 회원의 수: ${json.data}`;   
+
+    } catch (error) {
+        alert(error);
+    }
+}
+
+const totalLoginCountFetch = async () => {
+    try {
+        const response = await fetch("/api/loginCount/total");
+        const json = await response.json();
+        if (response.status !== 200) {
+            alert(json.message);
+            return;
+        }
+        totalLoginCount.innerHTML = `지금까지 로그인한 횟수: ${json.data}`;
+
+    } catch (error) {
+        alert(error);
     }
 }
 
@@ -95,7 +133,7 @@ const loginFetch = async () => {
     try {
         const id = idInput.value;
         const pw = pwInput.value;
-        const res = await fetch("/api/account/login", {
+        const response = await fetch("/api/account/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -107,27 +145,25 @@ const loginFetch = async () => {
         });
 
         // 리다이렉트 된 경우
-        if (res.redirected) {
-            const redirectUrl = res.url;
+        if (response.redirected) {
+            const redirectUrl = response.url;
             window.location.href = redirectUrl;
             return;
         }
-
-        const json = await res.json();
-        if (res.status === 200) {
-            if (json.token) {
-                setCookie("accessToken", json.token);
-                location.reload();
-            } else {
-                alert(`로그인 실패: ${json.message}`);
-                clearInputFields();
-            }
-        } else if (res.status === 400) {
-            alert("잘못된 요청: " + json.message);
-            location.href = "/";
-        } else if (res.status === 500) {
-            alert("서버 오류: " + json.message);
+        const json = await response.json();
+        if (response.status !== 200) {
+            alert(json.message);
+            return;
         }
+
+        // 로그인 실패하였을 경우
+        if (!json.token) {
+            alert(`로그인 실패: ${json.message}`);
+            clearInputFields();
+            return;
+        }
+        setCookie("accessToken", json.token);
+        location.reload();
 
     } catch (error) {
         alert("error: " + error);
