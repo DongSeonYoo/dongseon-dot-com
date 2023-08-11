@@ -32,6 +32,8 @@ async function displayPost() {
                 const postTitle = document.getElementById("post-title");
                 const postAuthor = document.getElementById("post-author");
                 const postContent = document.getElementById("post-content");
+                const postText = document.createElement("div");
+                
                 const postCreateDate = document.getElementById("post-create-date");
                 const postUpdateDate = document.getElementById("post-update-date");
 
@@ -40,9 +42,21 @@ async function displayPost() {
 
                 postTitle.innerHTML = post.title;
                 postAuthor.innerHTML = "작성자: " + post.author_name;
-                postContent.innerHTML = post.content;
+                
+                postText.innerHTML = post.content;
+                postContent.appendChild(postText);
+                const s3ImageUrl = "http://yoodongseon.s3.ap-northeast-2.amazonaws.com";
+                if (post.image_key !== null) {
+                    post.image_key.forEach(item => {
+                        const postImage = document.createElement("img");
+                        postImage.src = s3ImageUrl + "/" + item;
+                        postImage.alt = "Image";
+                        postContent.appendChild(postImage);
+                    });
+                }
                 postCreateDate.innerHTML = "작성일: " + parsingUpdatedDate;
                 postUpdateDate.innerHTML = "최근 수정일: " + parsingCreateDate;
+
                 return post.user_id;
             }
         } else if (res.status === 404) {
@@ -52,14 +66,15 @@ async function displayPost() {
             location.href = "/";
         } else if (res.status === 500) {
             alert("데이터베이스 오류");
-            location.href = "/";
+            console.log(json);
         }
-
     } catch (error) {
-        console.error(error);
+        console.error(error.message);
+        alert("데이터베이스 오류");
         location.href = "/";
     }
 }
+
 
 async function displayComment() {
     try {

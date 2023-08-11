@@ -4,11 +4,13 @@ const createClient = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 const loginAuth = require("../middleware/loginAuth");
+const imageUploader = require("../middleware/imageUploader");
 
 // 게시글 작성 api
 // userId, title, content
-router.post("/", loginAuth, async (req, res, next) => {
+router.post("/", loginAuth, imageUploader.array("postImages"), async (req, res, next) => {
     const userId = req.decoded.userPk;
+    const images = req.files;
     const { title, content } = req.body;
     const result = {
         isSuccess: false,
@@ -23,8 +25,8 @@ router.post("/", loginAuth, async (req, res, next) => {
 
         client = createClient();
         await client.connect();
-        const sql = `INSERT INTO post_TB (user_id, title, content) VALUES ($1, $2, $3)`;
-        const params = [userId, title, content];
+        const sql = `INSERT INTO post_TB (user_id, title, content, image_key) VALUES ($1, $2, $3, $4)`;
+        const params = [userId, title, content, images.map(item => item.transforms[0].key)];
         const data = await client.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
@@ -43,7 +45,7 @@ router.post("/", loginAuth, async (req, res, next) => {
     }
 });
 
-// 모든 게시글 조회 api
+// 특정 페이지 게시글 조회 api
 // GET
 // 명사이자 단수형으로
 router.get("/", loginAuth, async (req, res, next) => {
@@ -63,7 +65,7 @@ router.get("/", loginAuth, async (req, res, next) => {
         await client.connect();
         const sql = `SELECT 
               post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
-              FROM post_TB 
+              FROM post_TB
               JOIN user_TB ON post_TB.user_id = user_TB.id 
               ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
         const params = [offset, counterPage];
@@ -94,7 +96,6 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     const { postId } = req.params;
     const result = {
         data: null,
-        message: ""
     };
     let client = null;
 
@@ -103,8 +104,8 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
 
         client = createClient();
         await client.connect()
-        const sql = `SELECT post_TB.*, 
-      user_TB.name AS author_name 
+        const sql = `SELECT post_TB.*,
+      user_TB.name AS author_name
       FROM post_TB 
       JOIN user_TB ON post_TB.user_id = user_TB.id 
       WHERE post_TB.id = $1`;

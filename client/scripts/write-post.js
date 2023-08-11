@@ -45,20 +45,24 @@ const validateInput = () => {
 const createPostFetch = async () => {
     const titleValue = document.getElementById("input-title").value;
     const contentValue = document.getElementById("input-content").value;
+    const postImages = document.getElementById("image-file").files;
 
     try {
-        const result = await fetch("/api/post", {
+        const formData = new FormData();
+        formData.append("title", titleValue);
+        formData.append("content", contentValue);
+        formData.append("uploadDirectory", "post");
+
+        for (const file of postImages) {
+            formData.append("postImages", file);
+        }
+
+        const response = await fetch("/api/post", {
             "method": "POST",
-            "headers": {
-                "Content-Type": "application/json"
-            },
-            "body": JSON.stringify({
-                "title": titleValue,
-                "content": contentValue,
-            })
+            "body": formData,
         });
 
-        const json = await result.json();
+        const json = await response.json();
         if (json.isSuccess) {
             location.href = "/community";
 
