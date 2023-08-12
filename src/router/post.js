@@ -8,7 +8,7 @@ const imageUploader = require("../middleware/imageUploader");
 
 // 게시글 작성 api
 // userId, title, content
-router.post("/", loginAuth, imageUploader.array("postImages"), async (req, res, next) => {
+router.post("/", loginAuth, imageUploader, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const images = req.files;
     const { title, content } = req.body;

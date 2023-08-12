@@ -4,6 +4,8 @@ const multerS3 = require("multer-s3-transform");
 const sharp = require("sharp");
 const path = require("path");
 
+const { maxPostImageCount } = require("../module/global");
+
 require("dotenv").config();
 
 AWS.config.update({
@@ -40,4 +42,14 @@ const imageUploader = multer({
     }),
 })
 
-module.exports = imageUploader;
+module.exports = async (req, res, next) => {
+    imageUploader.array("postImages", maxPostImageCount)(req, res, (err) => {
+        if (err) {
+            next(err);
+            return;
+        }
+        next();
+    });
+};
+
+//LIMIT_UNEXPECTED_FILE

@@ -1,3 +1,5 @@
+const { maxPostImageCount } = require("../module/global");
+
 const errorHandling = () => {
     return (err, req, res, next) => {
         const result = {
@@ -49,6 +51,12 @@ const errorHandling = () => {
                 res.status(400).send(result);
             }
 
+        } else if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+            console.error(err.message);
+            result.message = `파일은 ${maxPostImageCount} 개까지 업로드 가능합니다`;
+            res.status(400).send(result);
+
+            // fk 에러
         } else {
             console.error(err);
             result.message = "서버에서 오류가 발생하였습니다";
