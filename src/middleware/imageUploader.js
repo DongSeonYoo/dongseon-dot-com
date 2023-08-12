@@ -29,7 +29,7 @@ const imageUploader = multer({
                     if (!allowedExtensions.includes(extension)) {
                         return callback(new Error("wrong extension"));
                     }
-                    callback(null, `${uploadDirectory}/${Date.now()}_${file.originalname}`)
+                    callback(null, `images/${req.decoded.loginId}/${uploadDirectory}/${Date.now()}_${file.originalname}`)
                 },
                 transform: function (req, file, callback) {
                     callback(null, sharp().resize(600, 500));
