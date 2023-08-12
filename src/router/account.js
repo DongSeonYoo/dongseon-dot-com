@@ -32,7 +32,7 @@ router.post("/login", async (req, res, next) => {
         client = createClient();
         await client.connect();
 
-        const sql = "SELECT id, name, email, phone_number FROM user_TB WHERE login_id = $1 AND password = $2";
+        const sql = "SELECT id, login_id, name FROM user_TB WHERE login_id = $1 AND password = $2";
         const params = [loginId, password];
         const data = await client.query(sql, params);
 

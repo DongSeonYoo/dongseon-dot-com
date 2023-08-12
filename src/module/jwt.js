@@ -4,9 +4,8 @@ const jwt = require("jsonwebtoken");
 const userSign = async (user) => {
     const payload = {
         userPk: user.id,
+        loginId: user.login_id,
         name: user.name,
-        phoneNumber: user.phone_number,
-        email: user.email,
         role: "user",
     }
     return jwt.sign(payload, secretKey, option);
@@ -23,4 +22,4 @@ const adminSign = async () => {
 module.exports = {
     userSign,
     adminSign
-}
+};
