@@ -1,8 +1,6 @@
 const express = require("express");
 const app = express();
-const path = require("path");
 const cookieParser = require("cookie-parser");
-const CLIENT_PATH = path.join(__dirname, './client/pages');
 
 const loggingSetting = require('./src/middleware/loggingSetting');
 const errorHandling = require("./src/middleware/errorHandling");
@@ -35,12 +33,13 @@ app.use("/api/comment", commentApi);
 app.use("/api/loginCount", loginCountApi);
 
 // 로깅 미들웨어
-app.use(loggingSetting());
 app.use("/api/log", logApi);
 
 // 404 error handling
 app.use((req, res, next) => {
-    res.status(404).sendFile(path.join(CLIENT_PATH, '404.html'))
+    const error = new Error();
+    error.status = 404;
+    next(error);
 });
 
 // error catch middleware

@@ -1,4 +1,6 @@
 const { maxPostImageCount } = require("../module/global");
+const path = require("path");
+const CLIENT_PATH = path.join(__dirname, '../../client/pages');
 
 const errorHandling = () => {
     return (err, req, res, next) => {
@@ -11,7 +13,14 @@ const errorHandling = () => {
             result.message = err.message;
             res.status(400).send(result);
 
-            // 토큰 inavlid
+
+        // 404 error
+        } else if (err.status === 404) {
+            console.error(err);
+            result.message = "404 not found";
+            res.status(404).sendFile(path.join(CLIENT_PATH, "404.html"));
+
+            // 토큰 expired
         } else if (err.status === 401) {
             console.error(err);
             result.message = "로그인 후 이용가능합니다";
