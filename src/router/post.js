@@ -5,6 +5,8 @@ const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 const loginAuth = require("../middleware/loginAuth");
 const imageUploader = require("../middleware/imageUploader");
+const AWS = require("../../config/s3");
+const s3 = new AWS.S3();
 
 // 게시글 작성 api
 // userId, title, content
@@ -44,6 +46,7 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
         }
     }
 });
+
 
 // 특정 페이지 게시글 조회 api
 // GET
@@ -192,12 +195,19 @@ router.delete("/", loginAuth, async (req, res, next) => {
         client = createClient();
         await client.connect();
 
-        const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2";
+        const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2 RETURNING image_key";
         const params = [postId, userId];
         const data = await client.query(sql, params);
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
+            for(const imgPath of data.rows[0].image_key){
+                await s3.deleteObject({
+                    Bucket: 'yoodongseon', 
+                    Key: imgPath
+                }).promise();
+            }
+            
         } else {
             result.message = "해당하는 게시글이 존재하지 않습니다";
         }
