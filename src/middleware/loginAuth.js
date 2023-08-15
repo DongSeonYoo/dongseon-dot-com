@@ -1,11 +1,12 @@
 const jwt = require("jsonwebtoken");
-const createClient = require("../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 require("dotenv").config();
 
 module.exports = async (req, res, next) => {
-    let client = null;
     // 쿠키에 담긴 토큰을 추출
     const { accessToken } = req.cookies;
+    let pgClient = null;
+
     try {
         // 쿠키 이름이 잘못되었을때?(쿠키 이름을 조작한경우)
         if (!accessToken) {
@@ -13,12 +14,11 @@ module.exports = async (req, res, next) => {
         }
 
         // 토큰이 블랙리스트에 등록되어있는지 체크
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
 
         const sql = "SELECT id FROM token_blacklist WHERE token = $1";
         const params = [accessToken];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         // 블랙리스트에 해당하는 토큰이 존재한다면?
         if (data.rows.length !== 0) {
             const error = new Error();
@@ -40,6 +40,6 @@ module.exports = async (req, res, next) => {
         }
         next(error);
     } finally {
-        if (client) await client.end();
+        if (pgClient) await pgClient.release();
     }
 };

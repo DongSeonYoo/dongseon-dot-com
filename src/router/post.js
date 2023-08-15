@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const createClient = require("../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 const loginAuth = require("../middleware/loginAuth");
@@ -20,18 +20,17 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = `INSERT INTO post_TB (user_id, title, content, image_key) VALUES ($1, $2, $3, $4)`;
         const params = [userId, title, content, images.map(item => item.transforms[0].key)];
-        const data = await client.query(sql, params)
+        const data = await pgClient.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
         }
@@ -43,8 +42,8 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -60,14 +59,13 @@ router.get("/", loginAuth, async (req, res, next) => {
         data: null,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(pageNumber, "pageNumber").isNumber();
 
         const offset = Number(pageNumber * counterPage);
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = `SELECT 
               post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
               FROM post_TB
@@ -75,7 +73,7 @@ router.get("/", loginAuth, async (req, res, next) => {
               ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
         const params = [offset, counterPage];
 
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rows.length !== 0) {
             result.data = data.rows;
         } else {
@@ -88,8 +86,8 @@ router.get("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -102,13 +100,12 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     const result = {
         data: null,
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        client = createClient();
-        await client.connect()
+        client = await pool.connect();
         const sql = `SELECT post_TB.*,
       user_TB.name AS author_name
       FROM post_TB 
@@ -130,7 +127,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -145,7 +142,7 @@ router.put("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
@@ -153,11 +150,10 @@ router.put("/", loginAuth, async (req, res, next) => {
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = "UPDATE post_TB SET title = $1, content = $2 WHERE user_id = $3 AND id = $4";
         const params = [title, content, userId, postId];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
@@ -172,8 +168,8 @@ router.put("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -188,18 +184,17 @@ router.delete("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
-        client = createClient();
-        await client.connect();
-
+        pgClient = await pool.connect();
+        
         const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2 RETURNING image_key";
         const params = [postId, userId];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
@@ -221,8 +216,8 @@ router.delete("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -234,14 +229,14 @@ router.get("/all/count", loginAuth, async (req, res, next) => {
         data: null,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
+
         const sql = `SELECT COUNT(*) FROM post_TB`;
 
-        const data = await client.query(sql);
+        const data = await pgClient.query(sql);
         if (data.rows.length !== 0) {
             result.data = data.rows[0].count;
         } else {
@@ -253,8 +248,8 @@ router.get("/all/count", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });

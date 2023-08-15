@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const redisClient = require("redis").createClient();
-const createClient = require("../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 
 
 router.get("/hour", async (req, res, next) => {
@@ -26,7 +26,7 @@ router.get("/hour", async (req, res, next) => {
     }
 });
 
-router.get("/total", async (rea, res, next) => {
+router.get("/total", async (req, res, next) => {
     const result = {
         isSuccess: false,
         data: null,
@@ -34,8 +34,7 @@ router.get("/total", async (rea, res, next) => {
     let pgClient = null;
 
     try {
-        pgClient = createClient();
-        await pgClient.connect();
+        pgClient = await pool.connect();
 
         const sql = "SELECT count(*) FROM logged_in_user";
         const data = await pgClient.query(sql);
@@ -46,7 +45,7 @@ router.get("/total", async (rea, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        await pgClient.end();
+        await pgClient.release();
     }
 })
 

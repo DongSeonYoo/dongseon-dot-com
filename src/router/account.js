@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const createClient = require("../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
@@ -32,8 +32,7 @@ router.post("/login", async (req, res, next) => {
         }
 
         // db연결
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
 
         const sql = "SELECT id, login_id, name FROM user_TB WHERE login_id = $1 AND password = $2";
         const params = [loginId, password];
@@ -57,7 +56,7 @@ router.post("/login", async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -88,13 +87,12 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
         data: false,
         message: "",
     };
-    let client = null;;
+    let client = null;
 
     try {
         exception(loginId, "loginId").checkInput().checkIdRegex();
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = "SELECT id FROM user_TB WHERE login_id = $1";
         const params = [loginId];
         const data = await client.query(sql, params);
@@ -111,7 +109,7 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
         next(error);
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -130,8 +128,7 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
     try {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
 
-        client = createClient();
-        await client.connect();
+        client = pool.connect();
         const sql = "SELECT phone_number FROM user_TB WHERE phone_number = $1";
         const params = [phoneNumber];
         const data = await client.query(sql, params);
@@ -147,7 +144,7 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
         next(error);
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 })
@@ -165,8 +162,7 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
 
     try {
         exception(email, "email").checkInput().checkEmailRegex();
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = "SELECT email FROM user_TB WHERE email = $1";
         const params = [email];
         const data = await client.query(sql, params);
@@ -182,7 +178,7 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
         next(error);
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 })
@@ -205,8 +201,7 @@ router.post("/signup", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = createClient();
-        await client.connect();
+        client = pool.connect();
         const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
         const params = [loginId, password, name, phoneNumber, email];
 
@@ -222,7 +217,7 @@ router.post("/signup", async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     };
 });
@@ -243,8 +238,7 @@ router.get("/loginId", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkLength(maxPhoneNumberLength, maxPhoneNumberLength);
         exception(email, "email").checkInput().checkLength(1, maxEmailLength);
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = "SELECT login_id FROM user_TB WHERE name = $1 AND phone_number = $2 AND email = $3";
         const params = [name, phoneNumber, email];
         const data = await client.query(sql, params);
@@ -262,7 +256,7 @@ router.get("/loginId", async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 })
@@ -285,8 +279,7 @@ router.post("/pw", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = `SELECT id FROM user_TB WHERE login_id = $1 AND name = $2 AND phone_number = $3 AND email = $4`;
         const params = [loginId, name, phoneNumber, email];
         const data = await client.query(sql, params);
@@ -305,7 +298,7 @@ router.post("/pw", async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -327,8 +320,7 @@ router.put("/pw", async (req, res, next) => {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(newPw, "newPw").checkInput().checkPwRegex();
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = "UPDATE user_TB SET password = $1 WHERE id = $2";
         const param = [newPw, userId];
         const data = await client.query(sql, param);
@@ -346,7 +338,7 @@ router.put("/pw", async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -364,9 +356,8 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
 
     try {
         exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
-        client = createClient();
 
-        await client.connect();
+        client = await pool.connect();
         const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
                     FROM user_TB WHERE id = $1`;
         const params = [userPk];
@@ -386,7 +377,7 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -409,8 +400,7 @@ router.put("/", loginAuth, async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
         const params = [name, phoneNumber, email, userPk];
         const data = await client.query(sql, params)
@@ -428,7 +418,7 @@ router.put("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });
@@ -446,8 +436,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
     try {
         exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
-        client = createClient();
-        await client.connect();
+        client = await pool.connect();
         const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
         const deleteUser = [userPk];
         const data = await client.query(deleteUserSql, deleteUser);
@@ -466,7 +455,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
                     Bucket: process.env.AWS_BUCKET_NAME,
                     Prefix: req.decoded.loginId,
                 }).promise();
-                
+
                 if (objects.Contents.length > 0) {
                     const deleteParams = {
                         Bucket: process.env.AWS_BUCKET_NAME,
@@ -487,7 +476,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (client) {
-            await client.end();
+            await client.release();
         }
     }
 });

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const createClient = require("../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
 const loginAuth = require("../middleware/loginAuth");
@@ -16,19 +16,18 @@ router.post("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = `INSERT INTO comment_TB (post_id, user_id, content) VALUES ($1, $2, $3)`;
         const params = [postId, userId, content];
 
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
         }
@@ -39,8 +38,8 @@ router.post("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -54,13 +53,12 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
         data: null,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = `SELECT 
                       comment_TB.id, 
                       comment_TB.user_id, 
@@ -78,7 +76,7 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
                       post_id = $1`;
         const params = [postId];
 
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         // 만약 해당 게시글에 댓글이 존재하면?
         if (data.rows.length !== 0) {
             result.data = data.rows;
@@ -94,8 +92,8 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -110,7 +108,7 @@ router.put("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
@@ -118,11 +116,10 @@ router.put("/", loginAuth, async (req, res, next) => {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = "UPDATE comment_TB SET content = $1 WHERE post_id = $2 AND user_id = $3 AND id = $4";
         const params = [content, postId, userId, commentId];
-        const data = await client.query(sql, params)
+        const data = await pgClient.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "댓글 수정 성공";
@@ -136,8 +133,8 @@ router.put("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
@@ -152,18 +149,17 @@ router.delete("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength)
 
-        client = createClient();
-        await client.connect();
+        pgClient = await pool.connect();
         const sql = "DELETE FROM comment_TB WHERE post_id = $1 AND user_id = $2 AND id = $3";
         const params = [postId, userId, commentId];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
         } else {
@@ -176,8 +172,8 @@ router.delete("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.end();
+        if (pgClient) {
+            await pgClient.release();
         }
     }
 });
