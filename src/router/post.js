@@ -18,7 +18,7 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
     const { title, content } = req.body;
     const result = {
         isSuccess: false,
-        message: ""
+        postId: "",
     };
     let pgClient = null;
 
@@ -28,11 +28,16 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
         pgClient = await pool.connect();
-        const sql = `INSERT INTO post_TB (user_id, title, content, image_key) VALUES ($1, $2, $3, $4)`;
+        const sql = `INSERT INTO 
+                        post_TB (user_id, title, content, image_key) 
+                        VALUES
+                        ($1, $2, $3, $4) RETURNING id`;
+
         const params = [userId, title, content, images.map(item => item.transforms[0].key)];
         const data = await pgClient.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
+            result.postId = data.rows[0].id;
         }
 
         res.send(result);

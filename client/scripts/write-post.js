@@ -1,5 +1,6 @@
 const submitBtn = document.getElementById("submit-button");
 const cancelBtn = document.getElementById("cancel-button");
+const postImages = document.getElementById("image-file");
 
 window.onload = async () => {
     await checkAuth();
@@ -39,13 +40,18 @@ const validateInput = () => {
         return false;
     }
 
+    if (postImages.files.length > 5) {
+        alert("사진은 5개까지만 가능합니다");
+        return false;
+    }
+
     return true;
 }
 
 const createPostFetch = async () => {
     const titleValue = document.getElementById("input-title").value;
     const contentValue = document.getElementById("input-content").value;
-    const postImages = document.getElementById("image-file").files;
+    const postFile = postImages.files;
 
     try {
         const formData = new FormData();
@@ -53,8 +59,8 @@ const createPostFetch = async () => {
         formData.append("content", contentValue);
         formData.append("uploadDirectory", "post");
 
-        for (const file of postImages) {
-            formData.append("postImages", file);
+        for (const file of postFile) {
+            formData.append("postImage", file);
         }
 
         const response = await fetch("/api/post", {
@@ -64,14 +70,26 @@ const createPostFetch = async () => {
 
         const json = await response.json();
         if (json.isSuccess) {
-            location.href = "/community";
+            const createdPostId = json.postId;
+            location.href = `/post/${createdPostId}`;
 
         } else {
-            alert("데이터베이스 에러: " + json.message);
-            location.href = "/";
+            alert(json.message);
+            pageInit();
         }
 
     } catch (error) {
+        alert(error);
         console.error(error);
     }
+}
+
+const pageInit = () => {
+    let titleValue = document.getElementById("input-title").value;
+    let contentValue = document.getElementById("input-content").value;
+    let postFiles = postImages;
+
+    titleValue = "";
+    contentValue = "";
+    postFiles = "";
 }
