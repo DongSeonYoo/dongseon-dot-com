@@ -8,6 +8,9 @@ const loginAuth = require("../middleware/loginAuth");
 const jwt = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
 
+const AWS = require("../../config/s3");
+const s3 = new AWS.S3();
+
 require("dotenv").config();
 
 router.post("/login", async (req, res, next) => {
@@ -453,12 +456,26 @@ router.delete("/", loginAuth, async (req, res, next) => {
             const token = req.cookies.accessToken;
             const expiredDate = new Date(req.decoded.exp * 1000);
             const reason = "leave";
-
             const registerBlackListSql = `INSERT INTO token_blacklist (token, expired_date, reason) VALUES ($1, $2, $3)`;
+
             const params = [token, expiredDate, reason];
             const data = await client.query(registerBlackListSql, params);
             if (data.rowCount !== 0) {
                 result.isSuccess = true;
+                const objects = await s3.listObjects({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Prefix: req.decoded.loginId,
+                }).promise();
+                
+                if (objects.Contents.length > 0) {
+                    const deleteParams = {
+                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Delete: {
+                            Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
+                        }
+                    };
+                    await s3.deleteObjects(deleteParams).promise();
+                }
             }
         }
         res.clearCookie("accessToken");
