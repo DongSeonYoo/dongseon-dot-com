@@ -7,7 +7,7 @@ const postContent = document.getElementById("input-content");
 const userId = sessionStorage.getItem("loginUserSession");
 const postId = parseUrl();
 
-let existingValue = {
+const existingValue = {
     title: "",
     content: "",
 };
@@ -59,7 +59,6 @@ async function loadPostData(postId) {
     try {
         const result = await fetch("/api/post/" + postId);
         const json = await result.json();
-
         if (result.status !== 200) {
             alert(json.message);
             location.href = "/";
@@ -68,8 +67,8 @@ async function loadPostData(postId) {
         postTitle.value = json.data.title;
         postContent.value = json.data.content;
 
-        existingValue.title = json.message.title;
-        existingValue.content = json.message.content;
+        existingValue.title = json.data.title;
+        existingValue.content = json.data.content;
 
     } catch (error) {
         console.error(error);
