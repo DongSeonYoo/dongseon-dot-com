@@ -5,8 +5,10 @@ const exception = require("../module/exception");
 const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 const loginAuth = require("../middleware/loginAuth");
 const imageUploader = require("../middleware/imageUploader");
+
 const AWS = require("../../config/s3");
 const s3 = new AWS.S3();
+require("dotenv").config();
 
 // 게시글 작성 api
 // userId, title, content
@@ -201,10 +203,11 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
-            for(const imgPath of data.rows[0].image_key){
+            const deletedImagekey = data.rows[0].image_key;
+            for(const imgPath of deletedImagekey){
                 await s3.deleteObject({
-                    Bucket: 'yoodongseon', 
-                    Key: imgPath
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: imgPath,
                 }).promise();
             }
             
