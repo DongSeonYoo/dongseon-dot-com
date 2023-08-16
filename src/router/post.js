@@ -196,7 +196,8 @@ router.delete("/", loginAuth, async (req, res, next) => {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
         pgClient = await pool.connect();
-        
+
+        pgClient.query("BEGIN");
         const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2 RETURNING image_key";
         const params = [postId, userId];
         const data = await pgClient.query(sql, params);
@@ -204,20 +205,28 @@ router.delete("/", loginAuth, async (req, res, next) => {
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             const deletedImagekey = data.rows[0].image_key;
-            for(const imgPath of deletedImagekey){
+            for (const imgPath of deletedImagekey) {
                 await s3.deleteObject({
                     Bucket: process.env.AWS_BUCKET_NAME,
                     Key: imgPath,
+                }, (err, data) => {
+                    console.log(err);
+                    throw err;
                 }).promise();
             }
-            
+
         } else {
+            await pgClient.query("ROLLBACK")
             result.message = "해당하는 게시글이 존재하지 않습니다";
         }
+        pgClient.query("COMMIT");
         res.send(result);
 
     } catch (error) {
         console.error(error);
+        if (pgClient) {
+            await pgClient.query("ROLLBACK");
+        }
         next(error);
 
     } finally {
