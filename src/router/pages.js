@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const CLIENT_PATH = path.join(__dirname, '../../client/pages');
-const loginAuth = require("../middleware/loginAuth");
-const adminAuth = require('../middleware/adminAuth');
 
 // 아이디 찾기 페이지
 router.get('/find-id', (req, res) => {
@@ -20,7 +18,7 @@ router.get('/reset-pw', (req, res) => {
     res.sendFile(path.join(CLIENT_PATH, 'reset-pw.html'));
 });
 
-// 프로필 보기 페이지 (2: 비밀번호 재설정 단계)
+// 프로필 보기 페이지
 router.get('/view-profile', (req, res) => {
     res.sendFile(path.join(CLIENT_PATH, 'view-profile.html'));
 });

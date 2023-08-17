@@ -209,6 +209,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
                 await s3.deleteObject({
                     Bucket: process.env.AWS_BUCKET_NAME,
                     Key: imgPath,
+                // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
                 }, (err, data) => {
                     if (err) {
                         throw err;
