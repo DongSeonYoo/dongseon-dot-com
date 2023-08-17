@@ -7,6 +7,7 @@ const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneN
 const loginAuth = require("../middleware/loginAuth");
 const jwt = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
+const imageUploader = require("../middleware/imageUploader");
 
 const AWS = require("../../config/s3");
 const s3 = new AWS.S3();
@@ -385,13 +386,14 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-router.put("/", loginAuth, async (req, res, next) => {
+router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, next) => {
     const { userPk } = req.decoded;
     const { name, phoneNumber, email } = req.body;
     const result = {
         isSuccess: false,
         message: "",
     };
+    console.log(req.body);
     let pgClient = null;
 
     try {
