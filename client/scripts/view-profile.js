@@ -110,7 +110,7 @@ const editProfileFetch = async () => {
     const phoneNumber = phoneNumberForm.value;
     const email = emailForm.value;
     // const profileImage = previewImg.src;
-    const profileImage = profileImg.files;
+    const profileImage = profileImg.files[0];
 
     try {
         const formData = new FormData();
