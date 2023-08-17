@@ -48,7 +48,7 @@ router.post("/", loginAuth, imageUploader, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -92,7 +92,7 @@ router.get("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -110,7 +110,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = `SELECT post_TB.*,
       user_TB.name AS author_name
       FROM post_TB 
@@ -118,7 +118,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
       WHERE post_TB.id = $1`;
         const params = [postId];
 
-        const data = await client.query(sql, params)
+        const data = await pgClient.query(sql, params)
         if (data.rows.length !== 0) {
             result.data = data.rows[0];
         } else {
@@ -131,8 +131,8 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -174,7 +174,7 @@ router.put("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -210,8 +210,9 @@ router.delete("/", loginAuth, async (req, res, next) => {
                     Bucket: process.env.AWS_BUCKET_NAME,
                     Key: imgPath,
                 }, (err, data) => {
-                    console.log(err);
-                    throw err;
+                    if (err) {
+                        throw err;
+                    }
                 }).promise();
             }
 
@@ -231,7 +232,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -263,7 +264,7 @@ router.get("/all/count", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });

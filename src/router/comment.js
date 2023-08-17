@@ -39,7 +39,7 @@ router.post("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -93,7 +93,7 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -134,7 +134,7 @@ router.put("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });
@@ -173,7 +173,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
     } finally {
         if (pgClient) {
-            await pgClient.release();
+            pgClient.release();
         }
     }
 });

@@ -45,7 +45,7 @@ router.get("/total", async (req, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        await pgClient.release();
+        pgClient.release();
     }
 })
 

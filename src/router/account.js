@@ -19,7 +19,7 @@ router.post("/login", async (req, res, next) => {
         message: "",
         token: null
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         // request값 유효성 검증
@@ -32,11 +32,11 @@ router.post("/login", async (req, res, next) => {
         }
 
         // db연결
-        client = await pool.connect();
+        pgClient = await pool.connect();
 
         const sql = "SELECT id, login_id, name FROM user_TB WHERE login_id = $1 AND password = $2";
         const params = [loginId, password];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rows.length !== 0) {
             const userData = data.rows[0];
@@ -55,8 +55,8 @@ router.post("/login", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -87,15 +87,15 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
         data: false,
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(loginId, "loginId").checkInput().checkIdRegex();
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = "SELECT id FROM user_TB WHERE login_id = $1";
         const params = [loginId];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rows.length !== 0) {
             result.data = true;
@@ -108,8 +108,8 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -123,15 +123,15 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
         data: false,
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
 
-        client = pool.connect();
+        pgClient = pool.connect();
         const sql = "SELECT phone_number FROM user_TB WHERE phone_number = $1";
         const params = [phoneNumber];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rows.length !== 0) {
             result.data = true;
         } else {
@@ -143,8 +143,8 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 })
@@ -158,14 +158,14 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
         data: false,
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(email, "email").checkInput().checkEmailRegex();
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = "SELECT email FROM user_TB WHERE email = $1";
         const params = [email];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rows.length !== 0) {
             result.data = true;
         } else {
@@ -177,8 +177,8 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 })
@@ -192,7 +192,7 @@ router.post("/signup", async (req, res, next) => {
         data: "",
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(loginId, "loginId").checkInput().checkIdRegex();
@@ -201,11 +201,11 @@ router.post("/signup", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = pool.connect();
+        pgClient = pool.connect();
         const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
         const params = [loginId, password, name, phoneNumber, email];
 
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rowCount !== 0) {
             result.message = "회원가입 성공";
         }
@@ -216,8 +216,8 @@ router.post("/signup", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     };
 });
@@ -231,17 +231,17 @@ router.get("/loginId", async (req, res, next) => {
         data: "",
         message: ""
     }
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(name, "name").checkInput().checkLength(1, maxNameLength);
         exception(phoneNumber, "phoneNumber").checkInput().checkLength(maxPhoneNumberLength, maxPhoneNumberLength);
         exception(email, "email").checkInput().checkLength(1, maxEmailLength);
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = "SELECT login_id FROM user_TB WHERE name = $1 AND phone_number = $2 AND email = $3";
         const params = [name, phoneNumber, email];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rows.length !== 0) {
             result.data = data.rows[0].login_id;
         } else {
@@ -255,8 +255,8 @@ router.get("/loginId", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 })
@@ -271,7 +271,7 @@ router.post("/pw", async (req, res, next) => {
         data: "",
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(loginId, "loginId").checkInput().checkIdRegex();
@@ -279,10 +279,10 @@ router.post("/pw", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = `SELECT id FROM user_TB WHERE login_id = $1 AND name = $2 AND phone_number = $3 AND email = $4`;
         const params = [loginId, name, phoneNumber, email];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
         if (data.rows.length !== 0) {
             result.isSuccess = true;
             result.data = data.rows[0].id;
@@ -297,8 +297,8 @@ router.post("/pw", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -314,16 +314,16 @@ router.put("/pw", async (req, res, next) => {
         data: "",
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(newPw, "newPw").checkInput().checkPwRegex();
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = "UPDATE user_TB SET password = $1 WHERE id = $2";
         const param = [newPw, userId];
-        const data = await client.query(sql, param);
+        const data = await pgClient.query(sql, param);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "비밀번호 수정 성공";
@@ -337,8 +337,8 @@ router.put("/pw", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -352,16 +352,16 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
         data: "",
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
                     FROM user_TB WHERE id = $1`;
         const params = [userPk];
-        const data = await client.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rows.length !== 0) {
             result.data = data.rows[0];
@@ -376,8 +376,8 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -392,7 +392,7 @@ router.put("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: "",
     };
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
@@ -400,10 +400,10 @@ router.put("/", loginAuth, async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
         const params = [name, phoneNumber, email, userPk];
-        const data = await client.query(sql, params)
+        const data = await pgClient.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "프로필 수정 성공";
@@ -417,8 +417,8 @@ router.put("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
@@ -431,15 +431,15 @@ router.delete("/", loginAuth, async (req, res, next) => {
     const result = {
         isSuccess: false
     }
-    let client = null;
+    let pgClient = null;
 
     try {
         exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
-        client = await pool.connect();
+        pgClient = await pool.connect();
         const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
         const deleteUser = [userPk];
-        const data = await client.query(deleteUserSql, deleteUser);
+        const data = await pgClient.query(deleteUserSql, deleteUser);
         // 삭제 성공 시 해당 토큰을 블랙리스트에 등록
         if (data.rowCount !== 0) {
             const token = req.cookies.accessToken;
@@ -448,7 +448,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
             const registerBlackListSql = `INSERT INTO token_blacklist (token, expired_date, reason) VALUES ($1, $2, $3)`;
 
             const params = [token, expiredDate, reason];
-            const data = await client.query(registerBlackListSql, params);
+            const data = await pgClient.query(registerBlackListSql, params);
             if (data.rowCount !== 0) {
                 result.isSuccess = true;
                 const objects = await s3.listObjects({
@@ -475,8 +475,8 @@ router.delete("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (client) {
-            await client.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });
