@@ -17,6 +17,11 @@
 
       <div class="profile-header">
         <h1>내 프로필</h1>
+        <img id="preview" src="../assets/user.png">
+        <label for="file">
+            <div class="btn-upload">이미지 업로드</div>
+        </label>
+        <input type="file" id="file" onchange="onchangeImg(this)">
       </div>
 
       <div class="profile-info">
@@ -34,11 +39,13 @@
           <div id="user-nickname">
             <span id="phoneNumber-lable" class="label">전화번호</span>
             <input id="phoneNumber-form">
+            <!-- <button id="check-phonenumber-duplicate">중복 체크</button> -->
           </div>
 
           <div id="user-email">
             <span id="email-lable" class="label">이메일</span>
             <input id="email-form">
+            <!-- <button id="check-email-duplicate">중복 체크</button> -->
           </div>
 
           <div id="user-created-date">

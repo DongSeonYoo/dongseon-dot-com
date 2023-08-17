@@ -4,9 +4,12 @@ const phoneNumberForm = document.getElementById("phoneNumber-form");
 const emailForm = document.getElementById("email-form");
 const signUpDateForm = document.getElementById("signup-date-form");
 const updateDateForm = document.getElementById("update-date-form");
+const token = getCookie("accessToken");
+
 const editProfileBtn = document.getElementById("edit-profile-button");
 const dropUserBtn = document.getElementById("drop-user-button");
-const token = getCookie("accessToken");
+const previewImg = document.getElementById("preview");
+const profileImg = document.getElementById("file");
 
 let existingName;
 let existingPhoneNumber;
@@ -22,6 +25,18 @@ window.onload = async () => {
     const json = await checkAuth();
     const userData = json.data.userPk;
     viewProfileFetch(userData);
+}
+
+const onchangeImg = (event) => {
+    if (event.files && event.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            previewImg.src = e.target.result;
+        }
+        reader.readAsDataURL(event.files[0]);
+    } else {
+        previewImg.src = "";
+    }
 }
 
 const inputValidate = (existingName, existingPhoneNumber, existingEmail) => {
@@ -94,27 +109,27 @@ const editProfileFetch = async () => {
     const name = nameForm.value;
     const phoneNumber = phoneNumberForm.value;
     const email = emailForm.value;
+    // const profileImage = previewImg.src;
+    const profileImage = profileImg.files;
 
     try {
-        const result = await fetch("/api/account", {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                "name": name,
-                "phoneNumber": phoneNumber,
-                "email": email
-            }),
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("phoneNumber", phoneNumber);
+        formData.append("email", email);
+        formData.append("profileImage", profileImage);
+        const response = await fetch("/api/account", {
+            "method": "PUT",
+            "body": formData,
         });
-        const json = await result.json();
-        if (result.status !== 200) {
+
+        const json = await response.json();
+        if (response.status !== 200) {
             alert(json.message);
-            location.href = "/";
-            return;
+            return location.href = "/";
         }
         if (json.isSuccess) {
-            location.href = "/";
+            return location.href = "/";
         }
 
     } catch (error) {
