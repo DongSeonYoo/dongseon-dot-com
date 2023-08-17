@@ -57,7 +57,6 @@ const createPostFetch = async () => {
         const formData = new FormData();
         formData.append("title", titleValue);
         formData.append("content", contentValue);
-        formData.append("uploadDirectory", "post");
 
         for (const file of postFile) {
             formData.append("postImage", file);
