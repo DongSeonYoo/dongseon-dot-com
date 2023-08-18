@@ -5,11 +5,16 @@ body {
   background-color: #dfdbdb
 }
 
+#back-button {
+    float: left;
+}
+
 #container {
+  padding: 40px;
   background-color: #fff;
   border-radius: 5px;
-  padding: 20px;
-  width: 600px;
+  width: 800px;
+  text-align: -webkit-center;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -24,16 +29,18 @@ h1 {
 
 #post-info-area {
   display: flex;
+  justify-content: center;
   flex-direction: column;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   justify-content: space-between;
 }
 
 .comment-info-area {
   display: flex;
   gap: 20px;
+  justify-content: flex-start;
 }
 
 .post-info {
@@ -45,6 +52,7 @@ h1 {
 #post-info-temp-div {
   display: flex;
   gap: 84px;
+  justify-content: center;
 }
 
 #button-zone {
@@ -53,18 +61,15 @@ h1 {
 }
 
 #post-content {
-  margin-bottom: 10px;
-}
-
-#post-content {
-  width: 600px;
-  height: 200px;
-  border: 1px solid #b1b1b1;
+  width: 780px;
+  /* border: 1px solid #b1b1b1; */
   border-radius: 5px;
+  margin-bottom: 10px;
 }
 
 .comments {
   margin-top: 20px;
+  padding: 20px;
 }
 
 .comment {
@@ -74,21 +79,31 @@ h1 {
   border-radius: 10px;
 }
 
+.comment-content {
+    /* margin-top: 10px; */
+    text-align: start;
+}
+
 #comment-input {
-  width: 595px;
+  width: 758px;
   height: 100px;
   border: 1px solid #ccc;
   border-radius: 5px;
 }
 
 #submit-comment-button {
-  margin-left: 535px;
+  margin-left: 700px;
   margin-top: 5px;
   margin-bottom: 30px;
 }
 
 .comment h3 {
   margin-bottom: 5px;
+}
+
+#comment-count {
+    text-align: start;
+    margin-left: 20px;
 }
 
 .comment-author, .comment-date {

@@ -32,7 +32,6 @@ async function displayPost() {
                 const postTitle = document.getElementById("post-title");
                 const postAuthor = document.getElementById("post-author");
                 const postContent = document.getElementById("post-content");
-                const postText = document.createElement("div");
                 
                 const postCreateDate = document.getElementById("post-create-date");
                 const postUpdateDate = document.getElementById("post-update-date");
@@ -278,7 +277,7 @@ async function clickCommentSubmitBtn() {
     }
 }
 
-async function clickCommentModifyButton() {
+function clickCommentModifyButton() {
     const commentInfoArea = document.querySelector(".comment-info-area");
     const modifyCommentInput = document.createElement("input");
 
@@ -328,5 +327,5 @@ async function deleteCommentFetch(postId, commentId) {
 }
 
 backBtn.addEventListener("click", () => {
-    location.href = "/community"
+    location.href = "/community";
 });
