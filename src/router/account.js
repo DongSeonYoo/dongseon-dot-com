@@ -360,7 +360,7 @@ router.get("/:userId", async (req, res, next) => {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
         pgClient = await pool.connect();
-        const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
+        const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date, profile_img 
                     FROM user_TB WHERE id = $1`;
         const params = [userId];
         const data = await pgClient.query(sql, params);
@@ -390,11 +390,12 @@ router.get("/:userId", async (req, res, next) => {
 router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, next) => {
     const { userPk } = req.decoded;
     const { name, phoneNumber, email } = req.body;
+    const profileImage = req.file?.key ?? "";
+    console.log(profileImage);
     const result = {
         isSuccess: false,
         message: "",
     };
-    console.log(req.body);
     let pgClient = null;
 
     try {
@@ -404,9 +405,18 @@ router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, 
         exception(email, "email").checkInput().checkEmailRegex();
 
         pgClient = await pool.connect();
-        const sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3 WHERE id = $4";
-        const params = [name, phoneNumber, email, userPk];
-        const data = await pgClient.query(sql, params)
+        let sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3";
+        const params = [name, phoneNumber, email];
+
+        if (profileImage) {
+            sql += ", profile_img = $4 WHERE id = $5";
+            params.push(profileImage, userPk);
+        } else {
+            sql += " WHERE id = $4";
+            params.push(userPk);
+        }
+
+        const data = await pgClient.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "프로필 수정 성공";
