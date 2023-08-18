@@ -1,4 +1,5 @@
 const homeBtn = document.getElementById("home-button");
+const s3ImageUrl = "http://yoodongseon.s3.ap-northeast-2.amazonaws.com";
 
 // 이름, 토큰을 받아 쿠키를 생성
 const setCookie = (name, value) => {

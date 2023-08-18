@@ -48,10 +48,10 @@ const inputValidate = (existingName, existingPhoneNumber, existingEmail) => {
     const newPhoneNumber = phoneNumberForm.value;
     const newEmail = emailForm.value;
 
-    if (existingName === newName && existingPhoneNumber === newPhoneNumber && existingEmail === newEmail) {
-        alert("프로필 정보가 변경되지 않았습니다.");
-        return false;
-    }
+    // if (existingName === newName && existingPhoneNumber === newPhoneNumber && existingEmail === newEmail) {
+    //     alert("프로필 정보가 변경되지 않았습니다.");
+    //     return false;
+    // }
 
 
     if (newName.length === 0 || newPhoneNumber.length === 0 || newEmail.length === 0) {
@@ -83,6 +83,9 @@ const viewProfileFetch = async (userData) => {
         const result = await fetch("/api/account/" + userPk);
         const json = await result.json();
         const user = json.data;
+        if (user.profile_img) {
+            previewImg.src = s3ImageUrl + "/" + user.profile_img;
+        }
 
         idForm.innerHTML = user.login_id;
         nameForm.value = user.name;

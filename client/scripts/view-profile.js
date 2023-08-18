@@ -7,7 +7,7 @@ const updateDateForm = document.getElementById("update-date-form");
 const token = getCookie("accessToken");
 const userName = document.getElementById("user-name");
 const buttonContainer = document.querySelector(".button-container");
-
+const profileImg = document.getElementById("profile-img");
 const editProfileBtn = document.getElementById("edit-profile-button");
 
 
@@ -16,6 +16,7 @@ window.onload = async () => {
     viewProfileFetch(viewUserPk);
     // 토큰이 존재하는지 확인
     if (token) {
+        // 현재 보고있는 프로필의 주인일 시 프로필 수정 버튼 생성
         try {
             const response = await fetch("/api/auth/login");
             const json = await response.json();
@@ -51,25 +52,15 @@ function parseUrl() {
     return postId;
 }
 
-const onchangeImg = (event) => {
-    if (event.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            previewImg.src = e.target.result;
-        }
-        reader.readAsDataURL(event.files[0]);
-    } else {
-        previewImg.src = "";
-    }
-}
-
 const viewProfileFetch = async (userPk) => {
     try {
-        const result = await fetch("/api/account/" + userPk);
+        const result = await fetch(`/api/account/${userPk}`);
         const json = await result.json();
         const user = json.data;
-
-        userName.innerHTML = `${user.name}의 프로필`;
+        if (user.profile_img) {
+            userName.innerHTML = `${user.name}의 프로필`;
+            profileImg.src = s3ImageUrl + "/" + user.profile_img;
+        }
         idForm.innerHTML = user.login_id;
         nameForm.innerHTML = user.name;
         phoneNumberForm.innerHTML = user.phone_number;
