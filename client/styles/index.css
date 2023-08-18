@@ -233,8 +233,9 @@ h2 {
 }
 
 #user-image {
-  width: 180px;
-  height: 200px;
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
 }
 
 /* about (main) */

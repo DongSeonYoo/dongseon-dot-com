@@ -13,13 +13,16 @@ const findPwBtn = document.getElementById("find-pw-button");
 const communityBtn = document.getElementById("community-button");
 const recentLoginCount = document.getElementById("recent-login-user-count");
 const totalLoginCount = document.getElementById("total-login-user-count");
+const homeTitle = document.getElementById("home-title");
 // 현재 브라우저의 쿠키(토큰)를 가져옴
 const token = getCookie("accessToken");
 // 요소의 높이 계산
 const navBarHeight = navBar.getBoundingClientRect().height;
 const homeHeight = home.getBoundingClientRect().height;
-// 로그인이 되어있으면 true, 되어있지 않으면 false(기본값)
+const userImage = document.getElementById("user-image");
 let isLoggedIn = false;
+
+// 로그인이 되어있으면 true, 되어있지 않으면 false(기본값)
 
 window.onload = async () => {
     try {
@@ -29,7 +32,7 @@ window.onload = async () => {
             if (!isLoggedIn) {
                 return;
             }
-            makeOnlyLoginUI();
+            makeOnlyLoginUI(isLoggedIn);
         }
 
         recentLoginCountFetch();
@@ -69,7 +72,8 @@ const totalLoginCountFetch = async () => {
     }
 }
 
-const makeOnlyLoginUI = () => {
+const makeOnlyLoginUI = async (isLoggedIn) => {
+    const userPk = isLoggedIn.data.userPk;
     const loginModalBtn = document.getElementById("login-modal-open-button");
     const navbarDiv = document.getElementById("nav-bar");
     const tempDiv = document.createElement("div");
@@ -77,10 +81,27 @@ const makeOnlyLoginUI = () => {
     const viewProfileButton = document.createElement("button");
     const logoutBtn = document.createElement("button");
 
+    // 프로필 정보 요청
+    try {
+        const response = await fetch(`/api/account/${userPk}`);
+        const json = await response.json();
+        if (response.status === 200) {
+            const resImg = json.data.profile_img;
+            if (resImg) {
+                userImage.src = s3ImageUrl + "/" + resImg;
+            }
+
+            homeTitle.innerHTML = json.data.name;
+        }
+    } catch (error) {
+        alert(error);
+        // console.error(error);
+    }
+
     // 로그인 버튼 제거
     loginModalBtn.style.display = "none";
     // 내 프로필 보기 버튼
-    viewProfileAtag.href = `/view-profile/${isLoggedIn.data.userPk}`;
+    viewProfileAtag.href = `/view-profile/${userPk}`;
     viewProfileButton.classList.add("login-only-button");
     viewProfileButton.innerHTML = "내 프로필";
     viewProfileAtag.appendChild(viewProfileButton);
