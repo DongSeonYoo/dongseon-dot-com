@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <title>프로필 페이지</title>
 
-  <link rel="stylesheet" type="text/css" href="../styles/view-profile.css">
+  <link rel="stylesheet" type="text/css" href="../styles/modify-profile.css">
   <link rel="stylesheet" type="text/css" href="../styles/common.css">
 </head>
 
@@ -16,8 +16,12 @@
     <div id="content">
 
       <div class="profile-header">
-        <h1 id="user-name">내 프로필</h1>
+        <h1>내 프로필</h1>
         <img id="preview" src="../assets/user.png">
+        <label for="file">
+            <div class="btn-upload">이미지 변경</div>
+        </label>
+        <input type="file" id="file" onchange="onchangeImg(this)">
       </div>
 
       <div class="profile-info">
@@ -29,17 +33,19 @@
 
           <div id="user-name">
             <span id="name-lable" class="label">이름</span>
-            <span id="name-form">
+            <input id="name-form">
           </div>
 
           <div id="user-nickname">
             <span id="phoneNumber-lable" class="label">전화번호</span>
-            <span id="phoneNumber-form">
+            <input id="phoneNumber-form">
+            <!-- <button id="check-phonenumber-duplicate">중복 체크</button> -->
           </div>
 
           <div id="user-email">
             <span id="email-lable" class="label">이메일</span>
-            <span id="email-form">
+            <input id="email-form">
+            <!-- <button id="check-email-duplicate">중복 체크</button> -->
           </div>
 
           <div id="user-created-date">
@@ -56,15 +62,17 @@
       </div>
 
       <div class="button-container">
+        <button id="edit-profile-button">프로필 편집</button>
         <button id="home-button" type="button">홈 화면 가기</button>
       </div>
 
+      <button id="drop-user-button" type="button">회원 탈퇴</button>
     </div>
 
   </section>
 
   <script src="../scripts/common.js"></script>
-  <script src="../scripts/view-profile.js"></script>
+  <script src="../scripts/modify-profile.js"></script>
 </body>
 
 </html>

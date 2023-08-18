@@ -1,0 +1,96 @@
+body {
+    background-color: #e9ecef;
+    margin: 0;
+    padding: 0;
+  }
+  
+  #preview {
+      width: 200px;
+      height: 200px;
+      border-radius: 200px;
+  }
+  
+  .btn-upload {
+      width: 150px;
+      height: 30px;
+      background: #fff;
+      border: 1px solid rgb(77,77,77);
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      &:hover {
+        background: rgb(77,77,77);
+        color: #fff;
+      }
+    }
+    
+    #file {
+      display: none;
+    }
+  
+  #container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  #content {
+    width: 400px;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 10px;
+    text-align: center;
+  }
+  
+  .profile-header {
+  text-align: -webkit-center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .profile-info {
+    margin-top: 30px;
+  }
+  
+  .user-info {
+    display: grid;
+    row-gap: 10px;
+    text-align: left;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .lable {
+    font-weight: bold;
+  }
+  
+  .button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  
+  .button-container button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #fff;
+    margin-right: 5px;
+  }
+  
+  #edit-profile-button {
+    background-color: #007bff;
+    cursor: pointer;
+  }
+  
+  #home-button {
+    background-color: #dc3545;
+  }

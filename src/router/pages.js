@@ -19,8 +19,13 @@ router.get('/reset-pw', (req, res) => {
 });
 
 // 프로필 보기 페이지
-router.get('/view-profile', (req, res) => {
+router.get('/view-profile/:userId', (req, res) => {
     res.sendFile(path.join(CLIENT_PATH, 'view-profile.html'));
+});
+
+// 프로필 수정 페이지
+router.get('/modify-profile', (req, res) => {
+    res.sendFile(path.join(CLIENT_PATH, 'modify-profile.html'));
 });
 
 //회원가입 페이지 

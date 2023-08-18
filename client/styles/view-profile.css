@@ -4,6 +4,33 @@ body {
   padding: 0;
 }
 
+#preview {
+    width: 200px;
+    height: 200px;
+    border-radius: 200px;
+}
+
+.btn-upload {
+    width: 150px;
+    height: 30px;
+    background: #fff;
+    border: 1px solid rgb(77,77,77);
+    border-radius: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+      background: rgb(77,77,77);
+      color: #fff;
+    }
+  }
+  
+  #file {
+    display: none;
+  }
+
 #container {
   display: flex;
   justify-content: center;
@@ -20,6 +47,7 @@ body {
 }
 
 .profile-header {
+text-align: -webkit-center;
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 20px;

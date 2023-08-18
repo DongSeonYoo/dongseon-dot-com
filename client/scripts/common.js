@@ -45,7 +45,6 @@ async function checkAuth() {
         return user;
 
     } catch (error) {
-        alert(error);
         location.href = "/";
     }
 }

@@ -347,8 +347,9 @@ router.put("/pw", async (req, res, next) => {
 // 프로필 보기 api
 // userId
 // GET
-router.get("/:userId", loginAuth, async (req, res, next) => {
-    const { userPk } = req.decoded;
+router.get("/:userId", async (req, res, next) => {
+    const { userId } = req.params;
+    console.log(userId);
     const result = {
         data: "",
         message: "",
@@ -356,12 +357,12 @@ router.get("/:userId", loginAuth, async (req, res, next) => {
     let pgClient = null;
 
     try {
-        exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
+        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
         pgClient = await pool.connect();
         const sql = `SELECT login_id, name, phone_number, email, created_date, updated_date 
                     FROM user_TB WHERE id = $1`;
-        const params = [userPk];
+        const params = [userId];
         const data = await pgClient.query(sql, params);
 
         if (data.rows.length !== 0) {

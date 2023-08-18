@@ -62,7 +62,7 @@ const totalLoginCountFetch = async () => {
             alert(json.message);
             return;
         }
-        totalLoginCount.innerHTML = `지금까지 로그인한 횟수: ${json.data}`;
+        totalLoginCount.innerHTML = `지금까지 로그인한 회원의 수: ${json.data}`;
 
     } catch (error) {
         alert(error);
@@ -80,7 +80,7 @@ const makeOnlyLoginUI = () => {
     // 로그인 버튼 제거
     loginModalBtn.style.display = "none";
     // 내 프로필 보기 버튼
-    viewProfileAtag.href = `/view-profile`;
+    viewProfileAtag.href = `/view-profile/${isLoggedIn.data.userPk}`;
     viewProfileButton.classList.add("login-only-button");
     viewProfileButton.innerHTML = "내 프로필";
     viewProfileAtag.appendChild(viewProfileButton);
@@ -157,12 +157,14 @@ const loginFetch = async () => {
         }
 
         // 로그인 실패하였을 경우
-        if (!json.token) {
+        if (!json.accessToken) {
             alert(`로그인 실패: ${json.message}`);
             clearInputFields();
             return;
         }
-        setCookie("accessToken", json.token);
+        setCookie("accessToken", json.accessToken);
+        setCookie("refreshToken", json.refreshToken);
+        
         location.reload();
 
     } catch (error) {
