@@ -28,7 +28,7 @@ async function displayPost() {
         if (res.status === 200) {
             if (json.data !== null) {
                 const post = json.data;
-                
+
                 const postInfoDiv = document.getElementById("post-info-temp-div");
                 const postTitle = document.getElementById("post-title");
                 const authorProfileImg = document.createElement("img");
@@ -157,6 +157,9 @@ function makeCommentList(comment) {
     const parsedUpdatedDate = new Date(comment.updated_date).toDateString();
 
     commentAuthor.innerHTML = "작성자: " + comment.authorName;
+    commentAuthor.onclick = () => {
+        location.href = `/view-profile/${comment.user_id}`
+    }
     commentCreatedDate.innerHTML = "작성일: " + parsedCreatedDate;
     commentUpdatedDate.innerHTML = "최근 수정일: " + parsedUpdatedDate;
     commentContent.innerHTML = comment.content;
@@ -169,7 +172,10 @@ function makeCommentList(comment) {
 
     // 만약 현재 보고있는 유저와 댓글의 아이디가 일치하면 (댓글주인일경우)
     if (userId == comment.user_id) {
-        makeMamnageCommentUI(commentDiv, comment.id);
+        const authorOwner = document.createElement("div");
+        authorOwner.innerHTML = "(작성자)";
+        commentInfoArea.appendChild(authorOwner);
+        makeMamnageCommentUI(commentInfoArea, comment.id);
     }
 
     commentsSection.appendChild(commentDiv);
@@ -203,15 +209,17 @@ function makeManagePostUI() {
     postInfoArea.appendChild(buttonZone);
 }
 
-function makeMamnageCommentUI(commentDiv, commentId) {
+function makeMamnageCommentUI(commentInfoArea, commentId) {
+    const manageButtonArea = document.createElement("div");
     const commentModifyBtn = document.createElement("button");
     const commentDeleteBtn = document.createElement("button");
 
     commentModifyBtn.innerHTML = "수정";
     commentDeleteBtn.innerHTML = "삭제";
 
-    commentDiv.appendChild(commentModifyBtn);
-    commentDiv.appendChild(commentDeleteBtn);
+    manageButtonArea.appendChild(commentModifyBtn);
+    manageButtonArea.appendChild(commentDeleteBtn);
+    commentInfoArea.appendChild(manageButtonArea);
 
     // commentModifyBtn.onclick = clickCommentModifyButton;
     commentDeleteBtn.onclick = () => clickCommentDeleteButton(commentId);
