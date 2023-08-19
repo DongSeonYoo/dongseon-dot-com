@@ -32,7 +32,7 @@ window.onload = async () => {
             if (!isLoggedIn) {
                 return;
             }
-            makeOnlyLoginUI(isLoggedIn);
+            await makeOnlyLoginUI(isLoggedIn);
         }
 
         recentLoginCountFetch();
@@ -94,8 +94,8 @@ const makeOnlyLoginUI = async (isLoggedIn) => {
             homeTitle.innerHTML = json.data.name;
         }
     } catch (error) {
-        alert(error);
         // console.error(error);
+        location.href = "/";
     }
 
     // 로그인 버튼 제거

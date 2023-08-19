@@ -259,17 +259,12 @@ const fetchSignupData = async () => {
 
         const json = await res.json();
         if (json.isSuccess) {
-            location.href = "/";
+            return location.href = "/";
 
-        } else {
-            location.href = "/";
         }
+        alert(json.message);
 
     } catch (err) {
         alert(err);
     }
 }
-
-document.querySelector("#home-button").addEventListener("click", () => {
-    location.href = "/";
-});

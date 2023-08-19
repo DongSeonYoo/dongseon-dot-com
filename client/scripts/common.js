@@ -40,8 +40,7 @@ async function checkAuth() {
         const user = await response.json();
         if (response.status !== 200) {
             deleteCookie("accessToken");
-            location.href = "/";
-            return false;
+            return location.href = "/";
         }
         return user;
 

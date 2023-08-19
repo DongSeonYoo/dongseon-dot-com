@@ -36,14 +36,12 @@ const onchangePage = (page) => {
 
 const updatePageMoveButton = () => {
     if (currentPage === 1) {
-        prevPageBtn.disabled = true;
-        return;
+        return prevPageBtn.disabled = true;
     }
     prevPageBtn.disabled = false;
 
     if (currentPage === maxPageCount) {
-        nextPageBtn.disabled = true;
-        return;
+        return nextPageBtn.disabled = true;
     }
     nextPageBtn.disabled = false;
 }
@@ -206,7 +204,8 @@ const loadApiFetch = async (order, method, page = currentPage, loginId = selecte
 
         // 응답 실패시
         if (response.status !== 200) {
-            alert(json.message);
+            alert(json.message + "q");
+            location.reload();
             return;
         }
         if (json.data) {

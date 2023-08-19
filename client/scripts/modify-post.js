@@ -61,8 +61,7 @@ async function loadPostData(postId) {
         const json = await result.json();
         if (result.status !== 200) {
             alert(json.message);
-            location.href = "/";
-            return;
+            return location.href = "/";
         }
         postTitle.value = json.data.title;
         postContent.value = json.data.content;
@@ -91,9 +90,12 @@ async function modifyPostFetch(titleValue, contentValue) {
         });
         if (result.status === 200) {
             const json = await result.json();
-            if (json.isSuccess) {
-                location.href = `/post/${postId}`;
+            if (!json.isSuccess) {
+                alert(json.message);
+                return location.href = "/community";
             }
+            location.href = `/post/${postId}`;
+            
         } else if (result.status === 401 || result.status === 403) {
             alert("다시 로그인 해주세요");
             location.href = "/";
