@@ -28,23 +28,29 @@ async function displayPost() {
         if (res.status === 200) {
             if (json.data !== null) {
                 const post = json.data;
-
-                const postTitle = document.getElementById("post-title");
-                const postAuthor = document.getElementById("post-author");
-                const postContent = document.getElementById("post-content");
                 
-                const postCreateDate = document.getElementById("post-create-date");
-                const postUpdateDate = document.getElementById("post-update-date");
+                const postInfoDiv = document.getElementById("post-info-temp-div");
+                const postTitle = document.getElementById("post-title");
+                const authorProfileImg = document.createElement("img");
+                const postContent = document.getElementById("post-content");
+
+                const postAuthorLink = document.getElementById("post-author-link");
+                
+                const postAuthor = document.createElement("p");
+                const postCreateDate = document.createElement("p");
+                const postUpdateDate = document.createElement("p");
 
                 const parsingUpdatedDate = new Date(post.updated_date).toLocaleDateString();
                 const parsingCreateDate = new Date(post.created_date).toLocaleString();
 
+                const authorPk = post.user_id;
+
                 postTitle.innerHTML = post.title;
-                postAuthor.innerHTML = "작성자: " + post.author_name;
+                authorProfileImg.src = s3ImageUrl + "/" + post.author_profile_img;
+                postAuthor.innerHTML = post.author_name;
                 
-                postText.innerHTML = post.content;
-                postContent.appendChild(postText);
-                const s3ImageUrl = "http://yoodongseon.s3.ap-northeast-2.amazonaws.com";
+                postContent.innerHTML = post.content;
+                postContent.id = "post-content";
                 if (post.image_key !== null) {
                     post.image_key.forEach(item => {
                         const postImage = document.createElement("img");
@@ -55,6 +61,25 @@ async function displayPost() {
                 }
                 postCreateDate.innerHTML = "작성일: " + parsingUpdatedDate;
                 postUpdateDate.innerHTML = "최근 수정일: " + parsingCreateDate;
+
+                postInfoDiv.appendChild(postCreateDate);
+                postInfoDiv.appendChild(postUpdateDate);
+
+                postAuthorLink.appendChild(authorProfileImg);
+                postAuthorLink.appendChild(postAuthor);
+
+                postAuthor.id = "post-author";
+                postAuthor.classList.add("post-info")
+
+                postCreateDate.id = "post-create-date";
+                postCreateDate.classList.add("post-info")
+
+                postUpdateDate.id = "post-update-date";
+                postUpdateDate.classList.add("post-info")
+
+                postAuthorLink.href = `/view-profile/${authorPk}`;
+
+                authorProfileImg.id = "post-author-img";
 
                 return post.user_id;
             }

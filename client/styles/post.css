@@ -27,10 +27,22 @@ h1 {
   text-align: center;
 }
 
+#post-author-img {
+  width: 30px;
+  border-radius: 20px;
+}
+
+#post-author-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
 #post-info-area {
   display: flex;
   justify-content: center;
   flex-direction: column;
+  align-items: center;
   border-bottom: 1px solid #ccc;
   padding-bottom: 10px;
   margin-bottom: 30px;
@@ -46,13 +58,13 @@ h1 {
 .post-info {
   font-size: 14px;
   color: #888;
-  margin-top: 5px;
 }
 
 #post-info-temp-div {
   display: flex;
   gap: 84px;
   justify-content: center;
+  align-items: center
 }
 
 #button-zone {
