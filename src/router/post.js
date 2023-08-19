@@ -112,10 +112,11 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
 
         pgClient = await pool.connect();
         const sql = `SELECT post_TB.*,
-      user_TB.name AS author_name
-      FROM post_TB 
-      JOIN user_TB ON post_TB.user_id = user_TB.id 
-      WHERE post_TB.id = $1`;
+                        user_TB.name AS author_name,
+                        user_TB.profile_img AS author_profile_img
+                        FROM post_TB 
+                        JOIN user_TB ON post_TB.user_id = user_TB.id 
+                        WHERE post_TB.id = $1`;
         const params = [postId];
 
         const data = await pgClient.query(sql, params)
