@@ -13,13 +13,12 @@ window.onload = async () => {
         // 게시글의 개수 먼저 불러오고
         const postCounts = await getPostCountFetch();
         allPostCounts = postCounts;
-        postCountSpan.innerHTML = allPostCounts;
+        postCountSpan.innerHTML = allPostCounts + " 개의 게시글";
 
         // 한 페이지에 보여주는 게시글의 기본값이 7 이니 postCounts / 8 한 값
         const maxPageSelectCount = Math.floor(postCounts / 8);
         makePageSelectButton(maxPageSelectCount);
         await getPostFetch(currentPage);
-
     } catch (error) {
         alert("요청에 실패하였습니다");
         console.error(error);
@@ -54,6 +53,8 @@ function clearPost() {
 
 // 게시글을 가져오는 요청을 하는 함수
 async function getPostFetch(count = 1) {
+    const pageSelectButtons = document.querySelectorAll(".page-select-btn");
+
     try {
         const response = await fetch(`/api/post?pageNumber=${count - 1}`);
         const json = await response.json();
@@ -70,6 +71,21 @@ async function getPostFetch(count = 1) {
             });
         }
 
+        const buttonArray = Array.from(pageSelectButtons);
+
+        // 모든 페이지 버튼의 활성화 상태 초기화
+        buttonArray.forEach(button => {
+            button.disabled = false;
+        });
+
+        // 현재 페이지 버튼을 비활성화
+        buttonArray
+        .filter(button => parseInt(button.innerHTML) === count)
+        .map(button => {
+            button.disabled = true;
+        });
+        
+
     } catch (error) {
         alert("네트워크 오류: " + error.message);
         console.error(error);
@@ -85,22 +101,6 @@ async function getPostFetch(count = 1) {
         })
     });
 }
-
-// async function getPostCountFetch() {
-//     const result = await fetch("/api/post/all/count");
-//     const json = await result.json();
-//     if (result.status === 200) {
-//         if (json.data !== null) {
-//             return await json.data;
-//         } else {
-
-//         }
-
-//     } else {
-//         alert("서버 오류: " + json.message);
-//         location.href = "/";
-//     }
-// }
 
 async function getPostCountFetch() {
     try {
