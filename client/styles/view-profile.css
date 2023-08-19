@@ -4,10 +4,14 @@ body {
   padding: 0;
 }
 
-#preview {
+#profile-img {
     width: 200px;
     height: 200px;
     border-radius: 200px;
+}
+
+#back-button {
+    background-color: #dc3545;
 }
 
 .btn-upload {
@@ -89,8 +93,4 @@ text-align: -webkit-center;
 #edit-profile-button {
   background-color: #007bff;
   cursor: pointer;
-}
-
-#home-button {
-  background-color: #dc3545;
 }

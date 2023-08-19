@@ -56,6 +56,9 @@ const viewProfileFetch = async (userPk) => {
     try {
         const result = await fetch(`/api/account/${userPk}`);
         const json = await result.json();
+        if (json.data === null) {
+            throw new Error("해당하는 사용자가 존재하지 않습니다");
+        }
         const user = json.data;
         if (user.profile_img) {
             userName.innerHTML = `${user.name}의 프로필`;
@@ -77,7 +80,11 @@ const viewProfileFetch = async (userPk) => {
         existingPhoneNumber = user.phone_number;
 
     } catch (error) {
-        alert(error);
+        alert(error.message);
         location.href = "/";
     }
 };
+
+const backButton = document.getElementById("back-button").addEventListener("click", () => {
+    history.back();
+})
