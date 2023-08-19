@@ -129,7 +129,7 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
     try {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
 
-        pgClient = pool.connect();
+        pgClient = await pool.connect();
         const sql = "SELECT phone_number FROM user_TB WHERE phone_number = $1";
         const params = [phoneNumber];
         const data = await pgClient.query(sql, params);
@@ -202,7 +202,7 @@ router.post("/signup", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        pgClient = pool.connect();
+        pgClient = await pool.connect();
         const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
         const params = [loginId, password, name, phoneNumber, email];
 
