@@ -60,11 +60,7 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
 
         pgClient = await pool.connect();
         const sql = `SELECT 
-                      comment_TB.id, 
-                      comment_TB.user_id, 
-                      comment_TB.content, 
-                      comment_TB.created_date, 
-                      comment_TB.updated_date, 
+                      comment_TB.*, 
                       user_TB.name AS "authorName" 
                     FROM 
                       comment_TB 
@@ -73,7 +69,8 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
                     ON 
                       comment_TB.user_id = user_TB.id 
                     WHERE 
-                      post_id = $1`;
+                      post_id = $1
+                    ORDER BY id DESC`;
         const params = [postId];
 
         const data = await pgClient.query(sql, params);
