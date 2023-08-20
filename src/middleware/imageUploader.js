@@ -16,6 +16,7 @@ AWS.config.update({
 
 const s3 = new AWS.S3();
 const allowedExtensions = ['.png', '.jpg', '.jpeg', '.bmp', 'png'];
+
 const postImageUploader = multer({
     storage: multerS3({
         s3: s3,
@@ -34,7 +35,7 @@ const postImageUploader = multer({
                     callback(null, `${req.decoded.loginId}/post/${Date.now()}_${file.originalname}`);
                 },
                 transform: function (req, file, callback) {
-                    callback(null, sharp().resize({ width: 600 }));
+                    callback(null, sharp().resize({ width: 800 }));
                 },
             },
         ],
@@ -42,7 +43,7 @@ const postImageUploader = multer({
     }),
     limits: {
         fileSize: 5 * 1024 * 1024,
-        files: 5
+        files: maxPostImageCount,
     }
 });
 
