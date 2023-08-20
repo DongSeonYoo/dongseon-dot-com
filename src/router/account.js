@@ -5,7 +5,7 @@ const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
 const loginAuth = require("../middleware/loginAuth");
-const jwt = require("../module/jwt");
+const jwtUtil = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
 const imageUploader = require("../middleware/imageUploader");
 
@@ -18,7 +18,8 @@ router.post("/login", async (req, res, next) => {
     const { loginId, password } = req.body;
     const result = {
         message: "",
-        token: null
+        accessToken: null,
+        refreshToken: null,
     };
     let pgClient = null;
 
@@ -27,8 +28,8 @@ router.post("/login", async (req, res, next) => {
         exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
         exception(password, "password").checkInput().checkLength(1, maxPwLength);
         if (loginId === process.env.ADMIN_ID && password === process.env.ADMIN_PW) {
-            const token = await jwt.adminSign();
-            res.cookie('accessToken', token);
+            const accessToken = await jwtUtil.adminSign();
+            res.cookie('accessToken', accessToken);
             return res.redirect('/admin');
         }
 
@@ -41,11 +42,13 @@ router.post("/login", async (req, res, next) => {
 
         if (data.rows.length !== 0) {
             const userData = data.rows[0];
-            const token = await jwt.userSign(userData);
-            dailyLoginCount.writeUser(loginId);
+            const accessToken = await jwtUtil.userSign(userData);
+            const refreshToken = await jwtUtil.refreshSign();
 
-            result.message = "로그인 성공";
-            result.token = token;
+
+            dailyLoginCount.writeUser(loginId);
+            result.accessToken = accessToken;
+            result.refreshToken = refreshToken;
         } else {
             result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
         }
@@ -349,7 +352,6 @@ router.put("/pw", async (req, res, next) => {
 // GET
 router.get("/:userId", async (req, res, next) => {
     const { userId } = req.params;
-    console.log(userId);
     const result = {
         data: "",
         message: "",
