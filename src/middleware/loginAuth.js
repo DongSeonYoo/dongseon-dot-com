@@ -19,18 +19,17 @@ module.exports = async (req, res, next) => {
         const sql = "SELECT id FROM token_blacklist WHERE token = $1";
         const params = [accessToken];
         const data = await pgClient.query(sql, params);
-        // 블랙리스트에 해당하는 토큰이 존재한다면?
-        if (data.rows.length !== 0) {
-            const error = new Error();
-            error.status = 401;
-            res.clearCookie("accessToken");
-            throw error;
 
-            // 블랙리스트에 토큰이 존재하지 않는 경우 (request에 디코딩한 값 담아줌)
-        } else {
+        // 블랙리스트에 존재하지 않는다면
+        if (data.rows.length === 0) {
             req.decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
-            next();
+            return next();
         }
+
+        const error = new Error();
+        error.status = 401;
+        res.clearCookie("accessToken");
+        throw error;
 
     } catch (error) {
         if (error.message === "jwt expired") {
