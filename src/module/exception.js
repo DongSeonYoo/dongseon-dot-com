@@ -9,7 +9,7 @@ const errorMessage = {
 
 function Exception(input, name) {
     this.checkInput = () => {
-        if (input === undefined) this.setError(errorMessage.invalidInput);
+        if (input === undefined || input.trim() === "") this.setError(errorMessage.invalidInput);
         return this;
     }
 
