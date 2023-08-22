@@ -2,6 +2,7 @@ const commentsSection = document.querySelector(".comments");
 const commentsCount = document.getElementById("comment-count");
 const postInfoArea = document.getElementById("post-info-area");
 const backBtn = document.getElementById("back-button");
+const postInfoDiv = document.getElementById("post-info-temp-div");
 
 let userId;
 const postId = parseUrl();
@@ -29,7 +30,7 @@ async function displayPost() {
             if (json.data !== null) {
                 const post = json.data;
 
-                const postInfoDiv = document.getElementById("post-info-temp-div");
+                
                 const postTitle = document.getElementById("post-title");
                 const authorProfileImg = document.createElement("img");
                 const postContent = document.getElementById("post-content");
@@ -59,8 +60,8 @@ async function displayPost() {
                         postContent.appendChild(postImage);
                     });
                 }
-                postCreateDate.innerHTML = "작성일: " + parsingUpdatedDate;
-                postUpdateDate.innerHTML = "최근 수정일: " + parsingCreateDate;
+                postCreateDate.innerHTML = "작성일: " + parsingCreateDate;
+                postUpdateDate.innerHTML = "최근 수정일: " + parsingUpdatedDate;
 
                 postInfoDiv.appendChild(postCreateDate);
                 postInfoDiv.appendChild(postUpdateDate);
@@ -156,7 +157,7 @@ function makeCommentList(comment) {
     const parsedCreatedDate = new Date(comment.created_date).toLocaleString();
     const parsedUpdatedDate = new Date(comment.updated_date).toDateString();
 
-    commentAuthor.innerHTML = "작성자: " + comment.authorName;
+    commentAuthor.innerHTML = comment.authorName;
     commentAuthor.onclick = () => {
         location.href = `/view-profile/${comment.user_id}`
     }
@@ -206,7 +207,7 @@ function makeManagePostUI() {
     buttonZone.appendChild(postModifyButton);
     buttonZone.appendChild(postDeleteButton);
 
-    postInfoArea.appendChild(buttonZone);
+    postInfoDiv.appendChild(buttonZone);
 }
 
 function makeMamnageCommentUI(commentInfoArea, commentId) {
