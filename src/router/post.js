@@ -57,7 +57,7 @@ router.post("/", loginAuth, imageUploader.postImageUpload(), async (req, res, ne
 // 특정 페이지 게시글 조회 api
 // GET
 // 명사이자 단수형으로
-router.get("/", loginAuth, async (req, res, next) => {
+router.get("/", async (req, res, next) => {
     const counterPage = 8;
     let { pageNumber } = req.query;
     const result = {
@@ -204,19 +204,21 @@ router.delete("/", loginAuth, async (req, res, next) => {
         const data = await pgClient.query(sql, params);
 
         if (data.rowCount !== 0) {
-            result.isSuccess = true;
             const deletedImagekey = data.rows[0].image_key;
-            for (const imgPath of deletedImagekey) {
-                await s3.deleteObject({
-                    Bucket: process.env.AWS_BUCKET_NAME,
-                    Key: imgPath,
-                // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
-                }, (err, data) => {
-                    if (err) {
-                        throw err;
-                    }
-                }).promise();
+            if (deletedImagekey) {
+                for (const imgPath of deletedImagekey) {
+                    await s3.deleteObject({
+                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Key: imgPath,
+                    // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
+                    }, (err, data) => {
+                        if (err) {
+                            throw err;
+                        }
+                    }).promise();
+                }
             }
+            result.isSuccess = true;
 
         } else {
             await pgClient.query("ROLLBACK")
