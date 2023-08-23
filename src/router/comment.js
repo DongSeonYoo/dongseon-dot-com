@@ -20,7 +20,6 @@ router.post("/", loginAuth, async (req, res, next) => {
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
         pgClient = await pool.connect();
@@ -110,7 +109,6 @@ router.put("/", loginAuth, async (req, res, next) => {
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
         pgClient = await pool.connect();
@@ -151,7 +149,6 @@ router.delete("/", loginAuth, async (req, res, next) => {
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength)
 
         pgClient = await pool.connect();
         const sql = "DELETE FROM comment_TB WHERE post_id = $1 AND user_id = $2 AND id = $3";

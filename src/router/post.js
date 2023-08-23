@@ -23,7 +23,6 @@ router.post("/", loginAuth, imageUploader.postImageUpload(), async (req, res, ne
     let pgClient = null;
 
     try {
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
@@ -151,7 +150,6 @@ router.put("/", loginAuth, async (req, res, next) => {
     let pgClient = null;
 
     try {
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
@@ -194,7 +192,6 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
-        exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
 
         pgClient = await pool.connect();
 

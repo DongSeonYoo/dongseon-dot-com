@@ -401,7 +401,6 @@ router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, 
     let pgClient = null;
 
     try {
-        exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
         exception(name, "name").checkInput().checkNameRegex();
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
@@ -449,9 +448,8 @@ router.delete("/", loginAuth, async (req, res, next) => {
     let pgClient = null;
 
     try {
-        exception(userPk, "userPk").checkInput().isNumber().checkLength(1, maxUserIdLength);
-
-        pgClient = await pool.connect();
+        
+        pgPool = await pool.connect();
         const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
         const deleteUser = [userPk];
         const data = await pgClient.query(deleteUserSql, deleteUser);
