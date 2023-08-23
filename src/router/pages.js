@@ -53,6 +53,11 @@ router.get('/modify-post/:postId', (req, res) => {
     res.sendFile(path.join(CLIENT_PATH, 'modify-post.html'));
 });
 
+//특정 유저의 게시글 목록 페이지
+router.get(`/list/post/:userId`, (req, res) => {
+    res.sendFile(path.join(CLIENT_PATH, 'post-list.html'));
+});
+
 // 관리자 페이지
 router.get('/admin', (req, res) => {
     res.sendFile(path.join(CLIENT_PATH, 'admin.html'));
