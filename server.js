@@ -12,6 +12,7 @@ const commentApi = require("./src/router/comment");
 const authApi = require("./src/router/auth");
 const logApi = require("./src/router/log");
 const loginCountApi = require("./src/router/loginCount");
+const listApi = require("./src/router/list");
 
 require("./src/module/schedule");
 require("dotenv").config();
@@ -31,6 +32,7 @@ app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
 app.use("/api/loginCount", loginCountApi);
+app.use("/api/list", listApi);
 
 // 로깅 미들웨어
 app.use("/api/log", logApi);

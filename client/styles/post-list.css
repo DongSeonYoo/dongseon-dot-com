@@ -1,0 +1,26 @@
+#container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  #content {
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 10px;
+    text-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.post-data-row {
+    display: flex;
+    border: 1px solid #ccc;
+    padding: 8px;
+    margin-bottom: 8px;
+    align-items: center;
+    cursor: pointer;
+    gap: 30px;
+}
