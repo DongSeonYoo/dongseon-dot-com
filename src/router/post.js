@@ -20,20 +20,20 @@ router.post("/", loginAuth, imageUploader.postImageUpload(), async (req, res, ne
         isSuccess: false,
         postId: "",
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
         const sql = `INSERT INTO 
                         post_TB (user_id, title, content, image_key) 
                         VALUES
                         ($1, $2, $3, $4) RETURNING id`;
 
         const params = [userId, title, content, images.map(item => item.transforms[0].key)];
-        const data = await pgClient.query(sql, params)
+        const data = await pgPool.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.postId = data.rows[0].id;
@@ -46,8 +46,8 @@ router.post("/", loginAuth, imageUploader.postImageUpload(), async (req, res, ne
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });
@@ -63,13 +63,13 @@ router.get("/", async (req, res, next) => {
         data: null,
         message: ""
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         exception(pageNumber, "pageNumber").isNumber();
 
         const offset = Number(pageNumber * counterPage);
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
         const sql = `SELECT 
               post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
               FROM post_TB
@@ -77,7 +77,7 @@ router.get("/", async (req, res, next) => {
               ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
         const params = [offset, counterPage];
 
-        const data = await pgClient.query(sql, params);
+        const data = await pgPool.query(sql, params);
         if (data.rows.length !== 0) {
             result.data = data.rows;
         } else {
@@ -90,8 +90,8 @@ router.get("/", async (req, res, next) => {
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });
@@ -104,12 +104,12 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
     const result = {
         data: null,
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
         const sql = `SELECT post_TB.*,
                         user_TB.name AS author_name,
                         user_TB.profile_img AS author_profile_img
@@ -118,7 +118,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
                         WHERE post_TB.id = $1`;
         const params = [postId];
 
-        const data = await pgClient.query(sql, params)
+        const data = await pgPool.query(sql, params)
         if (data.rows.length !== 0) {
             result.data = data.rows[0];
         } else {
@@ -131,8 +131,8 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });
@@ -147,17 +147,17 @@ router.put("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
         const sql = "UPDATE post_TB SET title = $1, content = $2 WHERE user_id = $3 AND id = $4";
         const params = [title, content, userId, postId];
-        const data = await pgClient.query(sql, params);
+        const data = await pgPool.query(sql, params);
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
@@ -172,8 +172,8 @@ router.put("/", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });
@@ -188,17 +188,17 @@ router.delete("/", loginAuth, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
 
-        pgClient.query("BEGIN");
+        pgPool.query("BEGIN");
         const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2 RETURNING image_key";
         const params = [postId, userId];
-        const data = await pgClient.query(sql, params);
+        const data = await pgPool.query(sql, params);
 
         if (data.rowCount !== 0) {
             const deletedImagekey = data.rows[0].image_key;
@@ -218,22 +218,22 @@ router.delete("/", loginAuth, async (req, res, next) => {
             result.isSuccess = true;
 
         } else {
-            await pgClient.query("ROLLBACK")
+            await pgPool.query("ROLLBACK")
             result.message = "해당하는 게시글이 존재하지 않습니다";
         }
-        pgClient.query("COMMIT");
+        pgPool.query("COMMIT");
         res.send(result);
 
     } catch (error) {
         console.error(error);
-        if (pgClient) {
-            await pgClient.query("ROLLBACK");
+        if (pgPool) {
+            await pgPool.query("ROLLBACK");
         }
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });
@@ -245,14 +245,14 @@ router.get("/all/count", loginAuth, async (req, res, next) => {
         data: null,
         message: ""
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
 
         const sql = `SELECT COUNT(*) FROM post_TB`;
 
-        const data = await pgClient.query(sql);
+        const data = await pgPool.query(sql);
         if (data.rows.length !== 0) {
             result.data = data.rows[0].count;
         } else {
@@ -264,8 +264,8 @@ router.get("/all/count", loginAuth, async (req, res, next) => {
         next(error);
 
     } finally {
-        if (pgClient) {
-            pgClient.release();
+        if (pgPool) {
+            pgPool.release();
         }
     }
 });

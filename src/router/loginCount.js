@@ -31,13 +31,13 @@ router.get("/total", async (req, res, next) => {
         isSuccess: false,
         data: null,
     };
-    let pgClient = null;
+    let pgPool = null;
 
     try {
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
 
         const sql = "SELECT count(*) FROM logged_in_user";
-        const data = await pgClient.query(sql);
+        const data = await pgPool.query(sql);
         result.isSuccess = true;
         result.data = data.rows[0].count;
         res.send(result);
@@ -45,7 +45,7 @@ router.get("/total", async (req, res, next) => {
         console.error(error);
         next(error);
     } finally {
-        pgClient.release();
+        pgPool.release();
     }
 })
 
