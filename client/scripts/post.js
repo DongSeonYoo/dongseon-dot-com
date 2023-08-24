@@ -30,13 +30,14 @@ async function displayPost() {
             if (json.data !== null) {
                 const post = json.data;
 
-                
                 const postTitle = document.getElementById("post-title");
                 const authorProfileImg = document.createElement("img");
                 const postContent = document.getElementById("post-content");
 
                 const postAuthorLink = document.getElementById("post-author-link");
-                
+                const userInfoDiv = document.createElement("div");
+                const userInfoMenuList = document.createElement("div");
+
                 const postAuthor = document.createElement("p");
                 const postCreateDate = document.createElement("p");
                 const postUpdateDate = document.createElement("p");
@@ -46,10 +47,22 @@ async function displayPost() {
 
                 const authorPk = post.user_id;
 
+                const profileMenuItem = document.createElement("a");
+                profileMenuItem.textContent = "프로필 보기";
+                profileMenuItem.onclick = () => {
+                    location.href = `/view-profile/${authorPk}`;
+                };
+
+                const postListMenuItem = document.createElement("a");
+                postListMenuItem.textContent = "게시글 목록 보기";
+                postListMenuItem.onclick = () => {
+                    location.href = `/list/post/${authorPk}`;
+                }
+
                 postTitle.innerHTML = post.title;
                 authorProfileImg.src = s3ImageUrl + "/" + post.author_profile_img;
                 postAuthor.innerHTML = post.author_name;
-                
+
                 postContent.innerHTML = post.content;
                 postContent.id = "post-content";
                 if (post.image_key !== null) {
@@ -63,24 +76,27 @@ async function displayPost() {
                 postCreateDate.innerHTML = "작성일: " + parsingCreateDate;
                 postUpdateDate.innerHTML = "최근 수정일: " + parsingUpdatedDate;
 
+                userInfoMenuList.appendChild(profileMenuItem);
+                userInfoMenuList.appendChild(postListMenuItem);
+
+                userInfoDiv.appendChild(authorProfileImg);
+                userInfoDiv.appendChild(postAuthor);
+                userInfoDiv.appendChild(userInfoMenuList);
+
+                postInfoDiv.appendChild(userInfoDiv);
                 postInfoDiv.appendChild(postCreateDate);
                 postInfoDiv.appendChild(postUpdateDate);
 
-                postAuthorLink.appendChild(authorProfileImg);
-                postAuthorLink.appendChild(postAuthor);
-
+                userInfoDiv.id = "user-info-div";
+                userInfoMenuList.id = "user-info-link";
                 postAuthor.id = "post-author";
-                postAuthor.classList.add("post-info")
-
                 postCreateDate.id = "post-create-date";
-                postCreateDate.classList.add("post-info")
-
                 postUpdateDate.id = "post-update-date";
-                postUpdateDate.classList.add("post-info")
-
-                postAuthorLink.href = `/view-profile/${authorPk}`;
-
                 authorProfileImg.id = "post-author-img";
+
+                postAuthor.classList.add("post-info")
+                postCreateDate.classList.add("post-info");
+                postUpdateDate.classList.add("post-info");
 
                 return post.user_id;
             }
@@ -95,7 +111,7 @@ async function displayPost() {
         }
     } catch (error) {
         console.error(error.message);
-        alert("데이터베이스 오류");
+        alert("네트워크 오류");
         location.href = "/";
     }
 }
@@ -139,6 +155,7 @@ async function loadCommentFetch(postId) {
     }
 }
 
+
 function parseUrl() {
     const url = window.location.href.split("/");
     const postId = url[url.length - 1];
@@ -174,7 +191,6 @@ function makeCommentList(comment) {
     // 만약 현재 보고있는 유저와 댓글의 아이디가 일치하면 (댓글주인일경우)
     if (userId == comment.user_id) {
         const authorOwner = document.createElement("div");
-        authorOwner.innerHTML = "(작성자)";
         commentInfoArea.appendChild(authorOwner);
         makeMamnageCommentUI(commentInfoArea, comment.id);
     }
@@ -249,12 +265,10 @@ async function clickPostDeleteButton() {
 
         const data = await response.json();
         if (response.status !== 200) {
-            alert(json.message);
-            return;
+            return alert(data.message);
         }
         if (!data.isSuccess) {
-            alert(data.message);
-            return;
+            return alert(data.message);
         }
         location.href = "/community";
 
@@ -361,5 +375,5 @@ async function deleteCommentFetch(postId, commentId) {
 }
 
 backBtn.addEventListener("click", () => {
-    location.href = "/community";
+    history.back();
 });
