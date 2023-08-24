@@ -40,12 +40,12 @@ async function checkAuth() {
         const user = await response.json();
         if (response.status !== 200) {
             deleteCookie("accessToken");
-            return location.href = "/";
+            throw new Error(user.message);
         }
         return user;
 
     } catch (error) {
-        location.href = "/";
+        console.error(error);
     }
 }
 
