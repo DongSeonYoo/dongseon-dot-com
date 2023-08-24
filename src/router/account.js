@@ -20,7 +20,6 @@ router.post("/login", async (req, res, next) => {
     const result = {
         message: "",
         accessToken: null,
-        refreshToken: null,
     };
     let pgPool = null;
 
@@ -44,11 +43,9 @@ router.post("/login", async (req, res, next) => {
         if (data.rows.length !== 0) {
             const userData = data.rows[0];
             const accessToken = await jwtUtil.userSign(userData);
-            const refreshToken = await jwtUtil.refreshSign();
 
             dailyLoginCount.writeUser(loginId);
             result.accessToken = accessToken;
-            result.refreshToken = refreshToken;
         } else {
             result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
         }
@@ -66,7 +63,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 // 로그아웃 api
-router.get("/logout", loginAuth, async (req, res, next) => {
+router.post("/logout", loginAuth, async (req, res, next) => {
     const result = {
         message: "",
     };
@@ -448,43 +445,47 @@ router.delete("/", loginAuth, async (req, res, next) => {
     let pgPool = null;
 
     try {
-        
         pgPool = await pool.connect();
+
+        // 트랜잭션 실행
+        pgPool.query("BEGIN");
         const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
-        const deleteUser = [userPk];
-        const data = await pgPool.query(deleteUserSql, deleteUser);
-        // 삭제 성공 시 해당 토큰을 블랙리스트에 등록
+        const params = [userPk];
+        const data = await pgPool.query(deleteUserSql, params);
+
         if (data.rowCount !== 0) {
-            const token = req.cookies.accessToken;
-            const expiredDate = new Date(req.decoded.exp * 1000);
-            const reason = "leave";
-            const registerBlackListSql = `INSERT INTO token_blacklist (token, expired_date, reason) VALUES ($1, $2, $3)`;
+            const objects = await s3.listObjects({
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Prefix: req.decoded.loginId,
+            }).promise();
 
-            const params = [token, expiredDate, reason];
-            const data = await pgPool.query(registerBlackListSql, params);
-            if (data.rowCount !== 0) {
-                result.isSuccess = true;
-                const objects = await s3.listObjects({
+            if (objects.Contents.length > 0) {
+                const deleteParams = {
                     Bucket: process.env.AWS_BUCKET_NAME,
-                    Prefix: req.decoded.loginId,
+                    Delete: {
+                        Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
+                    }
+                };
+                await s3.deleteObjects(deleteParams, (err, data) => {
+                    if (err) {
+                        throw err;
+                    }
                 }).promise();
-
-                if (objects.Contents.length > 0) {
-                    const deleteParams = {
-                        Bucket: process.env.AWS_BUCKET_NAME,
-                        Delete: {
-                            Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
-                        }
-                    };
-                    await s3.deleteObjects(deleteParams).promise();
-                }
             }
+            result.isSuccess = true;
+        } else {
+            await pgPool.query("ROLLBACK");
+            result.message = "해당하는 회원이 존재하지 않습니다";
         }
+        pgPool.query("COMMIT");
         res.clearCookie("accessToken");
         res.send(result);
 
     } catch (error) {
         console.error(error);
+        if (pgPool) {
+            await pgPool.query("ROLLBACK");
+        }
         next(error);
 
     } finally {
