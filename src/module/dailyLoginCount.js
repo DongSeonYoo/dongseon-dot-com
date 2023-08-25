@@ -1,12 +1,7 @@
-const redis = require("redis").createClient();
-
-const writeUser = async (loginId) => {
+const writeUser = async (req, loginId) => {
     try {
-        await redis.connect();
+        await req.redisClient.sAdd("dailyLoginUser", loginId);
 
-        await redis.sAdd("dailyLoginUser", loginId);
-
-        await redis.disconnect();
     } catch (error) {
         console.error(error);
     }

@@ -44,7 +44,7 @@ router.post("/login", async (req, res, next) => {
             const userData = data.rows[0];
             const accessToken = await jwtUtil.userSign(userData);
 
-            dailyLoginCount.writeUser(loginId);
+            dailyLoginCount.writeUser(req, loginId);
             result.accessToken = accessToken;
         } else {
             result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
