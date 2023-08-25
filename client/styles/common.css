@@ -1,9 +1,17 @@
 body {
-  background-image: url(../assets/home-background-image.jpg);
-  background-position: center;
-  margin: 0;
+    background-image: url(../assets/home-background-image.jpg);
+    background-position: center;
+    margin: 0;
 }
 
 button {
-  cursor: pointer;
+    cursor: pointer;
 }
+
+a {
+    text-decoration: none;
+  }
+  
+  a:visited {
+    color: black;
+  }

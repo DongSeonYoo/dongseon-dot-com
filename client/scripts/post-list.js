@@ -15,10 +15,11 @@ const loadWritedPostFetch = async () => {
         }
 
         const data = json.data;
-
-        data.forEach(element => {
-            makePostListUI(element);
-        });
+        if (data) {
+            data.forEach(element => {
+                makePostListUI(element);
+            });
+        }
     } catch (error) {
         alert(error);
     }
@@ -44,6 +45,10 @@ const makePostListUI = (data) => {
     postUpdateDateSpan.innerHTML = "최근 수정일: " + new Date(updated_date).toLocaleString();
     postIdInput.value = id;
 
+    postDataRow.onclick = () => {
+        location.href = `/post/${id}`;
+    }
+
     postDataRow.appendChild(postTitleSpan);
     postDataRow.appendChild(postContentSpan);
     postDataRow.appendChild(postCreateDateSpan);
@@ -64,4 +69,8 @@ function parseUrl() {
     const postId = url[url.length - 1];
 
     return postId;
+}
+
+const clickBackButton = () => {
+    history.back();
 }

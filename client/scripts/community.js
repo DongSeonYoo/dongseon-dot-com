@@ -62,8 +62,7 @@ async function getPostFetch(count = 1) {
         // 응답이 성공적으로 이루어지지 않았을 경우
         if (response.status !== 200) {
             alert(json.message);
-            location.href = "/";
-            return;
+            return location.href = "/";
         }
         if (json.data !== null) {
             json.data.forEach(post => {

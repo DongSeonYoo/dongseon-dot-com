@@ -258,6 +258,11 @@ h2 {
   height: 200px;
 }
 
+.backend-skills {
+    width: 4700px;
+    height: 300px;
+}
+
 /* works (main)  */
 #works {
   background-color: rgb(231, 234, 238);

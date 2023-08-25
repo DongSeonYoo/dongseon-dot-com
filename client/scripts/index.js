@@ -35,8 +35,8 @@ window.onload = async () => {
             await makeOnlyLoginUI(isLoggedIn);
         }
 
-        recentLoginCountFetch();
-        totalLoginCountFetch();
+        await recentLoginCountFetch();
+        await totalLoginCountFetch();
     } catch (error) {
         alert(error);
     }
@@ -94,8 +94,7 @@ const makeOnlyLoginUI = async (isLoggedIn) => {
             homeTitle.innerHTML = json.data.name;
         }
     } catch (error) {
-        // console.error(error);
-        location.href = "/";
+        console.log(error);
     }
 
     // 로그인 버튼 제거
@@ -184,8 +183,6 @@ const loginFetch = async () => {
             return;
         }
         setCookie("accessToken", json.accessToken);
-        setCookie("refreshToken", json.refreshToken);
-        
         location.reload();
 
     } catch (error) {
@@ -195,7 +192,9 @@ const loginFetch = async () => {
 
 const logoutFetch = async () => {
     try {
-        await fetch("/api/account/logout");
+        await fetch("/api/account/logout", {
+            method: "POST"
+        });
     } catch (error) {
         alert(error);
     }
@@ -235,7 +234,7 @@ navbarButton.addEventListener('click', () => {
 // 커뮤니티로 가는 버튼을 눌렀을시
 communityBtn.addEventListener("click", async () => {
     if (isLoggedIn) {
-        location.href = "/community"
+        location.href = "/community";
     } else {
         alert("로그인 후 이용가능합니다")
     }

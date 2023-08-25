@@ -5,8 +5,23 @@ body {
   background-color: #dfdbdb
 }
 
+#user-info-div {
+    position: relative;
+  }
+
+  #user-info-link {
+    display: flex;
+    flex-direction: column;
+  }
+
 #back-button {
     float: left;
+}
+
+#user-info-div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
 #container {
@@ -29,6 +44,7 @@ h1 {
 
 #post-author-img {
   width: 30px;
+  height: 30px;
   border-radius: 20px;
 }
 
@@ -53,6 +69,7 @@ h1 {
   display: flex;
   gap: 20px;
   justify-content: flex-start;
+  align-items: center;
 }
 
 .post-info {
@@ -62,7 +79,7 @@ h1 {
 
 #post-info-temp-div {
   display: flex;
-  gap: 84px;
+  gap: 60px;
   justify-content: center;
   align-items: center
 }
@@ -121,7 +138,10 @@ h1 {
 .comment-author, .comment-date {
   font-size: 14px;
   color: #888;
-  margin-top: 0;
+}
+
+.comment-author {
+  cursor: pointer;
 }
 
 .comment-content {

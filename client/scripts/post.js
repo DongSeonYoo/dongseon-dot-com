@@ -282,18 +282,15 @@ async function clickCommentSubmitBtn() {
     const commentContent = document.getElementById("comment-input");
 
     if (!userId) {
-        alert("로그인 후 이용해주세요");
-        return;
+        return alert("로그인 후 이용해주세요");
     }
 
     if (commentContent.value === "") {
-        alert("댓글이 입력되지 않았습니다");
-        return;
+        return alert("댓글이 입력되지 않았습니다");
     }
 
     if (commentContent.value.length > 300) {
-        alert("댓글은 300자 내로 입력해주세요");
-        return;
+        return alert("댓글은 300자 내로 입력해주세요");
     }
 
     try {
