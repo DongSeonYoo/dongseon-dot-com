@@ -12,11 +12,11 @@ const job = schedule.scheduleJob(rule, () => {
 
 // redis -> postgresql
 const moveDataToPostgres = async () => {
-    let pgClient = null;
+    let pgPool = null;
 
     try {
         // redis, postgresql 데이터베이스 연결
-        pgClient = await pool.connect();
+        pgPool = await pool.connect();
         await redisClient.connect();
 
         // redis에 저장되어있는 1시간동안의 로그인 기록을 가져옴 (type: array)
@@ -24,10 +24,12 @@ const moveDataToPostgres = async () => {
 
         // postgresql에 데이터 삽입
         for (const loginId of data) {
-            const query = `INSERT INTO logged_in_user (login_id, created_date, updated_date) VALUES ($1, $2, $3)`;
+            const query = `INSERT INTO 
+                            logged_in_user (login_id, created_date, updated_date) 
+                            VALUES ($1, $2, $3)`;
             const values = [loginId, new Date(), new Date()];
 
-            await pgClient.query(query, values);
+            await pgPool.query(query, values);
         }
         await redisClient.del("dailyLoginUser");
 
@@ -39,7 +41,7 @@ const moveDataToPostgres = async () => {
     } finally {
         // redis, postgresql 연결 해제
         await redisClient.disconnect();
-        await pgClient.release();
+        await pgPool.release();
     }
 }
 
