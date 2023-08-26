@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
-const { maxUserIdLength, maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
-const loginAuth = require("../middleware/loginAuth");
+const { maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
+const authGuard = require("../middleware/authGuard");
 
 
 // 댓글 생성 api
 // postId, userId, content
 // POST
-router.post("/", loginAuth, async (req, res, next) => {
+router.post("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const { postId, content } = req.body;
     const result = {
@@ -46,7 +46,7 @@ router.post("/", loginAuth, async (req, res, next) => {
 // 댓글 조회 api
 // :postId
 // GET
-router.get("/post/:postId", loginAuth, async (req, res, next) => {
+router.get("/post/:postId", authGuard, async (req, res, next) => {
     const { postId } = req.params;
     const result = {
         data: null,
@@ -97,7 +97,7 @@ router.get("/post/:postId", loginAuth, async (req, res, next) => {
 // 댓글 수정 api
 // postId, commentId, userId, content
 // PUT
-router.put("/", loginAuth, async (req, res, next) => {
+router.put("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const { content, postId, commentId } = req.body;
     const result = {
@@ -137,7 +137,7 @@ router.put("/", loginAuth, async (req, res, next) => {
 // 댓글 삭제 api
 // postId, commentId, userId
 // DELETE
-router.delete("/", loginAuth, async (req, res, next) => {
+router.delete("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const { postId, commentId } = req.body;
     const result = {
@@ -162,7 +162,6 @@ router.delete("/", loginAuth, async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
-        console.error(error);
         next(error);
 
     } finally {

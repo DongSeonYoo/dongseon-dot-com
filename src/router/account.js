@@ -4,7 +4,7 @@ const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
-const loginAuth = require("../middleware/loginAuth");
+const authGuard = require("../middleware/authGuard");
 const jwtUtil = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
 const imageUploader = require("../middleware/imageUploader");
@@ -63,7 +63,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 // 로그아웃 api
-router.post("/logout", loginAuth, async (req, res, next) => {
+router.post("/logout", authGuard, async (req, res, next) => {
     const result = {
         message: "",
     };
@@ -386,7 +386,7 @@ router.get("/:userId", async (req, res, next) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, next) => {
+router.put("/", authGuard, imageUploader.profileImageUpload(), async (req, res, next) => {
     const { userPk } = req.decoded;
     const { name, phoneNumber, email } = req.body;
     const profileImage = req.file?.key ?? "";
@@ -437,7 +437,7 @@ router.put("/", loginAuth, imageUploader.profileImageUpload(), async (req, res, 
 // 회원 탈퇴 api
 // userId
 // DELETE
-router.delete("/", loginAuth, async (req, res, next) => {
+router.delete("/", authGuard, async (req, res, next) => {
     const { userPk } = req.decoded;
     const result = {
         isSuccess: false

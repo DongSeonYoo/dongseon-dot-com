@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
-const { maxUserIdLength, maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
-const loginAuth = require("../middleware/loginAuth");
+const { maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
+const authGuard = require("../middleware/authGuard");
 const imageUploader = require("../middleware/imageUploader");
 
 const AWS = require("../../config/s3");
@@ -12,7 +12,7 @@ require("dotenv").config();
 
 // 게시글 작성 api
 // userId, title, content
-router.post("/", loginAuth, imageUploader.postImageUpload(), async (req, res, next) => {
+router.post("/", authGuard, imageUploader.postImageUpload(), async (req, res, next) => {
     const userId = req.decoded.userPk;
     const images = req.files;
     const { title, content } = req.body;
@@ -99,7 +99,7 @@ router.get("/", async (req, res, next) => {
 // 특정 게시글 조회 api
 // postId
 // GET
-router.get("/:postId", loginAuth, async (req, res, next) => {
+router.get("/:postId", authGuard, async (req, res, next) => {
     const { postId } = req.params;
     const result = {
         data: null,
@@ -140,7 +140,7 @@ router.get("/:postId", loginAuth, async (req, res, next) => {
 // 게시글 수정 api
 // userId, postId, title, content
 // PUT
-router.put("/", loginAuth, async (req, res, next) => {
+router.put("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const { postId, title, content } = req.body;
     const result = {
@@ -181,7 +181,7 @@ router.put("/", loginAuth, async (req, res, next) => {
 // 게시글 삭제 api
 // userId, postId
 // DELETE
-router.delete("/", loginAuth, async (req, res, next) => {
+router.delete("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
     const { postId } = req.body;
     const result = {
@@ -202,6 +202,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
         if (data.rowCount !== 0) {
             const deletedImagekey = data.rows[0].image_key;
+            // 이미지가 있는 게시글인 경우 s3에 업로드된 이미지도 함께 삭제
             if (deletedImagekey) {
                 for (const imgPath of deletedImagekey) {
                     await s3.deleteObject({
@@ -240,7 +241,7 @@ router.delete("/", loginAuth, async (req, res, next) => {
 
 // 모든 게시글의 수를 가져오는 api
 // GET
-router.get("/all/count", loginAuth, async (req, res, next) => {
+router.get("/all/count", authGuard, async (req, res, next) => {
     const result = {
         data: null,
         message: ""
