@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const redisClient = require("redis").createClient();
 const pool = require("../../config/database/postgresql");
-
 
 router.get("/hour", async (req, res, next) => {
     const result = {
@@ -12,8 +10,7 @@ router.get("/hour", async (req, res, next) => {
     };
 
     try {
-        await redisClient.connect();
-        const count = await redisClient.sCard("dailyLoginUser");
+        const count = await req.redisClient.sCard("dailyLoginUser");
         result.data = count;
         result.isSuccess = true;
         res.send(result);
@@ -21,8 +18,6 @@ router.get("/hour", async (req, res, next) => {
     } catch (error) {
         console.error(error);
         next(error);
-    } finally {
-        await redisClient.disconnect();
     }
 });
 
