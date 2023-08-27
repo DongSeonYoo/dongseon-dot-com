@@ -24,7 +24,7 @@ router.get("/", adminAuth, async (req, res, next) => {
         exception(order, "order").checkInput().checkLength(1, 6);
         exception(method, "method").checkInput().checkLength(0, 6);
         exception(page, "page").checkInput().isNumber().checkLength(1, 6);
-        exception(loginId, "loginId").checkInput().checkLength(0, maxLoginIdLength);
+        exception(loginId, "loginId").checkLength(0, maxLoginIdLength);
 
         if (order === 'old') {
             order = 1;
