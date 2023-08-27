@@ -2,7 +2,14 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
-const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
+const {
+    maxUserIdLength,
+    maxLoginIdLength,
+    maxPwLength,
+    maxNameLength,
+    maxPhoneNumberLength,
+    maxEmailLength
+} = require("../module/global");
 
 const authGuard = require("../middleware/authGuard");
 const bcryptUtil = require("../module/hashing");
