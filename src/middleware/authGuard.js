@@ -4,7 +4,6 @@ require("dotenv").config();
 module.exports = async (req, res, next) => {
     // 쿠키에 담긴 토큰을 추출
     const { accessToken } = req.cookies;
-    let pgClient = null;
 
     try {
         // 쿠키 이름이 잘못되었을때?(쿠키 이름을 조작한경우)
@@ -22,7 +21,5 @@ module.exports = async (req, res, next) => {
             error.status = 401;
         }
         next(error);
-    } finally {
-        if (pgClient) await pgClient.release();
     }
 };
