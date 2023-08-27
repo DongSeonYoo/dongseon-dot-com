@@ -5,6 +5,7 @@ const exception = require("../module/exception");
 const { maxUserIdLength, maxLoginIdLength, maxPwLength, maxNameLength, maxPhoneNumberLength, maxEmailLength } = require("../module/global");
 
 const authGuard = require("../middleware/authGuard");
+const bcryptUtil = require("../module/hashing");
 const jwtUtil = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
 const imageUploader = require("../middleware/imageUploader");
@@ -32,20 +33,20 @@ router.post("/login", async (req, res, next) => {
             res.cookie('accessToken', accessToken);
             return res.redirect('/admin');
         }
-
         // db연결
         pgPool = await pool.connect();
 
-        const sql = "SELECT id, login_id, name FROM user_TB WHERE login_id = $1 AND password = $2";
-        const params = [loginId, password];
+        const sql = "SELECT id, password, login_id, name FROM user_TB WHERE login_id = $1";
+        const params = [loginId];
         const data = await pgPool.query(sql, params);
-
         if (data.rows.length !== 0) {
             const userData = data.rows[0];
-            const accessToken = await jwtUtil.userSign(userData);
-
-            dailyLoginCount.writeUser(req, loginId);
-            result.accessToken = accessToken;
+            const passwordMatch = await bcryptUtil.compare(password, userData.password);
+            if (passwordMatch) {
+                const accessToken = await jwtUtil.userSign(userData);
+                dailyLoginCount.writeUser(req, loginId);
+                result.accessToken = accessToken;
+            }
         } else {
             result.message = "아이디 또는 비밀번호가 올바르지 않습니다";
         }
@@ -202,9 +203,11 @@ router.post("/signup", async (req, res, next) => {
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
+        const hashedPassword = await bcryptUtil.hashing(password);
+
         pgPool = await pool.connect();
         const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
-        const params = [loginId, password, name, phoneNumber, email];
+        const params = [loginId, hashedPassword, name, phoneNumber, email];
 
         const data = await pgPool.query(sql, params);
         if (data.rowCount !== 0) {
@@ -213,7 +216,6 @@ router.post("/signup", async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
-        console.error(error)
         next(error);
 
     } finally {
