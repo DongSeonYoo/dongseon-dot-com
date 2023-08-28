@@ -1,9 +1,7 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
-
-const loggingSetting = require('./src/middleware/loggingSetting');
-const errorHandling = require("./src/middleware/errorHandling");
+const redisClient = require("./config/database/redis");
 
 const pagesRoute = require("./src/router/pages");
 const accountApi = require("./src/router/account");
@@ -14,8 +12,14 @@ const logApi = require("./src/router/log");
 const loginCountApi = require("./src/router/loginCount");
 const listApi = require("./src/router/list");
 
+const loggingSetting = require('./src/middleware/loggingSetting');
+const errorHandling = require("./src/middleware/errorHandling");
+
 require("./src/module/schedule");
 require("dotenv").config();
+
+// redis 연결
+redisClient.connect();
 
 // 전역 미들웨어
 app.use(express.json());
