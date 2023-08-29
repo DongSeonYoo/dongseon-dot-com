@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const mongoClient = require("mongodb").MongoClient;
-const redisClient = require("redis").createClient();
+const redisClient = require("../../config/database/redis");
 
 const exception = require("../module/exception");
 const adminAuth = require("../middleware/adminAuth");
@@ -47,7 +47,6 @@ router.get("/", adminAuth, async (req, res, next) => {
 
         // db연결
         connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
-        await redisClient.connect();
 
         // mongodb 쿼리 실행
         const logData = await connect
@@ -79,10 +78,7 @@ router.get("/", adminAuth, async (req, res, next) => {
         result.data.logCount = logCount;
         res.send(result);
 
-        await redisClient.disconnect();
-        
     } catch (error) {
-        console.error(error);
         next(error);
 
     } finally {
@@ -97,18 +93,13 @@ router.get("/recentSearch", adminAuth, async (req, res, next) => {
     };
 
     try {
-        await redisClient.connect();
         const resultData = await redisClient.zRange(redisRecentSearchKey, 0, -1);
 
         result.data = resultData;
         res.send(result);
 
-        await redisClient.disconnect();
-
     } catch (error) {
-        console.error(error);
         next(error);
-
     }
 });
 

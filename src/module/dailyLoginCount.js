@@ -1,6 +1,8 @@
-const writeUser = async (req, loginId) => {
+const redisClient = require("../../config/database/redis");
+
+const writeUser = async (loginId) => {
     try {
-        await req.redisClient.sAdd("dailyLoginUser", loginId);
+        await redisClient.sAdd("dailyLoginUser", loginId);
 
     } catch (error) {
         console.error(error);

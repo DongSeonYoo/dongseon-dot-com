@@ -1,3 +1,4 @@
+const redisClient = require("../../config/database/redis");
 const express = require("express");
 const router = express.Router();
 
@@ -10,13 +11,12 @@ router.get("/hour", async (req, res, next) => {
     };
 
     try {
-        const count = await req.redisClient.sCard("dailyLoginUser");
+        const count = await redisClient.sCard("dailyLoginUser");
         result.data = count;
         result.isSuccess = true;
         res.send(result);
-        
+
     } catch (error) {
-        console.error(error);
         next(error);
     }
 });
