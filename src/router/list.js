@@ -12,16 +12,14 @@ router.get("/post/:userId", async (req, res, next) => {
         message: "",
         data: null
     }
-    let pgPool = null;
 
     try {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
-        pgPool = await pool.connect();
         const sql = `SELECT id, title, content, created_date, updated_date, image_key 
                         FROM post_TB 
                         WHERE user_id = $1`;
         const params = [userId];
-        const data = await pgPool.query(sql, params);
+        const data = await pool.query(sql, params);
 
         if (data.rows.length !== 0) {
             result.data = data.rows;
@@ -30,14 +28,8 @@ router.get("/post/:userId", async (req, res, next) => {
         }
         res.send(result);
 
-
     } catch (error) {
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 
@@ -47,17 +39,15 @@ router.get("/comment/:userId", async (req, res, next) => {
         message: "",
         data: null
     }
-    let pgPool = null;
 
     try {
         exception(userId, "userId").checkInput().isNumber().checkLength(1, maxUserIdLength);
-        
-        pgPool = await pool.connect();
+
         const sql = `SELECT content, created_date, updated_date 
                         FROM comment_TB 
                         WHERE user_id = $1`;
         const params = [userId];
-        const data = await pgPool.query(sql, params);
+        const data = await pool.query(sql, params);
 
         if (data.rows.length !== 0) {
             result.data = data.rows[0];
@@ -66,14 +56,8 @@ router.get("/comment/:userId", async (req, res, next) => {
         }
         res.send(result);
 
-
     } catch (error) {
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 

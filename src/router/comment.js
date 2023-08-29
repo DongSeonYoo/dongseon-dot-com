@@ -16,30 +16,22 @@ router.post("/", authGuard, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
-        pgPool = await pool.connect();
         const sql = `INSERT INTO comment_TB (post_id, user_id, content) VALUES ($1, $2, $3)`;
         const params = [postId, userId, content];
 
-        const data = await pgPool.query(sql, params);
+        const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
         }
         res.send(result);
 
     } catch (error) {
-        console.error(error);
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 
@@ -52,12 +44,10 @@ router.get("/post/:postId", authGuard, async (req, res, next) => {
         data: null,
         message: ""
     };
-    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        pgPool = await pool.connect();
         const sql = `SELECT 
                       comment_TB.*, 
                       user_TB.name AS "authorName" 
@@ -72,7 +62,7 @@ router.get("/post/:postId", authGuard, async (req, res, next) => {
                     ORDER BY id DESC`;
         const params = [postId];
 
-        const data = await pgPool.query(sql, params);
+        const data = await pool.query(sql, params);
         // 만약 해당 게시글에 댓글이 존재하면?
         if (data.rows.length !== 0) {
             result.data = data.rows;
@@ -84,13 +74,7 @@ router.get("/post/:postId", authGuard, async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
-        console.error(error);
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 
@@ -104,17 +88,15 @@ router.put("/", authGuard, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
         exception(content, "content").checkInput().checkLength(1, maxCommentContentLength);
 
-        pgPool = await pool.connect();
         const sql = "UPDATE comment_TB SET content = $1 WHERE post_id = $2 AND user_id = $3 AND id = $4";
         const params = [content, postId, userId, commentId];
-        const data = await pgPool.query(sql, params)
+        const data = await pool.query(sql, params)
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "댓글 수정 성공";
@@ -124,13 +106,7 @@ router.put("/", authGuard, async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
-        console.error(error);
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 
@@ -144,16 +120,14 @@ router.delete("/", authGuard, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgPool = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
         exception(commentId, "commentId").checkInput().isNumber().checkLength(1, maxCommentIdLength);
 
-        pgPool = await pool.connect();
         const sql = "DELETE FROM comment_TB WHERE post_id = $1 AND user_id = $2 AND id = $3";
         const params = [postId, userId, commentId];
-        const data = await pgPool.query(sql, params);
+        const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
         } else {
@@ -163,11 +137,6 @@ router.delete("/", authGuard, async (req, res, next) => {
 
     } catch (error) {
         next(error);
-
-    } finally {
-        if (pgPool) {
-            pgPool.release();
-        }
     }
 });
 
