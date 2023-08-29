@@ -373,16 +373,16 @@ router.delete("/", authGuard, async (req, res, next) => {
     const result = {
         isSuccess: false
     }
-    let pgPool = null;
+    let pgClient = null;
 
     try {
-        pgPool = await pool.connect();
+        pgClient = await pool.connect();
 
         // 트랜잭션 실행
-        pgPool.query("BEGIN");
+        pgClient.query("BEGIN");
         const deleteUserSql = "DELETE FROM user_TB WHERE id = $1";
         const params = [userPk];
-        const data = await pgPool.query(deleteUserSql, params);
+        const data = await pgClient.query(deleteUserSql, params);
 
         if (data.rowCount !== 0) {
             const objects = await s3.listObjects({
@@ -407,20 +407,19 @@ router.delete("/", authGuard, async (req, res, next) => {
         } else {
             result.message = "해당하는 회원이 존재하지 않습니다";
         }
-        pgPool.query("COMMIT");
+        pgClient.query("COMMIT");
         res.clearCookie("accessToken");
         res.send(result);
 
     } catch (error) {
-        console.error(error);
-        if (pgPool) {
-            await pgPool.query("ROLLBACK");
+        if (pgClient) {
+            await pgClient.query("ROLLBACK");
         }
         next(error);
 
     } finally {
-        if (pgPool) {
-            pgPool.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });

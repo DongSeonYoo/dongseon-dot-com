@@ -157,17 +157,17 @@ router.delete("/", authGuard, async (req, res, next) => {
         isSuccess: false,
         message: ""
     };
-    let pgPool = null;
+    let pgClient = null;
 
     try {
         exception(postId, "postId").checkInput().isNumber().checkLength(1, maxPostIdLength);
 
-        pgPool = await pool.connect();
+        pgClient = await pool.connect();
 
-        pgPool.query("BEGIN");
+        pgClient.query("BEGIN");
         const sql = "DELETE FROM post_TB WHERE id = $1 AND user_id = $2 RETURNING image_key";
         const params = [postId, userId];
-        const data = await pgPool.query(sql, params);
+        const data = await pgClient.query(sql, params);
 
         if (data.rowCount !== 0) {
             const deletedImagekey = data.rows[0].image_key;
@@ -177,7 +177,7 @@ router.delete("/", authGuard, async (req, res, next) => {
                     await s3.deleteObject({
                         Bucket: process.env.AWS_BUCKET_NAME,
                         Key: imgPath,
-                    // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
+                        // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
                     }, (err, data) => {
                         if (err) {
                             throw err;
@@ -188,22 +188,20 @@ router.delete("/", authGuard, async (req, res, next) => {
             result.isSuccess = true;
 
         } else {
-            await pgPool.query("ROLLBACK")
             result.message = "해당하는 게시글이 존재하지 않습니다";
         }
-        pgPool.query("COMMIT");
+        pgClient.query("COMMIT");
         res.send(result);
 
     } catch (error) {
-        console.error(error);
-        if (pgPool) {
-            await pgPool.query("ROLLBACK");
+        if (pgClient) {
+            await pgClient.query("ROLLBACK");
         }
         next(error);
 
     } finally {
-        if (pgPool) {
-            pgPool.release();
+        if (pgClient) {
+            pgClient.release();
         }
     }
 });

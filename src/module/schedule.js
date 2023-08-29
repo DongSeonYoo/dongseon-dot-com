@@ -1,13 +1,13 @@
 const schedule = require("node-schedule");
 const rule = new schedule.RecurrenceRule();
 
-const redisClient = require("redis").createClient();
+const redisClient = require("../../config/database/redis");
 const pool = require("../../config/database/postgresql");
 
 //매 0분마다 (한시간마다) 실행
 rule.minute = 0;
-const job = schedule.scheduleJob(rule, () => {
-    moveDataToPostgres();
+const job = schedule.scheduleJob(rule, async () => {
+    await moveDataToPostgres();
 });
 
 // redis -> postgresql
@@ -15,9 +15,11 @@ const moveDataToPostgres = async () => {
     let pgPool = null;
 
     try {
-        // redis, postgresql 데이터베이스 연결
+        // postgresql get connection
         pgPool = await pool.connect();
-        await redisClient.connect();
+
+        // 트랜잭션 시작
+        await pgPool.query("BEGIN");
 
         // redis에 저장되어있는 1시간동안의 로그인 기록을 가져옴 (type: array)
         const data = await redisClient.sMembers("dailyLoginUser");
@@ -28,19 +30,21 @@ const moveDataToPostgres = async () => {
                             logged_in_user (login_id, created_date, updated_date) 
                             VALUES ($1, $2, $3)`;
             const values = [loginId, new Date(), new Date()];
-
             await pgPool.query(query, values);
         }
-        await redisClient.del("dailyLoginUser");
 
+        await redisClient.del("dailyLoginUser");
+        // 트랜잭션 종료
+        await pgPool.query("COMMIT");
         console.log("스케쥴러 작동 성공");
 
     } catch (error) {
+        // 에러 어떻게 넘겨줄건지?
         console.error(error);
+        await pgPool.query("ROLLBACK");
 
     } finally {
-        // redis, postgresql 연결 해제
-        await redisClient.disconnect();
+        // postgresql 커넥션 반환
         await pgPool.release();
     }
 }
