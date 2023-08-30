@@ -61,10 +61,10 @@ router.get("/", async (req, res, next) => {
 
         const offset = Number(pageNumber * counterPage);
         const sql = `SELECT 
-              post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
-              FROM post_TB
-              JOIN user_TB ON post_TB.user_id = user_TB.id 
-              ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
+                        post_TB.id, post_TB.title, post_TB.content, post_TB.created_date, user_TB.name AS author_name
+                        FROM post_TB
+                        JOIN user_TB ON post_TB.user_id = user_TB.id 
+                        ORDER BY created_date DESC OFFSET $1 LIMIT $2`;
         const params = [offset, counterPage];
 
         const data = await pool.query(sql, params);
