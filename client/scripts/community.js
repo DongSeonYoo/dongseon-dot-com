@@ -95,7 +95,6 @@ async function getPostFetch(count = 1) {
     post.forEach((postElement) => {
         postElement.addEventListener("click", () => {
             const postId = postElement.querySelector("input").value;
-
             location.href = `/post/${postId}`;
         })
     });
@@ -106,9 +105,7 @@ async function getPostCountFetch() {
         const response = await fetch("/api/post/all/count");
         const json = await response.json();
         if (response.status !== 200) {
-            alert("서버 오류: " + json.message);
-            location.href = "/";
-            return;
+            throw new Error(json.message);
         }
         if (json.data !== null) {
             return await json.data;
@@ -116,7 +113,7 @@ async function getPostCountFetch() {
 
     } catch (error) {
         alert(error);
-        location.href = "/";
+        return location.href = "/";
     }
 }
 
