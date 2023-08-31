@@ -2,241 +2,241 @@
 <html lang="ko">
 
 <head>
-  <meta charset="UTF-8">
-  <title>MainPage</title>
+    <meta charset="UTF-8">
+    <title>MainPage</title>
 
-  <link rel="stylesheet" type="text/css" href="../styles/index.css">
+    <link rel="stylesheet" type="text/css" href="../styles/index.css">
 
 </head>
 
 <body>
-  <!-- header -->
-  <header>
-    <nav id="nav-bar">
+    <!-- header -->
+    <header>
+        <nav id="nav-bar">
 
-      <div id="nav-logo">
+            <div id="nav-logo">
 
-        <a href="/">
-          <img id="logo-img" src="./assets/database.png">
-        </a>
+                <a href="/">
+                    <img id="logo-img" src="./assets/database.png">
+                </a>
 
-        <a href="/">
-          <b>
-            YooDongSeon
-          </b>
-        </a>
+                <a href="/">
+                    <b>
+                        YooDongSeon
+                    </b>
+                </a>
 
-      </div>
+            </div>
 
-      <div id="nav-menu">
+            <div id="nav-menu">
 
-        <a class="nav-menu-item" href="#home">
-          Home
-        </a>
+                <a class="nav-menu-item" href="#home">
+                    Home
+                </a>
 
-        <a class="nav-menu-item" href="#about">
-          Abouts
-        </a>
+                <a class="nav-menu-item" href="#about">
+                    Abouts
+                </a>
 
-        <a class="nav-menu-item" href="#skills">
-          Skills
-        </a>
+                <a class="nav-menu-item" href="#skills">
+                    Skills
+                </a>
 
-        <a class="nav-menu-item" href="#works">
-          Works
-        </a>
+                <a class="nav-menu-item" href="#works">
+                    Works
+                </a>
 
-        <a class="nav-menu-item" href="#contacts">
-          Contacts
-        </a>
+                <a class="nav-menu-item" href="#contacts">
+                    Contacts
+                </a>
 
-        <div class="nav-menu-item" id="community-button">커뮤니티</div>
-      </div>
+                <div class="nav-menu-item" id="community-button">커뮤니티</div>
+            </div>
 
-      <button class="navbar-toggle-button">
-        <img id="toggle-button-icon" src="./assets/menu.png">
-      </button>
+            <button class="navbar-toggle-button">
+                <img id="toggle-button-icon" src="./assets/menu.png">
+            </button>
 
-      <div id="login-modal-open-button"> 로그인 </div>
+            <div id="login-modal-open-button"> 로그인 </div>
 
-      <div class="modal hidden">
+            <div class="modal hidden">
 
-        <div class="background"></div>
+                <div class="background"></div>
 
-        <div class="modalBox">
-          <button id="modal-close-button">X</button>
+                <div class="modalBox">
+                    <button id="modal-close-button">X</button>
 
-          <div id="inside">
+                    <div id="inside">
 
-              <h3>로그인</h3>
+                        <h3>로그인</h3>
 
-              <input id="id-form" class="user-login-form" type="text" placeholder="아이디">
-              <input id="pw-form" class="user-login-form" type="password" placeholder="비밀번호">
+                        <input id="id-form" class="user-login-form" type="text" placeholder="아이디">
+                        <input id="pw-form" class="user-login-form" type="password" placeholder="비밀번호">
 
-              <div id="modal-button-container">
+                        <div id="modal-button-container">
 
-                <button id="modal-login-button" onclick="clickLogin()">로그인</button>
+                            <button id="modal-login-button" onclick="clickLogin()">로그인</button>
 
-                <div>
-                  <button id="find-id-button" class="other-button" type="button">아이디 찾기</button>
+                            <div>
+                                <button id="find-id-button" class="other-button" type="button">아이디 찾기</button>
 
-                  <button id="find-pw-button" class="other-button" type="button">비밀번호 찾기</button>
-                
-                  <button id="sign-up-button" class="other-button"type="button">회원가입</button>
+                                <button id="find-pw-button" class="other-button" type="button">비밀번호 찾기</button>
+
+                                <button id="sign-up-button" class="other-button" type="button">회원가입</button>
+                            </div>
+
+                            <a id="kakao" href="/api/auth/kakao" class="btn">카카오톡 로그인</a>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </nav>
+    </header>
+
+    <!-- main -->
+    <main>
+        <section id="home">
+            <div id="home-container" class="section-container">
+
+                <img id="user-image" src="./assets/user.png">
+
+                <h2 id="home-title">
+                    로그인 해 주세요
+                </h2>
+
+                <h2 id="home-description">
+
+                </h2>
+
+            </div>
+        </section>
+
+        <section id="about">
+            <div class="section-container">
+
+                <h1 id="about-title">
+
+                </h1>
+
+                <h2 id="recent-login-user-count">
+
+                </h2>
+
+                <h2 id="total-login-user-count">
+
+                </h2>
+
+            </div>
+        </section>
+
+        <section id="skills">
+            <div class="section-container">
+
+                <h1 id="skills-title">
+                    My Skiils
+                </h1>
+
+                <div id="html-css-javascript">
+                    <img class="html-css-js-icon" src="./assets/html.png">
+                    <img class="html-css-js-icon" src="./assets/css.png">
+                    <img class="html-css-js-icon" src="./assets/javascript.png">
                 </div>
 
-              </div>
-          </div>
-        </div>
-      </div>
+                <div id="backend">
+                    <img class="backend-skills" src="./assets/nodejs.png">
+                </div>
 
-    </nav>
-  </header>
+                <h2 id="skills-description">
 
-  <!-- main -->
-  <main>
-    <section id="home">
-      <div id="home-container" class="section-container">
+                </h2>
 
-        <img id="user-image" src="./assets/user.png">
-
-        <h2 id="home-title">
-          로그인 해 주세요
-        </h2>
-
-        <h2 id="home-description">
-
-        </h2>
-
-      </div>
-    </section>
-
-    <section id="about">
-      <div class="section-container">
-
-        <h1 id="about-title">
-
-        </h1>
-
-        <h2 id="recent-login-user-count">
-            
-        </h2>
-
-        <h2 id="total-login-user-count">
-            
-        </h2>
-
-      </div>
-    </section>
-
-    <section id="skills">
-      <div class="section-container">
-
-        <h1 id="skills-title">
-          My Skiils
-        </h1>
-
-        <div id="html-css-javascript">
-          <img class="html-css-js-icon" src="./assets/html.png">
-          <img class="html-css-js-icon" src="./assets/css.png">
-          <img class="html-css-js-icon" src="./assets/javascript.png">
-        </div>
-
-        <div id="backend">
-            <img class="backend-skills" src="./assets/nodejs.png">
-        </div>
-
-        
-
-        <h2 id="skills-description">
-
-        </h2>
-
-      </div>
-    </section>
-
-    <section id="works">
-      <div class="section-container">
-
-        <h1 id="works-title">
-          Works
-        </h1>
-
-        <div class="works-projects">
-          <a href="http://3.34.91.126:8080/" class="project">
-            <img class="project-image" src="./assets/daily.png">
-
-            <div class="project-description">
-              <h3 class="project-title">
-                일정 관리 프로젝트
-              </h3>
-
-              <p>
-                일정 관리 프로젝트
-              </p>
             </div>
-          </a>
+        </section>
+
+        <section id="works">
+            <div class="section-container">
+
+                <h1 id="works-title">
+                    Works
+                </h1>
+
+                <div class="works-projects">
+                    <a href="http://3.34.91.126:8080/" class="project">
+                        <img class="project-image" src="./assets/daily.png">
+
+                        <div class="project-description">
+                            <h3 class="project-title">
+                                일정 관리 프로젝트
+                            </h3>
+
+                            <p>
+                                일정 관리 프로젝트
+                            </p>
+                        </div>
+                    </a>
+
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- footer -->
+    <footer id="contacts">
+
+        <h1 id="contacts-title">
+            Contact me
+        </h1>
+
+        <div id="contacts-container">
+
+            <div class="contacts-contents">
+
+                <h2 class="contacts-font">
+                    address
+                </h2>
+
+                <p class="contacts-font">
+                    songdo, inceon
+                </p>
+
+            </div>
+
+            <div class="contacts-contents">
+
+                <h2 class="contacts-font">
+                    email
+                </h2>
+
+                <p class="contacts-font">
+                    inko51366@naver.com
+                </p>
+
+            </div>
+
+            <div class="contacts-contents">
+
+                <h2 class="contacts-font">
+                    phone
+                </h2>
+
+                <p class="contacts-font">
+                    010-3626-1552
+                </p>
+
+            </div>
 
         </div>
 
-      </div>
-    </section>
-  </main>
+    </footer>
 
-  <!-- footer -->
-  <footer id="contacts">
-
-    <h1 id="contacts-title">
-      Contact me
-    </h1>
-
-    <div id="contacts-container">
-
-      <div class="contacts-contents">
-
-        <h2 class="contacts-font">
-          address
-        </h2>
-
-        <p class="contacts-font">
-          songdo, inceon
-        </p>
-
-      </div>
-
-      <div class="contacts-contents">
-
-        <h2 class="contacts-font">
-          email
-        </h2>
-
-        <p class="contacts-font">
-          inko51366@naver.com
-        </p>
-
-      </div>
-
-      <div class="contacts-contents">
-
-        <h2 class="contacts-font">
-          phone
-        </h2>
-
-        <p class="contacts-font">
-          010-3626-1552
-        </p>
-
-      </div>
-
-    </div>
-
-  </footer>
-
-  <button class="scroll-top-button">
-    Top
-  </button>
-  <script src="./scripts/common.js"></script>
-  <script src="../scripts/index.js"></script>
+    <button class="scroll-top-button">
+        Top
+    </button>
+    <script src="./scripts/common.js"></script>
+    <script src="../scripts/index.js"></script>
 </body>
 
 </html>
