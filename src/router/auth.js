@@ -14,6 +14,28 @@ passport.use('kakao', new KakaoStrategy({
 }, async (accessToken, refreshToken, profile, done) => {
     // 인증 전략 실행하자
     // 기존 테이블을 새로 만들어서 관리할건지 기존 테이블에 컬럼을 추가해서 통합으로 관리할건지
+    console.log(`accessTOken: ${accessToken}`);
+    console.log(`refreshToken: ${refreshToken}`);
+
+    try {
+        const { id, username, provider } = profile;
+        const email = profile._json.kakao_account.email;
+
+        const selectSql = `SELECT id FROM user_TB WHERE login_id = $1`;
+        const params = [id];
+
+        const selectedData = await pool.query(selectSql, params);
+        // 만약 기존에 가입한 유저가 아니라면 (회원가입시켜줘야지)
+        if (selectedData.rows.length === 0) {
+            const insertSql = "INSERT INTO user_TB (login_id, name, email, provider) VALUES ($1, $2, $3, $4)";
+            const params = [id, username, email, provider];
+            await pool.query(insertSql, params);
+        }
+        done(null, selectedData);
+
+    } catch (error) {
+        console.log(error);
+    }
 }));
 
 // 카카오 로그인 페이지로 이동시켜주는 api
