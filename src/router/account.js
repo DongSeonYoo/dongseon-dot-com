@@ -315,6 +315,7 @@ router.get("/:userId", async (req, res, next) => {
         } else {
             result.data = null;
             result.message = "해당하는 사용자가 존재하지 않습니다";
+            res.clearCookie("accessToken");
         }
         res.send(result);
 
