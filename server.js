@@ -15,20 +15,11 @@ const listApi = require("./src/router/list");
 const loggingSetting = require('./src/middleware/loggingSetting');
 const errorHandling = require("./src/middleware/errorHandling");
 
-const https = require("https");
-const fs = require("fs");
-
-const path = require("path");
+const passport = require("passport");
+const passportConfig = require("./src/module/passport");
 
 require("./src/module/schedule");
 require("dotenv").config();
-
-// SSL 옵션
-// const options = {
-//     "key": fs.readFileSync(path.join(__dirname, "./ssl/key.pem")),
-//     "cert": fs.readFileSync(path.join(__dirname, "./ssl/cert.pem")),
-//     "passphrase": "1234"
-// };
 
 // redis 연결
 redisClient.connect();
@@ -38,24 +29,11 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("client/"));
 app.use(loggingSetting());
-// CORS
-// app.use((req, res) => {
-//     res.header("Access-Control-Allow-Origin", "*"); // 모든 도메인 허용
-// });
+passportConfig();
+app.use(passport.initialize());
 
 // 페이지 미들웨어
 app.use("/", pagesRoute);
-
-// https 연결
-// app.get("*", (req, res, next) => {
-//     const protocol = req.protocol;
-//     if (protocol === "https") {
-//         next();
-//     } else {
-//         const destination = `https://${req.hostname}:8443/`;
-//         res.redirect(destination);
-//     }
-// });
 
 // api 호출 미들웨어
 app.use("/api/auth", authApi);
@@ -77,9 +55,5 @@ app.use((req, res, next) => {
 
 // error catch middleware
 app.use(errorHandling());
-
-// https.createServer(options, app).listen(8443, '0.0.0.0', () => {
-//     console.log("8443포트에서 https 웹 서버 실행");
-// });
 
 module.exports = app;
