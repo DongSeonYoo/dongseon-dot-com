@@ -6,6 +6,8 @@ const authGuard = require("../middleware/authGuard");
 const adminAuth = require('../middleware/adminAuth');
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
+
+const jwtUtil = require("../module/jwt");
 require("dotenv").config();
 
 passport.use('kakao', new KakaoStrategy({
@@ -42,9 +44,15 @@ router.get("/kakao", passport.authenticate("kakao"));
 
 // 카카오 인증 전략 실행
 router.get('/kakao/callback', passport.authenticate("kakao", {
+    session: false,
     failureRedirect: '/',
-}), (res, req) => {
-    res.redirect('/');
+}), async (req, res, next) => {
+    const accessToken = await jwtUtil.userSign(req.user.rows[0]);
+    res.cookie("accessToken", accessToken, {
+        httpOnly: false,
+        secure: false,
+    });
+    res.redirect("/");
 });
 
 router.get("/login", authGuard, (req, res) => {
