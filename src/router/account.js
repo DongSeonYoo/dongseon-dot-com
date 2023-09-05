@@ -16,6 +16,7 @@ const bcryptUtil = require("../module/hashing");
 const jwtUtil = require("../module/jwt");
 const dailyLoginCount = require("../module/dailyLoginCount");
 const imageUploader = require("../middleware/imageUploader");
+const emailHandler = require("../module/mail");
 
 const AWS = require("../../config/s3");
 const s3 = new AWS.S3();
@@ -181,12 +182,13 @@ router.post("/signup", async (req, res, next) => {
 
         const hashedPassword = await bcryptUtil.hashing(password);
 
-        const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5)`;
+        const sql = `INSERT INTO user_TB (login_id, password, name, phone_number, email) VALUES ($1, $2, $3, $4, $5) RETURNING email`;
         const params = [loginId, hashedPassword, name, phoneNumber, email];
 
         const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.message = "회원가입 성공";
+            emailHandler(data.rows[0]);
         }
         res.send(result);
 
