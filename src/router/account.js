@@ -188,7 +188,9 @@ router.post("/signup", async (req, res, next) => {
         const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.message = "회원가입 성공";
-            emailHandler(data.rows[0]);
+
+            const signupUserEmail = data.rows[0].email;
+            emailHandler.sendWelcomeEmail(signupUserEmail);
         }
         res.send(result);
 
