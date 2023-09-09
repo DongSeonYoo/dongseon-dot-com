@@ -47,19 +47,30 @@ router.post("/send-auth-email", (req, res, next) => {
 // 인증번호 체크
 router.post("/check-auth-email", async (req, res, next) => {
     const { email, code } = req.body;
+    const result = {
+        isSuccess: false,
+        message: "",
+    }
 
     try {
         exception(email, "email").checkInput().checkEmailRegex();
         exception(code, "code").checkInput().isNumber();
 
-        const data = await redisClient.get(email, code);
-        if (data) {
-            // 인증번호가 유효한 경우
-
+        const data = await redisClient.get(email);
+        if (!data) {
+            result.message = "인증번호가 만료되었습니다. 다시 발급받아주세요";
         } else {
-            // 인증번호가 유효하지 않은 경우
-
+            if (data === code) {
+                // 인증번호가 유효한 경우
+                result.isSuccess = true;
+                result.message = "인증이 완료되었습니다";
+                await redisClient.del(email);
+            } else {
+                // 인증번호가 유효하지 않은 경우
+                result.message = "인증이 실패되었습니다";
+            }
         }
+        res.send(result);
 
     } catch (error) {
         next(error);
