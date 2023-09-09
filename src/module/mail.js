@@ -34,11 +34,9 @@ const sendVerifyEmail = async (email) => {
             pass: process.env.NODEMAILER_PW
         }
     });
-    // auth-aa1234@naver.com : 123123
-    // cert-aa1234@naver.com : 1
     const authCode = Math.floor(Math.random() * 89999) + 10000;
-    await redisClient.sAdd(email, authCode.toString());
-    await redisClient.expire(email, 1200);
+    await redisClient.set(email, authCode.toString());
+    await redisClient.expire(email, 180);
 
     const option = {
         from: process.env.NODEMAILER_ID,
