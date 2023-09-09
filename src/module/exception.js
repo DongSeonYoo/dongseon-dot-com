@@ -34,7 +34,7 @@ function Exception(input, name) {
     }
 
     this.checkPhoneNumberRegex = () => {
-        if (!phoneNumberRegex.test(input)) this.setError(errorMessage.regex);
+        if (input !== "" && !phoneNumberRegex.test(input)) this.setError(errorMessage.regex);
         return this;
     }
 
