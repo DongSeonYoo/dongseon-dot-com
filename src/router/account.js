@@ -49,7 +49,6 @@ router.post("/login", async (req, res, next) => {
             const passwordMatch = await bcryptUtil.compare(password, userData.password);
             if (passwordMatch) {
                 const accessToken = await jwtUtil.userSign(userData);
-                dailyLoginCount.writeUser(loginId);
                 result.accessToken = accessToken;
             }
         } else {

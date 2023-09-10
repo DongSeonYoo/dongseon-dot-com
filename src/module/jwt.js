@@ -1,4 +1,5 @@
 const { secretKey, accessTokenOption, refreshTokenOption } = require("../../config/secretKey");
+const dailyLoginCount = require("../module/dailyLoginCount");
 const jwt = require("jsonwebtoken");
 
 const userSign = async (user) => {
@@ -8,6 +9,8 @@ const userSign = async (user) => {
         name: user.name,
         role: "user",
     }
+
+    dailyLoginCount.writeUser(user.login_id);
     return jwt.sign(payload, secretKey, accessTokenOption);
 }
 

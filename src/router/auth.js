@@ -7,6 +7,7 @@ const passport = require("passport");
 const exception = require("../module/exception");
 const emailHandler = require("../module/mail");
 const redisClient = require("../../config/database/redis");
+const dailyLoginCount = require("../module/dailyLoginCount");
 
 const jwtUtil = require("../module/jwt");
 require("dotenv").config();
@@ -19,7 +20,8 @@ router.get('/kakao/callback', passport.authenticate("kakao", {
     session: false,
     failureRedirect: '/',
 }), async (req, res, next) => {
-    const accessToken = await jwtUtil.userSign(req.user.rows[0]);
+    const userData = req.user.rows[0];
+    const accessToken = await jwtUtil.userSign(userData);
     res.cookie("accessToken", accessToken, {
         httpOnly: false,
         secure: false,
