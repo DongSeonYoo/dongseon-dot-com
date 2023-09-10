@@ -14,7 +14,7 @@ const userSign = async (user) => {
     return jwt.sign(payload, secretKey, accessTokenOption);
 }
 
-const adminSign = async () => {
+const adminSign = () => {
     const payload = {
         userPk: process.env.ADMIN_PK,
         role: "admin",
@@ -22,7 +22,7 @@ const adminSign = async () => {
     return jwt.sign(payload, secretKey, accessTokenOption);
 }
 
-const refreshSign = async () => {
+const refreshSign = () => {
     return jwt.sign({}, secretKey, refreshTokenOption)
 }
 

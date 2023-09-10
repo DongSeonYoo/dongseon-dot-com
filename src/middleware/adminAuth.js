@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-module.exports = async (req, res, next) => {
+module.exports = (req, res, next) => {
     // 쿠키에 담긴 토큰을 추출
     const { accessToken } = req.cookies;
     try {
