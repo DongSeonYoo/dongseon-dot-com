@@ -84,7 +84,7 @@ router.post("/logout", authGuard, async (req, res, next) => {
 router.get("/id/duplicate/:loginId", async (req, res, next) => {
     const { loginId } = req.params;
     const result = {
-        data: false,
+        isSuccess: false,
         message: "",
     };
 
@@ -96,9 +96,9 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
         const data = await pool.query(sql, params);
 
         if (data.rows.length !== 0) {
-            result.data = true;
+            result.isSuccess = true;
         } else {
-            result.data = false;
+            result.isSuccess = false;
         }
         res.send(result);
 
@@ -113,7 +113,7 @@ router.get("/id/duplicate/:loginId", async (req, res, next) => {
 router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
     const { phoneNumber } = req.params;
     const result = {
-        data: false,
+        isSuccess: false,
         message: "",
     };
 
@@ -124,9 +124,9 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
         const params = [phoneNumber];
         const data = await pool.query(sql, params);
         if (data.rows.length !== 0) {
-            result.data = true;
+            result.isSuccess = true;
         } else {
-            result.data = false;
+            result.isSuccess = false;
         }
         res.send(result);
 
@@ -141,7 +141,7 @@ router.get("/phoneNumber/duplicate/:phoneNumber", async (req, res, next) => {
 router.get("/email/duplicate/:email", async (req, res, next) => {
     const { email } = req.params;
     const result = {
-        data: false,
+        isSuccess: false,
         message: "",
     };
 
@@ -151,9 +151,9 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
         const params = [email];
         const data = await pool.query(sql, params);
         if (data.rows.length !== 0) {
-            result.data = true;
+            result.isSuccess = true;
         } else {
-            result.data = false;
+            result.isSuccess = false;
         }
         res.send(result);
 
