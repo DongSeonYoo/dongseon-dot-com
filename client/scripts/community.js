@@ -3,9 +3,11 @@ const posts = document.getElementById("posts");
 const createPostBtn = document.getElementById("create-post-button");
 const postCountSpan = document.getElementById("post-counts");
 const pageSelectContainer = document.getElementById("page-select-container");
+const searchPostInput = document.getElementById("search-post-area");
 
 let allPostCounts;
 let currentPage = 1; // 현재 페이지 번호
+let searchOption;
 
 window.onload = async () => {
     try {
@@ -13,7 +15,7 @@ window.onload = async () => {
         // 게시글의 개수 먼저 불러오고
         const postCounts = await getPostCountFetch();
         allPostCounts = postCounts;
-        postCountSpan.innerHTML = allPostCounts + " 개의 게시글";
+        postCountSpan.innerHTML = allPostCounts + " 개의 게시글 /";
 
         // 한 페이지에 보여주는 게시글의 기본값이 7 이니 postCounts / 8 한 값
         const maxPageSelectCount = Math.floor(postCounts / 8);
@@ -24,6 +26,29 @@ window.onload = async () => {
         console.error(error);
         location.href = "/";
     }
+}
+
+function onchangeSearchOption(e) {
+    searchOption = e.value;
+}
+
+async function clickSearchPost() {
+    const searchValue = searchPostInput.value;
+    try {
+        const response = await fetch(`/api/search/post?${searchOption}=${searchValue}`);
+        const json = await response.json();
+        if (response.status === 200) {
+            json.data.forEach(post => {
+                clearPost();
+                makePostList(post);
+            });
+        }
+
+
+    } catch (error) {
+
+    }
+    registerPostIdx()
 }
 
 // 페이지 이동 버튼을 만들어주는 함수
@@ -79,11 +104,11 @@ async function getPostFetch(count = 1) {
 
         // 현재 페이지 버튼을 비활성화
         buttonArray
-        .filter(button => parseInt(button.innerHTML) === count)
-        .map(button => {
-            button.disabled = true;
-        });
-        
+            .filter(button => parseInt(button.innerHTML) === count)
+            .map(button => {
+                button.disabled = true;
+            });
+
 
     } catch (error) {
         alert("네트워크 오류: " + error.message);
@@ -91,12 +116,16 @@ async function getPostFetch(count = 1) {
         location.href = "/";
     }
 
+    registerPostIdx();
+}
+
+function registerPostIdx() {
     const post = document.querySelectorAll(".post");
     post.forEach((postElement) => {
         postElement.addEventListener("click", () => {
             const postId = postElement.querySelector("input").value;
             location.href = `/post/${postId}`;
-        })
+        });
     });
 }
 
