@@ -11,6 +11,7 @@ const authApi = require("./src/router/auth");
 const logApi = require("./src/router/log");
 const loginCountApi = require("./src/router/loginCount");
 const listApi = require("./src/router/list");
+const searchApi = require("./src/router/search");
 
 const loggingSetting = require('./src/middleware/loggingSetting');
 const errorHandling = require("./src/middleware/errorHandling");
@@ -37,6 +38,7 @@ app.use("/", pagesRoute);
 
 // api 호출 미들웨어
 app.use("/api/auth", authApi);
+app.use("/api/search", searchApi);
 app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
