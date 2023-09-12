@@ -28,9 +28,9 @@ window.onload = async () => {
                 }
             }
         }
-         catch (error) {
+        catch (error) {
             alert(error);
-         }
+        }
     }
 }
 

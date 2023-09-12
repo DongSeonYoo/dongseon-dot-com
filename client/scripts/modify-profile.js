@@ -114,6 +114,8 @@ const editProfileFetch = async () => {
     const email = emailForm.value;
     // const profileImage = previewImg.src;
     const profileImage = profileImg.files[0];
+    console.log(profileImage);
+    alert("qwer");
 
     try {
         const formData = new FormData();
@@ -162,7 +164,7 @@ const dropUserFetch = async () => {
         if (!json.isSuccess) {
             alert("회원 탈퇴 실패: " + json.message);
         }
-        
+
     } catch (error) {
         alert("요청 오류: " + error.message);
         console.error(error);

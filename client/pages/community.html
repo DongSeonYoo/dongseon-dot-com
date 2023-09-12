@@ -2,29 +2,36 @@
 <html lang="ko">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Community</title>
-  <link rel="stylesheet" type="text/css" href="../styles/common.css">
-  <link rel="stylesheet" type="text/css" href="../styles/community.css">
+    <meta charset="UTF-8">
+    <title>Community</title>
+    <link rel="stylesheet" type="text/css" href="../styles/common.css">
+    <link rel="stylesheet" type="text/css" href="../styles/community.css">
 </head>
 
 <body>
-  <section id="container">
+    <section id="container">
 
-    <button id="create-post-button" class="buttons">게시글 작성</button>
-    <button id="home-button" class="buttons">홈 가기</button>
-    <span id="post-counts"></span>
+        <button id="create-post-button" class="buttons">게시글 작성</button>
+        <button id="home-button" class="buttons">홈 가기</button>
+        <span id="post-counts"></span>
+        <select name="search-option-list" onchange="onchangeSearchOption(this)">
+            <option value="title">제목</option>
+            <option value="content">내용</option>
+        </select>
 
-    <div id="posts">
-      <div id="no-post-title"></div>
-    </div>
+        <input id="search-post-area" type="text">
+        <button id="search-post-button" onclick="clickSearchPost()">검색</button>
 
-    <div id="page-select-container">
-    </div>
-  </section>
-  
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/community.js"></script>
+        <div id="posts">
+            <div id="no-post-title"></div>
+        </div>
+
+        <div id="page-select-container">
+        </div>
+    </section>
+
+    <script src="../scripts/common.js"></script>
+    <script src="../scripts/community.js"></script>
 </body>
 
 </html>

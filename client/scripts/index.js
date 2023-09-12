@@ -50,7 +50,7 @@ const recentLoginCountFetch = async () => {
             alert(json.message);
             return;
         }
-        recentLoginCount.innerHTML = `최근 1시간동안 로그인 한 회원의 수: ${json.data}`;   
+        recentLoginCount.innerHTML = `최근 1시간동안 로그인 한 회원의 수: ${json.data}`;
 
     } catch (error) {
         alert(error);
@@ -172,15 +172,13 @@ const loginFetch = async () => {
         }
         const json = await response.json();
         if (response.status !== 200) {
-            alert(json.message);
-            return;
+            return alert(json.message);
         }
 
         // 로그인 실패하였을 경우
         if (!json.accessToken) {
             alert(`로그인 실패: ${json.message}`);
-            clearInputFields();
-            return;
+            return clearInputFields();
         }
         setCookie("accessToken", json.accessToken);
         location.reload();

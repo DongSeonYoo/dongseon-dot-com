@@ -4,6 +4,10 @@ const pwCheckField = document.getElementById('pw-check-text-field');
 const nicknameField = document.getElementById('name-text-field');
 const emailField = document.getElementById('email-text-field');
 const phoneNumberField = document.getElementById('phonenumber-text-field');
+const verifyNumberTextField = document.getElementById("verify-number-textfield");
+
+const phoneNumberDuplicateBtn = document.getElementById("phonenumber-duplicate-button");
+const checkAllowRadio = document.querySelector(".check-allow-phonenumber");
 
 const loginIdRegex = /^[A-Za-z0-9]{5,15}$/;
 const pwRegex = /^.{10,17}$/;
@@ -20,6 +24,7 @@ window.onload = () => {
 }
 
 const validate = () => {
+    console.log(checkAllowRadio.checked);
     if (!idInputValidate()) {
         return false;
     }
@@ -32,8 +37,12 @@ const validate = () => {
         return false;
     }
 
-    if (!phoneNumberInputValidate()) {
-        return false;
+    if (checkAllowRadio.checked) {
+        // 전화번호를 입력할 필요가 없으므로 검사를 건너뛰도록 합니다.
+    } else {
+        if (!phoneNumberInputValidate()) {
+            return false;
+        }
     }
 
     if (!emailInputValidate()) {
@@ -46,6 +55,11 @@ const validate = () => {
 
     return true;
 };
+
+const onchangeVerifyNumber = (event) => {
+    console.log(event.value)
+}
+
 
 const idInputValidate = () => {
     if (idField.value === "") {
@@ -96,13 +110,19 @@ const nicknameInputValidate = () => {
 };
 
 const phoneNumberInputValidate = () => {
-    if (phoneNumberField.value === "") {
-        alert("전화번호를 입력해주세요");
-        phoneNumberField.focus();
-        return false;
+    // if (checkAllowRadio.value === "not-select-phonenumber") {
+    //     return true; // "not-select-phonenumber" 옵션이 선택되었을 때 true를 반환
+    // }
+
+    if (checkAllowRadio.checked) {
+        if (phoneNumberField.value === "") {
+            alert("전화번호를 입력해주세요 +");
+            phoneNumberField.focus();
+            return false;
+        }
     }
 
-    if (!phoneNumberRegex.test(phoneNumberField.value)) {
+    if (checkAllowRadio.checked && !phoneNumberRegex.test(phoneNumberField.value)) {
         alert("전화번호는 010으로 시작하는 11자리 숫자 문자열이어야 합니다.");
         phoneNumberField.focus();
         return false;
@@ -110,6 +130,7 @@ const phoneNumberInputValidate = () => {
 
     return true;
 };
+
 
 const emailInputValidate = () => {
     if (emailField.value === "") {
@@ -133,7 +154,7 @@ const isCheckDuplicateButton = () => {
         return false;
     }
 
-    if (!isPhoneNumberDuplicate) {
+    if (checkAllowRadio.checked && !isPhoneNumberDuplicate) {
         alert("전화번호 중복체크를 완료해주세요");
         return false;
     }
@@ -258,13 +279,77 @@ const fetchSignupData = async () => {
         });
 
         const json = await res.json();
-        if (json.isSuccess) {
-            return location.href = "/";
-
+        if (res.status === 200) {
+            alert(json.message);
+            location.href = "/";
+        } else {
+            alert(json.message);
         }
-        alert(json.message);
 
     } catch (err) {
         alert(err);
+    }
+}
+
+const togglePhoneNumberField = (radioButton) => {
+    const phoneNumberField = document.getElementById("phonenumber-text-field");
+
+    if (radioButton.value === "not-select-phonenumber") {
+        phoneNumberField.disabled = true;
+        phoneNumberField.value = "";
+        phoneNumberDuplicateBtn.disabled = true;
+    } else {
+        phoneNumberField.disabled = false;
+        phoneNumberDuplicateBtn.disabled = false;
+    }
+}
+
+const clickSendVerifyEmail = async () => {
+    if (!isEmailDuplicate) {
+        return alert("이메일 중복 체크를 완료해주세요");
+    }
+
+    if (emailInputValidate()) {
+        // 이메일 정규식 검증 성공 시 인증번호 전송할수있도록
+        const response = await fetch("/api/auth/send-auth-email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: emailField.value,
+            })
+        });
+
+        const json = await response.json();
+        if (response.status === 200) {
+            alert(json.message);
+        } else {
+            alert(json.message);
+        }
+    }
+}
+
+const onclickCheckVerify = async () => {
+    try {
+        const response = await fetch("/api/auth/check-auth-email", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                email: emailField.value,
+                code: verifyNumberTextField.value,
+            })
+        });
+        const json = await response.json();
+        if (response.status !== 200) {
+            return alert(json.message);
+        }
+        alert(json.message);
+        // 버튼 상태 변경해주면 될듯?
+
+    } catch (error) {
+        alert(error);
     }
 }

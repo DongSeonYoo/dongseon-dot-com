@@ -9,6 +9,7 @@ window.onload = async () => {
 submitBtn.addEventListener("click", () => {
     if (validateInput()) {
         createPostFetch();
+        submitBtn.disabled = true;
     }
 });
 
