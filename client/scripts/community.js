@@ -3,6 +3,8 @@ const posts = document.getElementById("posts");
 const createPostBtn = document.getElementById("create-post-button");
 const postCountSpan = document.getElementById("post-counts");
 const pageSelectContainer = document.getElementById("page-select-container");
+
+const searchPostSelect = document.getElementById("search-option-select");
 const searchPostInput = document.getElementById("search-post-area");
 
 let allPostCounts;
@@ -33,20 +35,20 @@ function onchangeSearchOption(e) {
 }
 
 async function clickSearchPost() {
+    const searchOption = searchPostSelect.value;
     const searchValue = searchPostInput.value;
     try {
         const response = await fetch(`/api/search/post?${searchOption}=${searchValue}`);
         const json = await response.json();
         if (response.status === 200) {
+            clearPost();
             json.data.forEach(post => {
-                clearPost();
                 makePostList(post);
             });
         }
 
-
     } catch (error) {
-
+        console.error(error);
     }
     registerPostIdx()
 }
