@@ -24,6 +24,7 @@ router.post("/", authGuard, imageUploader.postImageUpload(), async (req, res, ne
     try {
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
+        exception(images, "images").checkInput();
 
         const sql = `INSERT INTO 
                         post_TB (user_id, title, content, image_key) 
@@ -31,7 +32,7 @@ router.post("/", authGuard, imageUploader.postImageUpload(), async (req, res, ne
                         ($1, $2, $3, $4) RETURNING id`;
 
         const params = [userId, title, content, images.map(item => item.transforms[0].key)];
-        const data = await pool.query(sql, params)
+        const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.postId = data.rows[0].id;
