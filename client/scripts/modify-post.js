@@ -63,8 +63,22 @@ async function loadPostData(postId) {
             alert(json.message);
             return location.href = "/";
         }
-        postTitle.value = json.data.title;
-        postContent.value = json.data.content;
+        const post = json.data;
+        postTitle.value = post.title;
+        postContent.value = post.content;
+
+        // 이미지 미리보기 추가
+        if (post.image_key !== null) {
+            post.image_key.forEach(item => {
+                const postImage = document.createElement("img");
+                postImage.src = s3ImageUrl + "/" + item;
+                postImage.alt = "img";
+                postImage.style.width = "600px";
+
+                const imagePreviewContainer = document.getElementById("image-preview-container");
+                imagePreviewContainer.appendChild(postImage);
+            });
+        }
 
         existingValue.title = json.data.title;
         existingValue.content = json.data.content;
@@ -73,6 +87,7 @@ async function loadPostData(postId) {
         console.error(error);
     }
 }
+
 
 async function modifyPostFetch(titleValue, contentValue) {
     // PUT post api
@@ -95,7 +110,7 @@ async function modifyPostFetch(titleValue, contentValue) {
                 return location.href = "/community";
             }
             location.href = `/post/${postId}`;
-            
+
         } else if (result.status === 401 || result.status === 403) {
             alert("다시 로그인 해주세요");
             location.href = "/";
