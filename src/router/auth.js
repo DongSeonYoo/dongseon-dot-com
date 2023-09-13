@@ -7,7 +7,6 @@ const passport = require("passport");
 const exception = require("../module/exception");
 const emailHandler = require("../module/mail");
 const redisClient = require("../../config/database/redis");
-const dailyLoginCount = require("../module/dailyLoginCount");
 
 const jwtUtil = require("../module/jwt");
 require("dotenv").config();

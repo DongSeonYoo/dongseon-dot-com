@@ -14,7 +14,6 @@ const {
 const authGuard = require("../middleware/authGuard");
 const bcryptUtil = require("../module/hashing");
 const jwtUtil = require("../module/jwt");
-const dailyLoginCount = require("../module/dailyLoginCount");
 const imageUploader = require("../middleware/imageUploader");
 const emailHandler = require("../module/mail");
 
