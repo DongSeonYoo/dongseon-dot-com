@@ -60,7 +60,7 @@ async function displayPost() {
                 }
 
                 postTitle.innerHTML = post.title;
-                authorProfileImg.src = s3ImageUrl + "/" + post.author_profile_img;
+                authorProfileImg.src = post.author_profile_img;
                 postAuthor.innerHTML = post.author_name;
 
                 postContent.innerHTML = post.content;
@@ -68,7 +68,7 @@ async function displayPost() {
                 if (post.image_key !== null) {
                     post.image_key.forEach(item => {
                         const postImage = document.createElement("img");
-                        postImage.src = s3ImageUrl + "/" + item;
+                        postImage.src = item;
                         postImage.alt = "Image";
                         postContent.appendChild(postImage);
                     });
@@ -145,13 +145,12 @@ async function loadCommentFetch(postId) {
         const json = await result.json();
         if (result.status !== 200) {
             alert(json.message);
-            location.href = "/";
-            return;
+            return location.href = "/";
         }
         return json;
 
     } catch (error) {
-        console.error(error.message);
+        console.error(error);
     }
 }
 
@@ -372,5 +371,5 @@ async function deleteCommentFetch(postId, commentId) {
 }
 
 backBtn.addEventListener("click", () => {
-    history.back();
+    location.href = "/community";
 });

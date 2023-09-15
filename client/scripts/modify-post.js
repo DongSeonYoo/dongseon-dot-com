@@ -71,7 +71,7 @@ async function loadPostData(postId) {
         if (post.image_key !== null) {
             post.image_key.forEach(item => {
                 const postImage = document.createElement("img");
-                postImage.src = s3ImageUrl + "/" + item;
+                postImage.src = item;
                 postImage.alt = "img";
                 postImage.style.width = "600px";
 

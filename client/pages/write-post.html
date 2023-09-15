@@ -1,38 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>게시글 작성</title>
-  <link rel="stylesheet" type="text/css" href="../styles/write-post.css">
-  <link rel="stylesheet" type="text/css" href="../styles/common.css">
+    <meta charset="UTF-8">
+    <title>게시글 작성</title>
+    <link rel="stylesheet" type="text/css" href="../styles/write-post.css">
+    <link rel="stylesheet" type="text/css" href="../styles/common.css">
 </head>
+
 <body>
-  <div class="container">
+    <div class="container">
 
-    <h1>게시글 작성</h1>
+        <h1>게시글 작성</h1>
+        <div id="loading-icon" style="display: none;">
+            Loading...
+        </div>
 
-    <form id="post-form">
+        <form id="post-form">
 
-      <section class="form-area">
-        <label class="title">제목</label>
-        <input type="text" id="input-title" placeholder="제목을 입력하세요">
-      </section>
+            <section class="form-area">
+                <label class="title">제목</label>
+                <input type="text" id="input-title" placeholder="제목을 입력하세요">
+            </section>
 
-      <section class="form-area">
-        <label class="content">내용</label>
-        <input type="text" id="input-content" placeholder="내용을 입력하세요"></input>
-      </section>
+            <section class="form-area">
+                <label class="content">내용</label>
+                <input type="text" id="input-content" placeholder="내용을 입력하세요">
+                </input>
+            </section>
 
-      <input id="image-file" type="file" accept="image/*" multiple>
-      <div class="button-container">
-        <button type="button" id="cancel-button" class="buttons">취소</button>
-        <button type="button" id="submit-button" class="buttons">작성</button>
-      </div>
+            <input id="image-file" type="file" accept="image/*" onchange="onchangeFile(this)" multiple>
+            <div class="button-container">
+                <button type="button" id="cancel-button" class="buttons">취소</button>
+                <button type="button" id="submit-button" class="buttons">작성</button>
+            </div>
 
-    </form>
-  </div>
+        </form>
+    </div>
 
-  <script src="../scripts/common.js"></script>
-  <script src="../scripts/write-post.js"></script>
+    <script src="../scripts/common.js"></script>
+    <script src="../scripts/write-post.js"></script>
 </body>
+
 </html>

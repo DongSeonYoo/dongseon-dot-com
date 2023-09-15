@@ -62,7 +62,7 @@ const viewProfileFetch = async (userPk) => {
         const user = json.data;
         if (user.profile_img) {
             userName.innerHTML = `${user.name}의 프로필`;
-            profileImg.src = s3ImageUrl + "/" + user.profile_img;
+            profileImg.src = user.profile_img;
         }
         idForm.innerHTML = user.login_id;
         nameForm.innerHTML = user.name;

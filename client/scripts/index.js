@@ -88,7 +88,7 @@ const makeOnlyLoginUI = async (isLoggedIn) => {
         if (response.status === 200) {
             const resImg = json.data.profile_img;
             if (resImg) {
-                userImage.src = s3ImageUrl + "/" + resImg;
+                userImage.src = resImg;
             }
 
             homeTitle.innerHTML = json.data.name;
