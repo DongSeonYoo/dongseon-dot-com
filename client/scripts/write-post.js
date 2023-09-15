@@ -1,6 +1,9 @@
 const submitBtn = document.getElementById("submit-button");
 const cancelBtn = document.getElementById("cancel-button");
 const postImages = document.getElementById("image-file");
+let uploadedImageLocation;
+
+const formArea = document.querySelector(".form-area");
 
 window.onload = async () => {
     await checkAuth();
@@ -49,23 +52,64 @@ const validateInput = () => {
     return true;
 }
 
-const createPostFetch = async () => {
-    const titleValue = document.getElementById("input-title").value;
-    const contentValue = document.getElementById("input-content").value;
-    const postFile = postImages.files;
+const onchangeFile = async (e) => {
+    // 여기서 s3에 이미지 업로드하는 api 계속 호출
+    const postFiles = e.files;
+    const loadingIcon = document.getElementById('loading-icon');
 
     try {
         const formData = new FormData();
-        formData.append("title", titleValue);
-        formData.append("content", contentValue);
-
-        for (const file of postFile) {
+        for (const file of postFiles) {
             formData.append("postImage", file);
         }
 
-        const response = await fetch("/api/post", {
+        loadingIcon.style.display = 'block';
+
+        const response = await fetch("/api/uploader/file/post", {
             "method": "POST",
             "body": formData,
+        });
+
+        if (response.status !== 200) {
+            alert("개수를 확인해 주세요");
+            e.value = "";
+        }
+        const json = await response.json();
+        uploadedImageLocation = json.data;
+
+        loadingIcon.style.display = 'none';
+        createPreview(uploadedImageLocation);
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+const createPreview = (uploadedImageLocation) => {
+    uploadedImageLocation.map(item => {
+        const imgTag = document.createElement("img");
+        imgTag.src = item;
+        formArea.appendChild(imgTag);
+    });
+}
+
+const createPostFetch = async () => {
+    const titleValue = document.getElementById("input-title").value;
+    const contentValue = document.getElementById("input-content").value;
+    const postImageLocation = uploadedImageLocation;
+
+    try {
+        const response = await fetch("/api/post", {
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+
+            "body": JSON.stringify({
+                "title": titleValue,
+                "content": contentValue,
+                "postImageLocation": postImageLocation
+            })
         });
 
         const json = await response.json();

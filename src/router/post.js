@@ -4,7 +4,6 @@ const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
 const authGuard = require("../middleware/authGuard");
-const imageUploader = require("../middleware/imageUploader");
 
 const AWS = require("../../config/s3");
 const s3 = new AWS.S3();
@@ -12,10 +11,10 @@ require("dotenv").config();
 
 // 게시글 작성 api
 // userId, title, content
-router.post("/", authGuard, imageUploader.postImageUpload(), async (req, res, next) => {
+router.post("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
-    const images = req.files;
     const { title, content } = req.body;
+    const { postImageLocation } = req.body;
     const result = {
         isSuccess: false,
         postId: "",
@@ -24,14 +23,13 @@ router.post("/", authGuard, imageUploader.postImageUpload(), async (req, res, ne
     try {
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
-        exception(images, "images").checkInput();
 
         const sql = `INSERT INTO 
                         post_TB (user_id, title, content, image_key) 
                         VALUES
                         ($1, $2, $3, $4) RETURNING id`;
 
-        const params = [userId, title, content, images.map(item => item.transforms[0].key)];
+        const params = [userId, title, content, postImageLocation];
         const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
