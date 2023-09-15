@@ -27,15 +27,23 @@ window.onload = async () => {
     viewProfileFetch(userData);
 }
 
-const onchangeImg = (event) => {
-    if (event.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            previewImg.src = e.target.result;
-        }
-        reader.readAsDataURL(event.files[0]);
-    } else {
-        previewImg.src = "";
+const onchangeImg = async (event) => {
+    // 여기서 s3에 이미지 업로드하는 api 계속 호출
+    const profileImage = event.files[0];
+
+    try {
+        const formData = new FormData();
+        formData.append("profileImage", profileImage);
+
+        const response = await fetch("/api/uploader/file/profile", {
+            "method": "POST",
+            "body": formData,
+        });
+        const json = await response.json();
+        previewImg.src = json.data;
+
+    } catch (error) {
+        console.log(error);
     }
 }
 
@@ -84,7 +92,7 @@ const viewProfileFetch = async (userData) => {
         const json = await result.json();
         const user = json.data;
         if (user.profile_img) {
-            previewImg.src = s3ImageUrl + "/" + user.profile_img;
+            previewImg.src = user.profile_img;
         }
 
         idForm.innerHTML = user.login_id;
@@ -112,20 +120,21 @@ const editProfileFetch = async () => {
     const name = nameForm.value;
     const phoneNumber = phoneNumberForm.value;
     const email = emailForm.value;
-    // const profileImage = previewImg.src;
-    const profileImage = profileImg.files[0];
-    console.log(profileImage);
-    alert("qwer");
+    const profileImageUrl = previewImg.src;
 
     try {
-        const formData = new FormData();
-        formData.append("name", name);
-        formData.append("phoneNumber", phoneNumber);
-        formData.append("email", email);
-        formData.append("profileImage", profileImage);
         const response = await fetch("/api/account", {
             "method": "PUT",
-            "body": formData,
+            "headers": {
+                "Content-Type": "application/json"
+            },
+
+            "body": JSON.stringify({
+                "name": name,
+                "phoneNumber": phoneNumber,
+                "email": email,
+                "profileImageUrl": profileImageUrl
+            })
         });
 
         const json = await response.json();
@@ -138,7 +147,7 @@ const editProfileFetch = async () => {
         }
 
     } catch (error) {
-        alert("요청 오류: " + error.message);
+        alert("요청 오류: " + error);
         console.error(error);
         location.href = "/";
     }

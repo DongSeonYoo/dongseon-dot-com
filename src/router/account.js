@@ -329,10 +329,9 @@ router.get("/:userId", async (req, res, next) => {
 // 회원 정보 수정 api
 // userId, name, phoneNumber, email
 // PUT
-router.put("/", authGuard, imageUploader.profileImageUpload(), async (req, res, next) => {
+router.put("/", authGuard, async (req, res, next) => {
     const { userPk } = req.decoded;
-    const { name, phoneNumber, email } = req.body;
-    const profileImage = req.file?.key ?? "";
+    const { name, phoneNumber, email, profileImageUrl } = req.body;
     const result = {
         isSuccess: false,
         message: "",
@@ -343,16 +342,8 @@ router.put("/", authGuard, imageUploader.profileImageUpload(), async (req, res, 
         exception(phoneNumber, "phoneNumber").checkInput().checkPhoneNumberRegex();
         exception(email, "email").checkInput().checkEmailRegex();
 
-        let sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3";
-        const params = [name, phoneNumber, email];
-
-        if (profileImage) {
-            sql += ", profile_img = $4 WHERE id = $5";
-            params.push(profileImage, userPk);
-        } else {
-            sql += " WHERE id = $4";
-            params.push(userPk);
-        }
+        let sql = "UPDATE user_TB SET name = $1, phone_number = $2, email = $3, profile_img = $4 WHERE id = $5";
+        const params = [name, phoneNumber, email, profileImageUrl, userPk];
 
         const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
