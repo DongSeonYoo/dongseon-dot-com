@@ -12,6 +12,7 @@ const logApi = require("./src/router/log");
 const loginCountApi = require("./src/router/loginCount");
 const listApi = require("./src/router/list");
 const searchApi = require("./src/router/search");
+const uploaderApi = require("./src/router/uploader");
 
 const loggingSetting = require('./src/middleware/loggingSetting');
 const errorHandling = require("./src/middleware/errorHandling");
@@ -43,6 +44,7 @@ app.use("/api/account", accountApi);
 app.use("/api/post", postApi);
 app.use("/api/comment", commentApi);
 app.use("/api/loginCount", loginCountApi);
+app.use("/api/uploader", uploaderApi);
 app.use("/api/list", listApi);
 
 // 로깅 미들웨어
