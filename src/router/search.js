@@ -9,7 +9,10 @@ router.get("/post", authGuard, async (req, res, next) => {
     }
 
     try {
-        let sql = 'SELECT post_tb.*, user_tb.name AS author_name FROM post_tb JOIN user_tb ON post_tb.user_id = user_tb.id WHERE 1 = 1';
+        let sql = `SELECT post_tb.*, user_tb.name AS author_name 
+                        FROM post_tb 
+                        JOIN user_tb 
+                        ON post_tb.user_id = user_tb.id WHERE 1 = 1`;
         const params = [];
 
         if (title) {
@@ -18,7 +21,7 @@ router.get("/post", authGuard, async (req, res, next) => {
         }
 
         if (content) {
-            sql += ' AND content LIKE $2';
+            sql += ' AND content LIKE $1';
             params.push(`%${content}%`);
         }
 
