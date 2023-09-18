@@ -64,33 +64,60 @@ async function loadPostData(postId) {
             return location.href = "/";
         }
         const post = json.data;
+
+
+        // 기존 값과 변경된 값을 비교하기 위해 전역변수로 보관
+        existingValue.title = json.data.title;
+        existingValue.content = json.data.content;
+        existingValue.image = json.data.image_key;
+
+        // 기존 필드들 채워줌
         postTitle.value = post.title;
         postContent.value = post.content;
 
-        // 이미지 미리보기 추가
+        const imagePreviewContainer = document.getElementById("image-preview-container");
+        imagePreviewContainer.innerHTML = ""; // 이미지 컨테이너 내용 초기화
+
+        // 이미지 미리보기 및 삭제 버튼 추가
         if (post.image_key !== null) {
-            post.image_key.forEach(item => {
+            post.image_key.forEach((item, index) => {
+                const imageWrapper = document.createElement("div");
+                imageWrapper.className = "image-wrapper";
+
                 const postImage = document.createElement("img");
                 postImage.src = item;
                 postImage.alt = "img";
                 postImage.style.width = "600px";
 
-                const imagePreviewContainer = document.getElementById("image-preview-container");
-                imagePreviewContainer.appendChild(postImage);
+                const deleteButton = document.createElement("button");
+                deleteButton.innerHTML = "X";
+                deleteButton.className = "delete-button";
+
+                // X 버튼 클릭 이벤트 처리
+                deleteButton.addEventListener("click", () => {
+                    // 이미지 및 해당 인덱스의 이미지 키 삭제
+                    imageWrapper.remove();
+                    post.image_key[index] = "";
+                    existingValue.image = post.image_key;
+                });
+
+                imageWrapper.appendChild(postImage);
+                imageWrapper.appendChild(deleteButton);
+                imagePreviewContainer.appendChild(imageWrapper);
             });
         }
-
-        existingValue.title = json.data.title;
-        existingValue.content = json.data.content;
 
     } catch (error) {
         console.error(error);
     }
 }
 
-
-async function modifyPostFetch(titleValue, contentValue) {
+async function modifyPostFetch() {
     // PUT post api
+    const titleValue = postTitle.value;
+    const contentValue = postContent.value;
+    const modifiedImages = existingValue.image.filter((item) => item !== '');
+
     try {
         const result = await fetch("/api/post", {
             "method": "PUT",
@@ -100,7 +127,8 @@ async function modifyPostFetch(titleValue, contentValue) {
             "body": JSON.stringify({
                 "postId": postId,
                 "title": titleValue,
-                "content": contentValue
+                "content": contentValue,
+                "images": modifiedImages
             })
         });
         if (result.status === 200) {
@@ -122,12 +150,7 @@ async function modifyPostFetch(titleValue, contentValue) {
 }
 
 submitBtn.addEventListener("click", () => {
-    if (validateInput()) {
-        const titleValue = postTitle.value;
-        const contentValue = postContent.value;
-
-        modifyPostFetch(titleValue, contentValue);
-    }
+    modifyPostFetch();
 });
 
 cancelBtn.addEventListener("click", () => {
