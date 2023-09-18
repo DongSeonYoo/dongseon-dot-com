@@ -16,8 +16,11 @@ module.exports = {
     maxCommentIdLength: 8,
     maxCommentContentLength: 300,
 
+    // community
+    maxItemPerPageOfCommunity: 8,
+
     // log
-    maxItemPerPage: 16,
+    maxItemPerPageOfLog: 16,
 
     // image
     maxPostImageCount: 5

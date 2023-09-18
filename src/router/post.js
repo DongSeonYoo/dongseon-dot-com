@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
-const { maxPostIdLength, maxPostTitleLength, maxPostContentLength } = require("../module/global");
+const { maxPostIdLength, maxPostTitleLength, maxPostContentLength, maxItemPerPageOfCommunity } = require("../module/global");
 const authGuard = require("../middleware/authGuard");
 
 const AWS = require("../../config/s3");
@@ -48,7 +48,7 @@ router.post("/", authGuard, async (req, res, next) => {
 // GET
 // 명사이자 단수형으로
 router.get("/", async (req, res, next) => {
-    const counterPage = 8;
+    const counterPage = maxItemPerPageOfCommunity;
     let { pageNumber } = req.query;
     const result = {
         data: null,

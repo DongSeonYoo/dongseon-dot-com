@@ -5,7 +5,7 @@ const redisClient = require("../../config/database/redis");
 const exception = require("../module/exception");
 const adminAuth = require("../middleware/adminAuth");
 
-const { maxItemPerPage, maxLoginIdLength } = require("../module/global");
+const { maxItemPerPageOfLog, maxLoginIdLength } = require("../module/global");
 require("dotenv").config();
 
 const redisRecentSearchKey = process.env.REDIS_RECENT_SEARCH;
@@ -54,8 +54,8 @@ router.get("/", adminAuth, async (req, res, next) => {
             .collection("api_logs")
             .find(queryOption)
             .sort({ "_id": order })
-            .skip((page - 1) * maxItemPerPage)
-            .limit(maxItemPerPage)
+            .skip((page - 1) * maxItemPerPageOfLog)
+            .limit(maxItemPerPageOfLog)
             .toArray();
         const logCount = await connect
             .db()
