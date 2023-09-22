@@ -4,6 +4,7 @@ const pool = require("../../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxPostIdLength, maxCommentIdLength, maxCommentContentLength } = require("../module/global");
 const authGuard = require("../middleware/authGuard");
+const { BadRequestException } = require('../module/customError');
 
 
 // 댓글 생성 api
@@ -31,6 +32,13 @@ router.post("/", authGuard, async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
+        if (error.constraint === "comment_tb_user_id_fkey") {
+            return next(new BadRequestException("해당하는 유저가 존재하지 않습니다"));
+        }
+
+        if (error.constraint === "comment_tb_post_id_fkey") {
+            return next(new BadRequestException("해당하는 게시글이 존재하지 않습니다"));
+        }
         next(error);
     }
 });
@@ -66,11 +74,8 @@ router.get("/post/:postId", authGuard, async (req, res, next) => {
         // 만약 해당 게시글에 댓글이 존재하면?
         if (data.rows.length !== 0) {
             result.data = data.rows;
-
-            // 댓글이 존재하지 않으면? data = null
-        } else {
-            result.message = "해당 게시글에 댓글이 존재하지 않습니다";
         }
+
         res.send(result);
 
     } catch (error) {
@@ -100,10 +105,10 @@ router.put("/", authGuard, async (req, res, next) => {
         if (data.rowCount !== 0) {
             result.isSuccess = true;
             result.message = "댓글 수정 성공";
-        } else {
-            result.message = "해당하는 댓글이 존재하지 않습니다";
+            return res.send(result);
         }
-        res.send(result);
+
+        throw new BadRequestException("해당하는 댓글이 존재하지 않습니다");
 
     } catch (error) {
         next(error);
@@ -130,10 +135,10 @@ router.delete("/", authGuard, async (req, res, next) => {
         const data = await pool.query(sql, params);
         if (data.rowCount !== 0) {
             result.isSuccess = true;
-        } else {
-            result.message = "해당하는 댓글이 존재하지 않습니다";
+            return res.send(result);
         }
-        res.send(result);
+
+        throw new BadRequestException("해당하는 댓글이 존재하지 않습니다");
 
     } catch (error) {
         next(error);
