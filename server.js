@@ -52,13 +52,6 @@ app.use("/api/list", listApi);
 // 로깅 미들웨어
 app.use("/api/log", logApi);
 
-// 404 error handling
-app.use((req, res, next) => {
-    const error = new Error();
-    error.status = 404;
-    next(error);
-});
-
 // error catch middleware
 app.use(errorHandling());
 
