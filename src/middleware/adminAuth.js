@@ -1,5 +1,7 @@
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+const jwt = require("jsonwebtoken");
+const { UnauthorizedException, ForbbidenException } = require("../module/customError");
 
 module.exports = (req, res, next) => {
     // 쿠키에 담긴 토큰을 추출
@@ -13,17 +15,13 @@ module.exports = (req, res, next) => {
         req.decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
         const { role } = req.decoded;
         if (role !== "admin") {
-            throw new Error("admin only")
+            return next(new ForbbidenException("권한이 거부되었습니다"));
         }
         next();
 
     } catch (error) {
-        if (error.message === "jwt expired") {
-            error.status = 419;
-        } else if (error.message === "invalid token") {
-            error.status = 401;
-        } else if (error.message === "admin only") {
-            error.status = 403;
+        if (error.message === "jwt expired" || error.message === "invalid token") {
+            return next(new UnauthorizedException("로그인 후 이용가능합니다"));
         }
         next(error);
     }
