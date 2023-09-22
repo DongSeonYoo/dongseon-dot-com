@@ -1,5 +1,7 @@
-const jwt = require("jsonwebtoken");
 require("dotenv").config();
+
+const jwt = require("jsonwebtoken");
+const { UnauthorizedException } = require("../module/customError");
 
 module.exports = (req, res, next) => {
     // 쿠키에 담긴 토큰을 추출
@@ -15,10 +17,8 @@ module.exports = (req, res, next) => {
         return next();
 
     } catch (error) {
-        if (error.message === "jwt expired") {
-            error.status = 419;
-        } else if (error.message === "invalid token") {
-            error.status = 401;
+        if (error.message === "jwt expired" || error.message === "invalid token") {
+            return next(new UnauthorizedException("로그인 후 이용가능합니다"));
         }
         next(error);
     }
