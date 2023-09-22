@@ -6,6 +6,7 @@ const { maxPostIdLength, maxPostTitleLength, maxPostContentLength, maxItemPerPag
 const authGuard = require("../middleware/authGuard");
 
 const AWS = require("../../config/s3");
+const { BadRequestException, NotFoundException } = require('../module/customError');
 const s3 = new AWS.S3();
 require("dotenv").config();
 
@@ -39,6 +40,9 @@ router.post("/", authGuard, async (req, res, next) => {
         res.send(result);
 
     } catch (error) {
+        if (error.constraint === "post_tb_user_id_fkey") {
+            return next(BadRequestException("해당하는 유저가 존재하지 않습니다"));
+        }
         next(error);
     }
 });
@@ -103,10 +107,10 @@ router.get("/:postId", authGuard, async (req, res, next) => {
         const data = await pool.query(sql, params)
         if (data.rows.length !== 0) {
             result.data = data.rows[0];
-        } else {
-            next();
+            return res.send(result);
         }
-        res.send(result);
+
+        throw new NotFoundException("해당하는 페이지가 존재하지 않습니다");
 
     } catch (error) {
         next(error);
@@ -118,7 +122,7 @@ router.get("/:postId", authGuard, async (req, res, next) => {
 // PUT
 router.put("/", authGuard, async (req, res, next) => {
     const userId = req.decoded.userPk;
-    const { postId, title, content } = req.body;
+    const { postId, title, content, images } = req.body;
     const result = {
         isSuccess: false,
         message: ""
@@ -129,17 +133,16 @@ router.put("/", authGuard, async (req, res, next) => {
         exception(title, "title").checkInput().checkLength(1, maxPostTitleLength);
         exception(content, "content").checkInput().checkLength(1, maxPostContentLength);
 
-        const sql = "UPDATE post_TB SET title = $1, content = $2 WHERE user_id = $3 AND id = $4";
-        const params = [title, content, userId, postId];
+        const sql = "UPDATE post_TB SET title = $1, content = $2, image_key = $3 WHERE user_id = $4 AND id = $5";
+        const params = [title, content, images, userId, postId];
         const data = await pool.query(sql, params);
 
         if (data.rowCount !== 0) {
             result.isSuccess = true;
-        } else {
-            result.isSuccess = false;
-            result.message = "수정 실패, 해당하는 게시글이 존재하지 않습니다";
+            return res.send(result);
         }
-        res.send(result);
+
+        throw new BadRequestException("수정 실패, 해당하는 게시글이 존재하지 않습니다");
 
     } catch (error) {
         next(error);
@@ -185,12 +188,11 @@ router.delete("/", authGuard, async (req, res, next) => {
                 }
             }
             result.isSuccess = true;
-
-        } else {
-            result.message = "해당하는 게시글이 존재하지 않습니다";
+            pgClient.query("COMMIT");
+            return res.send(result);
         }
-        pgClient.query("COMMIT");
-        res.send(result);
+
+        throw new BadRequestException("삭제 실패, 해당하는 게시글이 존재하지 않습니다");
 
     } catch (error) {
         if (pgClient) {
