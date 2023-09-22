@@ -5,6 +5,7 @@ const sharp = require("sharp");
 const path = require("path");
 
 const { maxPostImageCount } = require("../module/global");
+const { BadRequestException } = require("../module/customError");
 
 require("dotenv").config();
 
@@ -15,7 +16,7 @@ AWS.config.update({
 });
 
 const s3 = new AWS.S3();
-const allowedExtensions = ['.png', '.jpg', '.jpeg', '.bmp', 'png'];
+const allowedExtensions = ['.png', '.jpg', '.jpeg'];
 
 const postImageUploader = multer({
     storage: multerS3({
@@ -27,7 +28,6 @@ const postImageUploader = multer({
             {
                 id: "postImage",
                 key: (req, file, callback) => {
-                    console.log("postImageUpload excute!");
                     const extension = path.extname(file.originalname);
                     if (!allowedExtensions.includes(extension)) {
                         return callback(new Error("wrong extension"));
@@ -54,11 +54,11 @@ const profileImageUploder = multer({
         contentType: multerS3.AUTO_CONTENT_TYPE,
         id: "profileImage",
         key: (req, file, callback) => {
-            console.log("profileImageUpload excute!");
             const extension = path.extname(file.originalname);
             if (!allowedExtensions.includes(extension)) {
                 return callback(new Error("wrong extension"));
             }
+            console.log(`profileImageUpload excute!`);
             callback(null, `${req.decoded.loginId}/profile/${Date.now()}_${file.originalname}`);
         },
         acl: "public-read-write"
@@ -72,8 +72,8 @@ module.exports = {
     postImageUpload: () => {
         return async (req, res, next) => {
             postImageUploader.array("postImage", maxPostImageCount)(req, res, (err) => {
-                if (err) {
-                    return next(err);
+                if (err instanceof multer.MulterError) {
+                    return next(new BadRequestException("이미지 개수를 확인해 주세요"));
                 }
                 next();
             });
@@ -91,17 +91,5 @@ module.exports = {
         }
     }
 }
-
-
-
-// module.exports = async (req, res, next) => {
-//     postImageUploader.array("postImage", maxPostImageCount)(req, res, (err) => {
-//         if (err) {
-//             next(err);
-//             return;
-//         }
-//         next();
-//     });
-// };
 
 //LIMIT_UNEXPECTED_FILE
