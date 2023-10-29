@@ -50,7 +50,7 @@ router.post("/", authGuard, async (req, res, next) => {
     const { commentId, content } = req.body;
     const result = {
         isSuccess: false,
-        data: null
+        data: {}
     }
 
     try {

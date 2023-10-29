@@ -5,7 +5,7 @@ const authGuard = require("../middleware/authGuard");
 const adminAuth = require('../middleware/adminAuth');
 const passport = require("passport");
 const exception = require("../module/exception");
-const emailHandler = require("../module/mail");
+const emailHandler = require("../module/mailHandler");
 const redisClient = require("../../config/database/redis");
 
 const jwtUtil = require("../module/jwt");
@@ -23,7 +23,7 @@ router.get('/kakao/callback', passport.authenticate("kakao", {
     const accessToken = await jwtUtil.userSign(userData);
     res.cookie("accessToken", accessToken, {
         httpOnly: false,
-        secure: false,
+        secure: false
     });
     res.redirect("/");
 });

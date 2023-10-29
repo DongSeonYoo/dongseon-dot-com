@@ -1,6 +1,7 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const pool = require("../../../config/database/postgresql");
+const { BadRequestException } = require('../customError');
 
 module.exports = () => {
     passport.use('kakao', new KakaoStrategy({
@@ -25,7 +26,6 @@ module.exports = () => {
             }
             // 만약 기존에 가입한 유저라면 (바로 로그인 시켜줘야지)
             done(null, selectedData);
-
         } catch (error) {
             console.log(error);
             done(error);

@@ -236,24 +236,12 @@ const fetchPhoneNumberDuplicate = async () => {
 const fetchEmailDuplicate = async () => {
     const result = await fetch("/api/account/email/duplicate/" + emailField.value);
     const json = await result.json();
+    // 중복된 이메일이 존재하지 않는 경우
     if (result.status === 200) {
-        // 중복된 이메일이 존재하는 경우
-        if (json.data) {
-            alert("중복된 이메일이 존재합니다");
-            // 중복된 이메일이 존재하지 않는 경우
-        } else {
-            isEmailDuplicate = true;
-            alert("사용 가능한 이메일입니다");
-        }
-        // 클라이언트에서 유효하지 않은 요청을 보냈을 경우
-    } else if (response.status === 400) {
-        alert(json.message);
-        location.href = "/";
-        // 서버에서 에러가 발생한 경우
-    } else if (response.status === 500) {
-        alert("서버 오류: " + json.message);
-        location.href = "/";
+        return alert(json.message);
     }
+    isEmailDuplicate = true;
+    return alert(json.message);
 }
 
 const fetchSignupData = async () => {
@@ -309,7 +297,7 @@ const clickSendVerifyEmail = async () => {
         return alert("이메일 중복 체크를 완료해주세요");
     }
 
-    if (emailInputValidate()) {
+    if (!emailInputValidate()) {
         // 이메일 정규식 검증 성공 시 인증번호 전송할수있도록
         const response = await fetch("/api/auth/send-auth-email", {
             method: "POST",
@@ -327,6 +315,8 @@ const clickSendVerifyEmail = async () => {
         } else {
             alert(json.message);
         }
+    } else {
+        alert("중복체크를 완료해주세요")
     }
 }
 
@@ -344,9 +334,10 @@ const onclickCheckVerify = async () => {
         });
         const json = await response.json();
         if (response.status !== 200) {
+            verifyNumberTextField.value = "";
             return alert(json.message);
         }
-        alert(json.message);
+        return alert(json.message);
         // 버튼 상태 변경해주면 될듯?
 
     } catch (error) {

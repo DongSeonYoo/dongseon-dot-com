@@ -306,6 +306,7 @@ async function clickCommentSubmitBtn() {
         });
         const json = await response.json();
         if (response.status !== 200) {
+            console.log(json);
             alert(json.message);
             location.href = "/community";
             return;

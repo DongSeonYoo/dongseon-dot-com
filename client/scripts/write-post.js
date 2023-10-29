@@ -44,10 +44,10 @@ const validateInput = () => {
         return false;
     }
 
-    if (postImages.files.length > 5) {
-        alert("사진은 5개까지만 가능합니다");
-        return false;
-    }
+    // if (postImages.files.length > 2) {
+    //     alert("사진은 5개까지만 가능합니다");
+    //     return false;
+    // }
 
     return true;
 }
@@ -69,12 +69,13 @@ const onchangeFile = async (e) => {
             "method": "POST",
             "body": formData,
         });
+        const json = await response.json();
 
         if (response.status !== 200) {
-            alert("개수를 확인해 주세요");
+            alert(json.message);
             e.value = "";
         }
-        const json = await response.json();
+
         uploadedImageLocation = json.data;
 
         loadingIcon.style.display = 'none';

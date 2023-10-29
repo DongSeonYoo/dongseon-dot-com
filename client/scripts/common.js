@@ -55,7 +55,7 @@ async function adminAuthCheck() {
     try {
         const response = await fetch("/api/auth/admin");
         if (response.status !== 200) {
-            location.href = "/";
+            return location.href = "/";
         }
     } catch (error) {
         console.log(error);

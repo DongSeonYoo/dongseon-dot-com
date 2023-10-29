@@ -18,8 +18,9 @@ window.onload = async () => {
         const postCounts = await getPostCountFetch();
         allPostCounts = postCounts;
         postCountSpan.innerHTML = allPostCounts + " 개의 게시글 /";
+        console.log(typeof allPostCounts)
 
-        // 한 페이지에 보여주는 게시글의 기본값이 7 이니 postCounts / 8 한 값
+        // 한 페이지에 보여주는 게시글의 기본값이 8 이니 postCounts / 8 한 값
         const maxPageSelectCount = Math.floor(postCounts / 8);
         makePageSelectButton(maxPageSelectCount);
         await getPostFetch(currentPage);

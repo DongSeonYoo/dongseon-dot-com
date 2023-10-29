@@ -116,9 +116,10 @@ async function modifyPostFetch() {
     // PUT post api
     const titleValue = postTitle.value;
     const contentValue = postContent.value;
-    const modifiedImages = existingValue.image.filter((item) => item !== '');
 
     try {
+        const modifiedImages = existingValue.image.filter((item) => item !== '');
+
         const result = await fetch("/api/post", {
             "method": "PUT",
             "headers": {

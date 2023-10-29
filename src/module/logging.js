@@ -30,7 +30,6 @@ const logging = async (req, res, resBody) => {
     } catch (error) {
         console.log("api logger ERROR: " + error);
 
-
     } finally {
         if (connect) connect.close();
     }

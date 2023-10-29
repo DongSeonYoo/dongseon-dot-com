@@ -216,7 +216,7 @@ router.get("/all/count", authGuard, async (req, res, next) => {
     };
 
     try {
-        const sql = `SELECT COUNT(*) FROM post_TB`;
+        const sql = `SELECT COUNT(*)::int FROM post_TB`;
 
         const data = await pool.query(sql);
         if (data.rows.length !== 0) {

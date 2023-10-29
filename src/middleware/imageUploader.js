@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const AWS = require("aws-sdk");
 const multer = require("multer");
 const multerS3 = require("multer-s3-transform");
@@ -6,14 +8,6 @@ const path = require("path");
 
 const { maxPostImageCount } = require("../module/global");
 const { BadRequestException } = require("../module/customError");
-
-require("dotenv").config();
-
-AWS.config.update({
-    region: 'ap-northeast-2',
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECERET_ACCESS_KEY
-});
 
 const s3 = new AWS.S3();
 const allowedExtensions = ['.png', '.jpg', '.jpeg'];
@@ -75,6 +69,9 @@ module.exports = {
                 if (err instanceof multer.MulterError) {
                     return next(new BadRequestException("이미지 개수를 확인해 주세요"));
                 }
+                if (err) {
+                    return next(err);
+                }
                 next();
             });
         }
@@ -91,5 +88,6 @@ module.exports = {
         }
     }
 }
+
 
 //LIMIT_UNEXPECTED_FILE

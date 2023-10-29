@@ -14,10 +14,10 @@ const {
 const authGuard = require("../middleware/authGuard");
 const bcryptUtil = require("../module/hashing");
 const jwtUtil = require("../module/jwt");
-const imageUploader = require("../middleware/imageUploader");
-const emailHandler = require("../module/mail");
+const emailHandler = require("../module/mailHandler");
 
 const AWS = require("../../config/s3");
+const { BadRequestException } = require('../module/customError');
 const s3 = new AWS.S3();
 
 require("dotenv").config();
@@ -149,12 +149,14 @@ router.get("/email/duplicate/:email", async (req, res, next) => {
         const sql = "SELECT email FROM user_TB WHERE email = $1";
         const params = [email];
         const data = await pool.query(sql, params);
-        if (data.rows.length !== 0) {
+        // 기존의 이메일이 존재한다면?
+        if (data.rows.length === 0) {
             result.isSuccess = true;
-        } else {
-            result.isSuccess = false;
+            result.message = "사용 가능한 이메일입니다";
+            return res.send(result);
         }
-        res.send(result);
+
+        throw new BadRequestException("중복된 이메일이 존재합니다");
 
     } catch (error) {
         next(error);
