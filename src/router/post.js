@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../../config/database/postgresql");
+const pool = require("../config/database/postgresql");
 const exception = require("../module/exception");
 const { maxPostIdLength, maxPostTitleLength, maxPostContentLength, maxItemPerPageOfCommunity } = require("../module/global");
 const authGuard = require("../middleware/authGuard");

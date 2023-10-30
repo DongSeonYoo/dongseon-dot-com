@@ -7,7 +7,7 @@ const env = {
   DB_HOST: process.env.DB_HOST,
   DB_DATABASE: process.env.DB_DATABASE,
   DB_PASSWORD: process.env.DB_PASSWORD,
-  DB_PORT: process.env.PORT,
+  DB_PORT: process.env.DB_PORT,
 
   MONGO_DB_LOGS: process.env.MONGO_DB_LOGS,
 

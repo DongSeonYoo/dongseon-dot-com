@@ -1,6 +1,6 @@
 const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
-const pool = require("../../../config/database/postgresql");
+const pool = require("../../config/database/postgresql");
 const { BadRequestException } = require('../customError');
 const env = require("../../config/env");
 

@@ -1,8 +1,7 @@
-const redisClient = require("../../config/database/redis");
 const express = require("express");
 const router = express.Router();
-
-const pool = require("../../config/database/postgresql");
+const pool = require("../config/database/postgresql");
+const redisClient = require("../config/database/redis");
 
 router.get("/hour", async (req, res, next) => {
     const result = {

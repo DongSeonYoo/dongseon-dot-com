@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
-const redisClient = require("../config/database/redis");
+const redisClient = require("./config/database/redis");
+
 
 const pagesRoute = require("./router/pages");
 const accountApi = require("./router/account");

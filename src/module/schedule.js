@@ -2,7 +2,7 @@ const schedule = require("node-schedule");
 const rule = new schedule.RecurrenceRule();
 
 const redisClient = require("../../config/database/redis");
-const pool = require("../../config/database/postgresql");
+const pool = require("../config/database/postgresql");
 
 //매 0분마다 (한시간마다) 실행
 rule.minute = 0;

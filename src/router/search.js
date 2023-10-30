@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const pool = require("../../config/database/postgresql");
+const pool = require("../config/database/postgresql");
 const authGuard = require("../middleware/authGuard");
 
 router.get("/post", authGuard, async (req, res, next) => {
