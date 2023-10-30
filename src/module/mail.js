@@ -1,5 +1,5 @@
 const nodeMailer = require("nodemailer");
-const redisClient = require("../../config/database/redis");
+const redisClient = require("../config/database/redis");
 const env = require('../config/env');
 
 const sendWelcomeEmail = async (email) => {

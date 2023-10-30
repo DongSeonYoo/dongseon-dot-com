@@ -16,7 +16,7 @@ const bcryptUtil = require("../module/hashing");
 const jwtUtil = require("../module/jwt");
 const emailHandler = require("../module/mailHandler");
 
-const AWS = require("../../config/s3");
+const AWS = require("../config/aws");
 const { BadRequestException } = require('../module/customError');
 const env = require('../config/env');
 const s3 = new AWS.S3();

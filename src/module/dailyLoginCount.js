@@ -1,4 +1,4 @@
-const redisClient = require("../../config/database/redis");
+const redisClient = require("../config/database/redis");
 
 const writeUser = async (loginId) => {
     try {

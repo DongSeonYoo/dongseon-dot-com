@@ -1,7 +1,7 @@
-require("dotenv").config();
+const env = require('./env');
 
 module.exports = {
-    secretKey: process.env.JWT_SECRET_KEY,
+    secretKey: env.JWT_SECRET_KEY,
     accessTokenOption: {
         "algorithm": "HS256",
         "expiresIn": "1h",

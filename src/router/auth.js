@@ -6,7 +6,7 @@ const adminAuth = require('../middleware/adminAuth');
 const passport = require("passport");
 const exception = require("../module/exception");
 const emailHandler = require("../module/mailHandler");
-const redisClient = require("../../config/database/redis");
+const redisClient = require("../config/database/redis");
 
 const jwtUtil = require("../module/jwt");
 require("dotenv").config();

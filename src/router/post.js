@@ -5,7 +5,7 @@ const exception = require("../module/exception");
 const { maxPostIdLength, maxPostTitleLength, maxPostContentLength, maxItemPerPageOfCommunity } = require("../module/global");
 const authGuard = require("../middleware/authGuard");
 
-const AWS = require("../../config/s3");
+const AWS = require("../config/aws");
 const { BadRequestException, NotFoundException } = require('../module/customError');
 const env = require('../config/env');
 const s3 = new AWS.S3();

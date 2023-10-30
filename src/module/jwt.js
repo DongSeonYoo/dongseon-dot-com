@@ -1,4 +1,4 @@
-const { secretKey, accessTokenOption, refreshTokenOption } = require("../../config/secretKey");
+const { secretKey, accessTokenOption, refreshTokenOption } = require("../config/secretKey");
 const env = require('../config/env');
 const dailyLoginCount = require("../module/dailyLoginCount");
 const jwt = require("jsonwebtoken");

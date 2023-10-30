@@ -1,4 +1,5 @@
-const AWS = require("../../config/s3");
+const AWS = require("../config/aws");
+
 const multer = require("multer");
 const multerS3 = require("multer-s3-transform");
 const sharp = require("sharp");
