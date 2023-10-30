@@ -1,27 +1,27 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
-const redisClient = require("./config/database/redis");
+const redisClient = require("../config/database/redis");
 
-const pagesRoute = require("./src/router/pages");
-const accountApi = require("./src/router/account");
-const postApi = require("./src/router/post");
-const commentApi = require("./src/router/comment");
-const replyApi = require("./src/router/reply");
-const authApi = require("./src/router/auth");
-const logApi = require("./src/router/log");
-const loginCountApi = require("./src/router/loginCount");
-const listApi = require("./src/router/list");
-const searchApi = require("./src/router/search");
-const uploaderApi = require("./src/router/uploader");
+const pagesRoute = require("./router/pages");
+const accountApi = require("./router/account");
+const postApi = require("./router/post");
+const commentApi = require("./router/comment");
+const replyApi = require("./router/reply");
+const authApi = require("./router/auth");
+const logApi = require("./router/log");
+const loginCountApi = require("./router/loginCount");
+const listApi = require("./router/list");
+const searchApi = require("./router/search");
+const uploaderApi = require("./router/uploader");
 
-const loggingSetting = require('./src/middleware/loggingSetting');
-const errorHandling = require("./src/middleware/errorHandling");
+const loggingSetting = require('./middleware/loggingSetting');
+const errorHandling = require("./middleware/errorHandling");
 
 const passport = require("passport");
-const passportConfig = require("./src/module/passport");
+const passportConfig = require("./module/passport");
 
-require("./src/module/schedule");
+require("./module/schedule");
 require("dotenv").config();
 
 // redis 연결
