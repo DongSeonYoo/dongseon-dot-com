@@ -2,11 +2,12 @@ const passport = require('passport');
 const KakaoStrategy = require('passport-kakao').Strategy;
 const pool = require("../../../config/database/postgresql");
 const { BadRequestException } = require('../customError');
+const env = require("../../config/env");
 
 module.exports = () => {
     passport.use('kakao', new KakaoStrategy({
-        clientID: process.env.KAKAO_ID,
-        callbackURL: process.env.KAKAO_CALLBACKURL,
+        clientID: env.KAKAO_ID,
+        callbackURL: env.KAKAO_CALLBACKURL,
     }, async (accessToken, refreshToken, profile, done) => {
         // 인증 전략 실행
         try {

@@ -1,6 +1,4 @@
-require("dotenv").config();
-
-const AWS = require("aws-sdk");
+const AWS = require("../../config/s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3-transform");
 const sharp = require("sharp");
@@ -8,6 +6,7 @@ const path = require("path");
 
 const { maxPostImageCount } = require("../module/global");
 const { BadRequestException } = require("../module/customError");
+const env = require('../config/env');
 
 const s3 = new AWS.S3();
 const allowedExtensions = ['.png', '.jpg', '.jpeg'];
@@ -15,7 +14,7 @@ const allowedExtensions = ['.png', '.jpg', '.jpeg'];
 const postImageUploader = multer({
     storage: multerS3({
         s3: s3,
-        bucket: process.env.AWS_BUCKET_NAME,
+        bucket: env.AWS_BUCKET_NAME,
         contentType: multerS3.AUTO_CONTENT_TYPE,
         shouldTransform: true,
         transforms: [
@@ -44,7 +43,7 @@ const postImageUploader = multer({
 const profileImageUploder = multer({
     storage: multerS3({
         s3: s3,
-        bucket: process.env.AWS_BUCKET_NAME,
+        bucket: env.AWS_BUCKET_NAME,
         contentType: multerS3.AUTO_CONTENT_TYPE,
         id: "profileImage",
         key: (req, file, callback) => {

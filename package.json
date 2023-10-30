@@ -36,7 +36,7 @@
     "nodemon": "^2.0.22"
   },
   "scripts": {
-    "start": "nodemon ./bin/www.js",
+    "start": "nodemon ./src/app.js",
     "test": "jest --runInBand"
   },
   "name": "node",
@@ -44,5 +44,6 @@
   "version": "1.0.0",
   "main": "server.js",
   "author": "",
+  "type": "commonjs",
   "license": "ISC"
 }

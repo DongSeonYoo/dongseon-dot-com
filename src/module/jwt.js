@@ -1,4 +1,5 @@
 const { secretKey, accessTokenOption, refreshTokenOption } = require("../../config/secretKey");
+const env = require('../config/env');
 const dailyLoginCount = require("../module/dailyLoginCount");
 const jwt = require("jsonwebtoken");
 
@@ -16,7 +17,7 @@ const userSign = async (user) => {
 
 const adminSign = () => {
     const payload = {
-        userPk: process.env.ADMIN_PK,
+        userPk: env.ADMIN_PK,
         role: "admin",
     }
     return jwt.sign(payload, secretKey, accessTokenOption);

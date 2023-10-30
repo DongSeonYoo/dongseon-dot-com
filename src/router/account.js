@@ -18,6 +18,7 @@ const emailHandler = require("../module/mailHandler");
 
 const AWS = require("../../config/s3");
 const { BadRequestException } = require('../module/customError');
+const env = require('../config/env');
 const s3 = new AWS.S3();
 
 require("dotenv").config();
@@ -34,8 +35,8 @@ router.post("/login", async (req, res, next) => {
         // request값 유효성 검증
         exception(loginId, "loginId").checkInput().checkLength(1, maxLoginIdLength);
         exception(password, "password").checkInput().checkLength(1, maxPwLength);
-        if (loginId === process.env.ADMIN_ID && password === process.env.ADMIN_PW) {
-            const accessToken = await jwtUtil.adminSign();
+        if (loginId === env.ADMIN_ID && password === env.ADMIN_PW) {
+            const accessToken = jwtUtil.adminSign();
             res.cookie('accessToken', accessToken);
             return res.redirect('/admin');
         }
@@ -382,13 +383,13 @@ router.delete("/", authGuard, async (req, res, next) => {
 
         if (data.rowCount !== 0) {
             const objects = await s3.listObjects({
-                Bucket: process.env.AWS_BUCKET_NAME,
+                Bucket: env.AWS_BUCKET_NAME,
                 Prefix: req.decoded.loginId,
             }).promise();
 
             if (objects.Contents.length > 0) {
                 const deleteParams = {
-                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Bucket: env.AWS_BUCKET_NAME,
                     Delete: {
                         Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
                     }

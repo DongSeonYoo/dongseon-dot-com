@@ -6,9 +6,9 @@ const exception = require("../module/exception");
 const adminAuth = require("../middleware/adminAuth");
 
 const { maxItemPerPageOfLog, maxLoginIdLength } = require("../module/global");
-require("dotenv").config();
+const env = require('../config/env');
 
-const redisRecentSearchKey = process.env.REDIS_RECENT_SEARCH;
+const redisRecentSearchKey = env.REDIS_RECENT_SEARCH;
 // 과연 이 log 라우터에 로그불러오기, 최근검색어 둘다 넣는게 맞는건지? 파일을 역할별로 분리해야 할것같기도 하고
 
 // 한 페이지의 로그와 전체 로그의 개수를 보내주는 api
@@ -46,7 +46,7 @@ router.get("/", adminAuth, async (req, res, next) => {
         }
 
         // db연결
-        connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
+        connect = await mongoClient.connect(env.MONGO_DB_LOGS);
 
         // mongodb 쿼리 실행
         const logData = await connect

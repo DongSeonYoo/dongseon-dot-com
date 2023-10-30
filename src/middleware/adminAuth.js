@@ -1,7 +1,6 @@
-require("dotenv").config();
-
 const jwt = require("jsonwebtoken");
 const { UnauthorizedException, ForbbidenException } = require("../module/customError");
+const env = require('../config/env');
 
 module.exports = (req, res, next) => {
     // 쿠키에 담긴 토큰을 추출
@@ -12,7 +11,7 @@ module.exports = (req, res, next) => {
             throw new Error("invalid token");
         }
 
-        req.decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+        req.decoded = jwt.verify(accessToken, env.JWT_SECRET_KEY);
         const { role } = req.decoded;
         if (role !== "admin") {
             return next(new ForbbidenException("권한이 거부되었습니다"));

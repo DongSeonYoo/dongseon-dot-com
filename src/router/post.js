@@ -7,6 +7,7 @@ const authGuard = require("../middleware/authGuard");
 
 const AWS = require("../../config/s3");
 const { BadRequestException, NotFoundException } = require('../module/customError');
+const env = require('../config/env');
 const s3 = new AWS.S3();
 require("dotenv").config();
 
@@ -177,7 +178,7 @@ router.delete("/", authGuard, async (req, res, next) => {
             if (deletedImagekey) {
                 for (const imgPath of deletedImagekey) {
                     await s3.deleteObject({
-                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Bucket: env.AWS_BUCKET_NAME,
                         Key: imgPath,
                         // 만약 s3 연결에 문제가 생겼다면? 에러를 던지고 롤백
                     }, (err, data) => {

@@ -1,8 +1,7 @@
 const mongoClient = require("mongodb").MongoClient;
 const moment = require("moment");
 const momentTimeZone = require("moment-timezone");
-
-require("dotenv").config();
+const env = require('../config/env');
 // 한국시간 설정
 momentTimeZone.tz.setDefault("Asia/Seoul");
 
@@ -21,7 +20,7 @@ const logging = async (req, res, resBody) => {
 
     let connect = null;
     try {
-        connect = await mongoClient.connect(process.env.MONGO_DB_LOGS);
+        connect = await mongoClient.connect(env.MONGO_DB_LOGS);
         await connect
             .db()
             .collection("api_logs")
