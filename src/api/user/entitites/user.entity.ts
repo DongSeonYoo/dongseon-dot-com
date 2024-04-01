@@ -19,17 +19,20 @@ export class User {
   @ApiProperty()
   email: string;
 
-  @ApiProperty()
-  profileImg: string;
+  @ApiProperty({ required: false })
+  profileImg?: string;
 
-  @ApiProperty()
-  provider: string;
+  @ApiProperty({ required: false })
+  provider?: string;
 
   @ApiProperty()
   createdAt: Date;
 
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  deletedAt: Date | null;
 
   constructor(user: User) {
     Object.assign(this, user);
