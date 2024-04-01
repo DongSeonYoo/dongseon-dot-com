@@ -37,13 +37,13 @@ export class SignupRequestDto {
 
   @IsOptional()
   @Matches(/^https:\/\/yoodongseon\.s3\.ap-northeast-2\.amazonaws\.com\/.+$/)
-  @ApiProperty()
-  profileImg?: string | null;
+  @ApiProperty({ required: false })
+  profileImg?: string;
 
   @IsOptional()
   @IsString()
   @IsEnum(Provider)
-  @ApiProperty()
+  @ApiProperty({ required: false })
   provider: Provider;
 }
 
