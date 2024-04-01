@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Comment {
+  idx       Int       @id @default(autoincrement())
+  userIdx   Int       @default(autoincrement()) @map("user_idx")
+  postIdx   Int       @default(autoincrement()) @map("post_idx")
+  content   String    @db.VarChar
+  createdAt DateTime  @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime  @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamptz(6)
+  postTb    Post    @relation(fields: [postIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_post_tb_to_comment_tb")
+  userTb    User    @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_tb_to_comment_tb")
+  replyTb   Reply[]
+
+  @@map("comment_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model HashTag {
+  idx       Int         @id @default(autoincrement())
+  name      String      @db.VarChar
+  tagCount  Int         @default(0) @map("tag_count")
+  createdAt DateTime    @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime    @map("updated_at") @db.Timestamptz(6)
+  postTag PostTag[]
+
+  @@map("hash_tag_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model LoggedInUser {
+  idx       Int      @id @default(autoincrement())
+  userIdx   Int      @default(autoincrement()) @map("user_idx")
+  createdAt DateTime @map("created_at") @db.Timestamptz(6)
+  user    User   @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_tb_to_logged_in_user")
+
+  @@map("logged_in_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model PostImg {
+  postIdx Int    @id @default(autoincrement()) @map("post_idx")
+  imgPath String @map("img_path")
+  post  Post @relation(fields: [postIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_post_tb_to_post_img_tb")
+
+  @@map("post_img_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model PostTag {
+  postIdx   Int       @default(autoincrement()) @map("post_idx")
+  tagIdx    Int       @default(autoincrement()) @map("tag_idx")
+  hashTag HashTag @relation(fields: [tagIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_hash_tag_tb_to_post_tag_tb")
+  post    Post    @relation(fields: [postIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_post_tb_to_post_tag_tb")
+
+  @@id([postIdx, tagIdx])
+  @@map("post_tag_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Post {
+  idx       Int         @id @default(autoincrement())
+  userIdx   Int         @default(autoincrement()) @map("user_idx")
+  title     String?     @db.VarChar
+  content   String?
+  createdAt DateTime    @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime    @map("updated_at") @db.Timestamptz(6)
+  deletedAt DateTime?   @map("deleted_at") @db.Timestamptz(6)
+  comment Comment[]
+  postImg PostImg?
+  postTag PostTag[]
+  user    User      @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_tb_to_post_tb")
+
+  @@map("post_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Reply {
+  idx        Int       @id @default(autoincrement())
+  userIdx    Int       @default(autoincrement()) @map("user_idx")
+  commentIdx Int       @default(autoincrement()) @map("comment_idx")
+  content    String
+  createdAt  DateTime  @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  comment  Comment @relation(fields: [commentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_comment_tb_to_reply_tb")
+  user     User    @relation(fields: [userIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_user_tb_to_reply_tb")
+
+  @@map("reply_tb")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model User {
+  idx          Int            @id @default(autoincrement())
+  loginId      String         @map("login_id") @db.VarChar
+  password     String         @db.Char(60)
+  name         String         @db.VarChar
+  phoneNumber  String         @map("phone_number") @db.Char(11)
+  email        String         @db.VarChar(256)
+  profileImg   String         @map("profile_img")
+  createdAt    DateTime       @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime       @map("updated_at") @db.Timestamptz(6)
+  deletedAt    DateTime?      @map("deleted_at") @db.Timestamptz(6)
+  comment    Comment[]
+  loggedInUser LoggedInUser[]
+  post       Post[]
+  reply      Reply[]
+
+  @@unique([loginId, deletedAt], map: "unique_login_id_deleted_at")
+  @@map("user_tb")
+}
